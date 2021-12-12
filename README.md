@@ -1,4 +1,4 @@
-# Realtimeplot_Frontend
+# Realtimeplot Frontend
 Forked Version from : https://github.com/Fritz-Haber-Institut/Realtimeplot1_Frontend
 
 ## Project setup
