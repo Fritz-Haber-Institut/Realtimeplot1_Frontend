@@ -4,7 +4,7 @@
       <v-form ref="Login" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-email" label="Email" v-model="LoginValues.login_name" :rules="[(v) => !!v || $General.NoEmpty(), (v) => /.+@.+\..+/.test(v) || $General.WrongEmailFormat()]"></v-text-field>
+            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Username" v-model="LoginValues.username" :rules="[(v) => !!v || $General.NoEmpty()]"></v-text-field>
             <v-text-field autocomplete="new-password" filled prepend-inner-icon="mdi-star" label="Password" v-model="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.NoEmpty()]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
           </v-col>
         </v-row>
@@ -36,7 +36,7 @@ export default {
     Login() {
       if (this.$refs.Login.validate()) {
         this.$Axios
-          .post(this.$General.APILogin(), this.LoginValues, this.$General.GetHeaderValue())
+          .post(this.$General.APILogin(), this.LoginValues, this.$General.GetHeaderValue(window.btoa(this.LoginValues.username + ':' + this.LoginValues.password), false))
           .then((LoginResult) => {
             console.log(LoginResult);
           })

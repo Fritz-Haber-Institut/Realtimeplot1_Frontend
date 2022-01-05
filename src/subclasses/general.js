@@ -1,7 +1,7 @@
 export default {
     // APIs
     MainDomain: function () {
-        return (window.location.hostname.includes('localhost') || window.location.hostname.includes('192.168')) ? 'http://localhost:5000' : '';
+        return 'http://192.168.0.152:5000';
     },
     APILogin: function () { return this.MainDomain() + "/auth/get_access_token"; },
 
@@ -21,8 +21,14 @@ export default {
         }
     },
 
-    GetHeaderValue: function (Authorization) {
-        return { headers: { 'Content-Type': 'application/json', 'Authorization': (Authorization != null) ? 'Bearer ' + Authorization : '' } };
+    GetHeaderValue: function (Authorization, Bearer) {
+        if (Bearer) {
+            return { headers: { 'Content-Type': 'application/json', 'Authorization': (Authorization != null) ? 'Bearer ' + Authorization : '' } };
+
+        }
+        else {
+            return { headers: { 'Content-Type': 'application/json', 'Authorization': (Authorization != null) ? 'Basic ' + Authorization : '' } };
+        }
     },
 
     // Default Messages
