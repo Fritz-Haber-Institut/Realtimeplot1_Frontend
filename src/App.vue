@@ -1,18 +1,31 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <v-btn to="/" link>
+    <v-app-bar app color="info" dark>
+      <v-btn small to="/" link fab>
         <v-icon>mdi-home</v-icon>
-        <span class="ml-2">Homepage</span>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn href="https://vuetifyjs.com/en" target="_blank" text>
-        <v-icon>mdi-open-in-new</v-icon>
-        <span class="ml-2">Vuetify V2.4 (MIT License)</span>
+      <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
+        <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-app-bar>
+
+    <v-navigation-drawer v-model="GeneralSettings.Drawer" color="info" absolute right temporary>
+      <v-list nav dense>
+        <v-list-item dark>
+          <v-list-item-content>
+            <v-list-item-title class="text-h6">
+              Name
+            </v-list-item-title>
+            <v-list-item-subtitle class="mt-2">Email</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
     <v-main>
-      <router-view />
+      <transition name="slide-fade" mode="out-in">
+        <router-view :key="$route.fullPath" />
+      </transition>
     </v-main>
   </v-app>
 </template>
@@ -20,8 +33,21 @@
 <script>
 export default {
   name: 'App',
+  components: {
 
-  data: () => ({}),
+  },
+  data: () => ({
+    GeneralSettings: {
+      Drawer: false,
+      UserInfos: null,
+    },
+  }),
+  methods: {
+
+  },
+  mounted() {
+
+  },
 };
 </script>
 <style>
@@ -33,5 +59,28 @@ export default {
 }
 body {
   padding: 0 !important;
+}
+
+/* Fade Animation */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Fade-Slide Animation */
+.slide-fade-enter-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
 }
 </style>
