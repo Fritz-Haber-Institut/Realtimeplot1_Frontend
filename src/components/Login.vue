@@ -26,6 +26,7 @@ export default {
   name: 'Login',
 
   data: () => ({
+    LocalStorage: {},
     GeneralValues: {
       PasswordShow: false,
       AlertMessage: '',
@@ -39,6 +40,8 @@ export default {
           .post(this.$General.APILogin(), this.LoginValues, this.$General.GetHeaderValue(window.btoa(this.LoginValues.username + ':' + this.LoginValues.password), false))
           .then((LoginResult) => {
             console.log(LoginResult);
+            this.LocalStorage.Token = LoginResult.data.access_token;
+            this.$General.SetLSSettings(this.LocalStorage);
           })
           .catch((Error) => {
             console.log(Error);
@@ -47,6 +50,10 @@ export default {
       }
     },
   },
-  mounted() {},
+  mounted() {
+    setInterval(() => {
+      this.LocalStorage = this.$General.GetLSSettings();
+    }, 100);
+  },
 };
 </script>
