@@ -5,24 +5,44 @@
         <v-icon>mdi-home</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
+      <v-btn small v-if="GeneralSettings.UserInfos != null" @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
         <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="GeneralSettings.Drawer" color="info" absolute right temporary>
+    <v-navigation-drawer v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="info" absolute right temporary>
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
-            <v-list-item-title class="text-h6">
-              Name
-            </v-list-item-title>
-            <v-list-item-subtitle class="mt-2">Email</v-list-item-subtitle>
+            <v-list-item-title class="text-h6"> {{ GeneralSettings.UserInfos.login_name }} </v-list-item-title>
+            <v-list-item-subtitle class="mt-2">{{ GeneralSettings.UserInfos.email || '[ No Email ]' }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <v-divider></v-divider>
+      <v-list dense nav dark>
+        <v-list-item v-for="item in GeneralSettings.Navigation" :key="item.title" link :to="item.url">
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn color="secondary" block @click="Logout()">
+            <v-icon small class="mr-2">mdi-logout</v-icon>
+            Logout
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
     <v-main>
+      <transition name="fade" mode="out-in">
+        <Header :title="$router.currentRoute.meta.title" :icon="$router.currentRoute.meta.icon" :key="$route.fullPath" />
+      </transition>
       <transition name="slide-fade" mode="out-in">
         <router-view :key="$route.fullPath" />
       </transition>
@@ -31,22 +51,39 @@
 </template>
 
 <script>
+import Header from './components/Header.vue';
 export default {
-  name: 'App',
   components: {
-
+    Header,
   },
   data: () => ({
     GeneralSettings: {
       Drawer: false,
-      UserInfos: null,
+      UserInfos: {},
+      Navigation: [{ title: 'Dashboard', icon: 'mdi-view-dashboard', url: '/dashboard' }],
     },
   }),
   methods: {
-
+    GetInfos() {
+      this.$Axios
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then((LoginResult) => {
+          this.GeneralSettings.UserInfos = LoginResult.data;
+        })
+        .catch((Error) => {
+          console.log(Error);
+          this.GeneralSettings.UserInfos = null;
+        });
+    },
+    Logout() {
+      this.LocalStorage = this.$General.GetLSSettings();
+      this.LocalStorage.Token = null;
+      this.$General.SetLSSettings(this.LocalStorage);
+      window.location.href = '/login';
+    },
   },
   mounted() {
-
+    this.GetInfos();
   },
 };
 </script>

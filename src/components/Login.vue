@@ -23,8 +23,6 @@
 
 <script>
 export default {
-  name: 'Login',
-
   data: () => ({
     LocalStorage: {},
     GeneralValues: {
@@ -42,6 +40,7 @@ export default {
             console.log(LoginResult);
             this.LocalStorage.Token = LoginResult.data.access_token;
             this.$General.SetLSSettings(this.LocalStorage);
+            window.location.href = '/dashboard';           
           })
           .catch((Error) => {
             console.log(Error);

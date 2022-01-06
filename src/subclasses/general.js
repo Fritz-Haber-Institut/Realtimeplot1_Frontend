@@ -24,7 +24,7 @@ export default {
 
     GetHeaderValue: function (Authorization, Bearer) {
         if (Bearer) {
-            return { headers: { 'Content-Type': 'application/json', 'Authorization': (Authorization != null) ? 'Bearer ' + Authorization : '' } };
+            return { headers: { 'Content-Type': 'application/json', 'x-access-tokens': Authorization } };
 
         }
         else {
