@@ -3,7 +3,7 @@ Forked Version from : https://github.com/Fritz-Haber-Institut/Realtimeplot1_Fron
 
 ## Project setup
 ```
-npm install
+npm install npm-check-updates -S
 ```
 
 ### Compiles and hot-reloads for development
