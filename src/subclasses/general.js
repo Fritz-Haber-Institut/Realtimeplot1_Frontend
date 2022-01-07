@@ -35,5 +35,9 @@ export default {
     // Default Messages
     NoEmpty: function () { return "Field cannot be empty!"; },
     WrongInfos: function () { return "Wrong email or password!"; },
+    WrongInfos2: function () { return "Informations are not Complete"; },
+    WrongInfos3: function () { return "Username already exists"; },    
     WrongEmailFormat: function () { return "Wrong Email format!"; },
+    Success: function () { return "Operations successfully completed!"; },
+    DoubleEmail: function () { return "Email already exists"; },
 }

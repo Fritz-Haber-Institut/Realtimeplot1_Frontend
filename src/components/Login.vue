@@ -10,8 +10,8 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert v-if="GeneralValues.AlertMessage != ''" color="error" dark>
-              {{ GeneralValues.AlertMessage }}
+            <v-alert rounded="xl" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+              {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Login()">Login </v-btn>
           </v-col>
@@ -27,7 +27,10 @@ export default {
     LocalStorage: {},
     GeneralValues: {
       PasswordShow: false,
-      AlertMessage: '',
+      AlertMessage: {
+        Message: '',
+        Color: '',
+      },
     },
     LoginValues: {},
   }),
@@ -40,11 +43,16 @@ export default {
             console.log(LoginResult);
             this.LocalStorage.Token = LoginResult.data.access_token;
             this.$General.SetLSSettings(this.LocalStorage);
-            window.location.href = '/dashboard';           
+            this.GeneralValues.AlertMessage.Message = this.$General.Success();
+            this.GeneralValues.AlertMessage.Color = 'success';
+            setTimeout(() => {
+              this.$General.ReloadPage('/dashboard');
+            }, 2000);
           })
           .catch((Error) => {
             console.log(Error);
-            this.Alerts.Message = this.$General.WrongInfos();
+            this.GeneralValues.AlertMessage.Message = this.$General.WrongInfos();
+            this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
     },

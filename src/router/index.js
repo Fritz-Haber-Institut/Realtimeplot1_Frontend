@@ -3,20 +3,24 @@ import VueRouter from 'vue-router'
 import Axios from 'axios'
 import General from '../subclasses/general.js';
 
-import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+
+import Profile from '../views/Profile.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Accounts from '../views/Accounts.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '*',
-    redirect: '/'
+    redirect: '/login'
   },
-  { path: '/', component: Home, meta: { requiresAuth: false, title: "Home Page", icon: "mdi-home-outline" } },
   { path: '/login', component: Login, meta: { requiresAuth: false, title: "Login", icon: "mdi-information-outline" } },
+  
+  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: "My Profile",button:"Update My Profile", icon: "mdi-information-outline" } },  
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true, title: "Dashboard", icon: "mdi-information-outline" } },
+  { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: "Accounts", icon: "mdi-information-outline" } },  
 ]
 
 const router = new VueRouter({

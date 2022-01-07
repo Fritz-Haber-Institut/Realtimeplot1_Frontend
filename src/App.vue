@@ -1,16 +1,16 @@
 <template>
   <v-app>
-    <v-app-bar app color="info" dark>
-      <v-btn small to="/" link fab>
+    <v-app-bar small v-if="GeneralSettings.UserInfos != null" app color="info" dark>
+      <v-btn small to="/dashboard" link fab>
         <v-icon>mdi-home</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn small v-if="GeneralSettings.UserInfos != null" @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
+      <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
         <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="info" absolute right temporary>
+    <v-navigation-drawer v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="secondary" app right temporary>
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
@@ -32,7 +32,7 @@
       </v-list>
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn color="secondary" block @click="Logout()">
+          <v-btn color="warning" block @click="Logout()">
             <v-icon small class="mr-2">mdi-logout</v-icon>
             Logout
           </v-btn>
@@ -44,7 +44,7 @@
         <Header :title="$router.currentRoute.meta.title" :icon="$router.currentRoute.meta.icon" :key="$route.fullPath" />
       </transition>
       <transition name="slide-fade" mode="out-in">
-        <router-view :key="$route.fullPath" />
+        <router-view :user="GeneralSettings.UserInfos" :key="$route.fullPath" />
       </transition>
     </v-main>
   </v-app>
@@ -60,9 +60,25 @@ export default {
     GeneralSettings: {
       Drawer: false,
       UserInfos: {},
-      Navigation: [{ title: 'Dashboard', icon: 'mdi-view-dashboard', url: '/dashboard' }],
+      Navigation: [
+        { title: 'My Account', icon: 'mdi-cogs', url: '/profile' },
+        { title: 'Dashboard', icon: 'mdi-view-dashboard', url: '/dashboard' },
+        { title: 'Manage Users', icon: 'mdi-account-multiple-outline', url: '/accounts' },
+      ],
     },
   }),
+  watch: {
+    $route(to, from) {
+      if (to != from) {
+        this.GetInfos();
+      }
+    },
+    'GeneralSettings.UserInfos'(Value) {
+      if (Value) {
+        this.GeneralSettings.UserInfos = Value;
+      }
+    },
+  },
   methods: {
     GetInfos() {
       this.$Axios
@@ -79,7 +95,7 @@ export default {
       this.LocalStorage = this.$General.GetLSSettings();
       this.LocalStorage.Token = null;
       this.$General.SetLSSettings(this.LocalStorage);
-      window.location.href = '/login';
+      this.$General.ReloadPage('/login');
     },
   },
   mounted() {
