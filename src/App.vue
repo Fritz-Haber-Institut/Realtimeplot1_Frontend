@@ -59,7 +59,7 @@ export default {
   data: () => ({
     GeneralSettings: {
       Drawer: false,
-      UserInfos: {},
+      UserInfos: null,
       Navigation: [
         { title: 'My Account', icon: 'mdi-cogs', url: '/profile' },
         { title: 'Dashboard', icon: 'mdi-view-dashboard', url: '/dashboard' },

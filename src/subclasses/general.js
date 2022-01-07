@@ -1,7 +1,7 @@
 export default {
     // APIs
     MainDomain: function () {
-        return 'http://192.168.0.152:5000';
+        return 'http://localhost:5000';
     },
     APILogin: function () { return this.MainDomain() + "/auth/get_access_token"; },
     APIUsers: function () { return this.MainDomain() + "/auth/users"; },
