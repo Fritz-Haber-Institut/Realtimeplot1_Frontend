@@ -4,8 +4,8 @@
       <v-form ref="Login" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Username" v-model="LoginValues.username" :rules="[(v) => !!v || $General.NoEmpty()]"></v-text-field>
-            <v-text-field autocomplete="new-password" filled prepend-inner-icon="mdi-star" label="Password" v-model="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.NoEmpty()]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
+            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Username" v-model="LoginValues.username" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
+            <v-text-field autocomplete="new-password" filled prepend-inner-icon="mdi-star" label="Password" v-model="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.NoEmpty]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -43,7 +43,7 @@ export default {
             console.log(LoginResult);
             this.LocalStorage.Token = LoginResult.data.access_token;
             this.$General.SetLSSettings(this.LocalStorage);
-            this.GeneralValues.AlertMessage.Message = this.$General.Success();
+            this.GeneralValues.AlertMessage.Message = this.$General.Success;
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
               this.$General.ReloadPage('/dashboard');
@@ -51,7 +51,7 @@ export default {
           })
           .catch((Error) => {
             console.log(Error);
-            this.GeneralValues.AlertMessage.Message = this.$General.WrongInfos();
+            this.GeneralValues.AlertMessage.Message = this.$General.WrongInfos;
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }

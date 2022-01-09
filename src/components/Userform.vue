@@ -4,14 +4,14 @@
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="6">
-            <v-text-field autocomplete="new-first_name" filled prepend-inner-icon="mdi-star" label="Firstname" v-model="FormValues.first_name" :rules="[(v) => !!v || $General.NoEmpty()]"></v-text-field>
+            <v-text-field autocomplete="new-first_name" filled prepend-inner-icon="mdi-star" label="Firstname" v-model="FormValues.first_name" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" label="Lastname" v-model="FormValues.last_name" :rules="[(v) => !!v || $General.NoEmpty()]"></v-text-field>
+            <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" label="Lastname" v-model="FormValues.last_name" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" label="Email" v-model="FormValues.email" :rules="[(v) => !!v || $General.NoEmpty(), (v) => /.+@.+\..+/.test(v) || $General.WrongEmailFormat()]"></v-text-field>
-            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Login Name" v-model="FormValues.login_name" :rules="[(v) => !!v || $General.NoEmpty()]"></v-text-field>
+            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" label="Email" v-model="FormValues.email" :rules="[(v) => !!v || $General.NoEmpty, (v) => /.+@.+\..+/.test(v) || $General.WrongEmailFormat]"></v-text-field>
+            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Login Name" v-model="FormValues.login_name" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -96,7 +96,7 @@ export default {
         };
         this.$Axios(AxiosConfig)
           .then(() => {
-            this.GeneralValues.AlertMessage.Message = this.$General.Success();
+            this.GeneralValues.AlertMessage.Message = this.$General.Success;
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
               this.$General.ReloadPage();
@@ -104,7 +104,7 @@ export default {
           })
           .catch((Error) => {
             console.log(Error);
-            this.GeneralValues.AlertMessage.Message = this.$General.WrongInfos3();
+            this.GeneralValues.AlertMessage.Message = this.$General.WrongInfos3;
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
