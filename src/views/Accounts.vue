@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-card class="pa-5"> Accounts </v-card>
+    <v-card class="pa-5"> {{ $General.GetString('manageusers') }} </v-card>
   </v-container>
 </template>
 

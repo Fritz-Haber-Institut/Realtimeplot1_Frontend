@@ -1,0 +1,80 @@
+{
+    "Strings": [
+        {
+            "value": "profile",
+            "en": "My Account"
+        },
+        {
+            "value": "logout",
+            "en": "Logout"
+        },
+        {
+            "value": "login",
+            "en": "Login"
+        },
+        {
+            "value": "dashboard",
+            "en": "Dashboard"
+        },
+        {
+            "value": "loginname",
+            "en": "Login Name"
+        },
+        {
+            "value": "password",
+            "en": "Password"
+        },
+        {
+            "value": "firstname",
+            "en": "First Name"
+        },
+        {
+            "value": "lastname",
+            "en": "Last Name"
+        },
+        {
+            "value": "email",
+            "en": "Email Address"
+        },
+        {
+            "value": "manageusers",
+            "en": "Manage Users"
+        },
+        {
+            "value": "update",
+            "en": "Update"
+        },
+        {
+            "value": "noempty",
+            "en": "Field cannot be empty!"
+        },
+        {
+            "value": "wronginfos",
+            "en": "Wrong email or password!"
+        },
+        {
+            "value": "wronginfos2",
+            "en": "Informations are not Complete"
+        },
+        {
+            "value": "wronginfos3",
+            "en": "Username already exists"
+        },
+        {
+            "value": "wrongemailformat",
+            "en": "Wrong Email format!"
+        },
+        {
+            "value": "success",
+            "en": "Operations successfully completed!"
+        },
+        {
+            "value": "doubleemail",
+            "en": "Email already exists"
+        },
+        {
+            "value": "noemail",
+            "en": "[ No Email ]"
+        }
+    ]
+}
