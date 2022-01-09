@@ -4,7 +4,7 @@
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model="FormValues.email" :rules="[(v) => !!v || $General.GetString('noempty'), (v) => /.+@.+\..+/.test(v) || $General.GetString('wronginfos3')]"></v-text-field>
+            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model="FormValues.email"></v-text-field>
             <v-text-field autocomplete="new-loginname" filled prepend-inner-icon="mdi-star" :label="$General.GetString('loginname')" v-model="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
             <v-select
               filled
@@ -35,7 +35,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            <v-alert rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Submit()">{{ $router.currentRoute.meta.button }} </v-btn>

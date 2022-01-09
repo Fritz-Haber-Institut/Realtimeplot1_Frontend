@@ -50,7 +50,7 @@
         },
         {
             "value": "wronginfos",
-            "en": "Wrong email or password!"
+            "en": "Wrong login name or password!"
         },
         {
             "value": "wronginfos2",

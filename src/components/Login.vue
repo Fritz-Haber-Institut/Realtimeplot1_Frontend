@@ -10,7 +10,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert rounded="xl" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            <v-alert rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Login()">{{ $General.GetString('login') }} </v-btn>
