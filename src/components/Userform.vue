@@ -10,7 +10,7 @@
             <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" label="Lastname" v-model="FormValues.last_name" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" label="Email" v-model="FormValues.email" :rules="[(v) => !!v || $General.NoEmpty, (v) => /.+@.+\..+/.test(v) || $General.WrongEmailFormat]"></v-text-field>
+            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" label="Email" v-model="FormValues.email" :rules="[(v) => !!v || $General.NoEmpty, (v) => $General.emailRegex.test(v) || $General.WrongEmailFormat]"></v-text-field>
             <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" label="Login Name" v-model="FormValues.login_name" :rules="[(v) => !!v || $General.NoEmpty]"></v-text-field>
           </v-col>
         </v-row>
