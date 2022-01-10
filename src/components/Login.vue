@@ -13,7 +13,7 @@
             <v-alert rounded="xl" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
-            <v-btn color="info" dark block @click="Login()">Login </v-btn>
+            <v-btn color="info" dark block @click="Login">Login</v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -32,9 +32,17 @@ export default {
         Color: '',
       },
     },
-    LoginValues: {},
+    LoginValues: {
+      username: '',
+      password: ''
+    },
   }),
   methods: {
+    initiateLoginOnEnterKey (e) {
+      if (e.key === 'Enter' && this.LoginValues.username !== '' && this.LoginValues.password !== '') {
+        this.Login()
+      }
+    },
     Login() {
       if (this.$refs.Login.validate()) {
         this.$Axios
@@ -61,6 +69,7 @@ export default {
     setInterval(() => {
       this.LocalStorage = this.$General.GetLSSettings();
     }, 100);
+    document.addEventListener('keydown', this.initiateLoginOnEnterKey)
   },
 };
 </script>

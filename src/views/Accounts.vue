@@ -1,6 +1,5 @@
 <template>
   <v-container fluid>
-    <v-card class="pa-5"> Accounts </v-card>
     <user-table :users="users" @reload-users="getUsers"></user-table>
   </v-container>
 </template>
