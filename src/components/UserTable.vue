@@ -235,7 +235,7 @@ export default {
       return this.isUpdateDialogActive ? `Edit User ${currentUsername}` : 'New User';
     },
     generalFormRules() {
-      return [(v) => !!v || this.$General.NoEmpty, (v) => (v || '').indexOf(' ') < 0 || 'No spaces are allowed'];
+      return [(v) => !!v || this.$General.GetString('noempty'), (v) => (v || '').indexOf(' ') < 0 || 'No spaces are allowed'];
     },
     nameRules() {
       const rules = [];
@@ -257,11 +257,11 @@ export default {
       return this.tempUser.password ? this.generalPasswordRules : [true];
     },
     newUserPasswordRules() {
-      const rules = [(v) => (!!v && v) === this.formValidation.confirmedPassword || this.$General.passwordsDontMatch];
+      const rules = [(v) => (!!v && v) === this.formValidation.confirmedPassword || this.$General.GetString('passwordsdontmatch')];
       return this.generalPasswordRules.concat(rules);
     },
     emailRules() {
-      const rules = [(v) => this.$General.emailRegex.test(v) || this.$General.WrongEmailFormat];
+      const rules = [(v) => this.$General.emailRegex.test(v) || this.$General.GetString('wrongemailformat')];
       return this.generalFormRules.concat(rules);
     },
     radioGroupRules() {
@@ -370,7 +370,7 @@ export default {
           .then(() => {
             this.dialogAlert.isVisible = true;
             this.dialogAlert.type = 'success';
-            this.dialogAlert.text = this.$General.userTableUpdateDialogSuccess;
+            this.dialogAlert.text = this.$General.GetString('usertableupdatedialogsuccess');
             this.$emit('reload-users');
           })
           .catch((e) => {

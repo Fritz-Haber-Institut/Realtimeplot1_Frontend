@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <UserTable :users="users"/>
+    <UserTable :users="users" @reload-users="getUsers"></UserTable>
   </v-container>
 </template>
 

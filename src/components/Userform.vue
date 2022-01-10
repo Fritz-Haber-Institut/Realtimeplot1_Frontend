@@ -38,7 +38,7 @@
             <v-alert rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
-            <v-btn color="info" dark block @click="Submit()">{{ $router.currentRoute.meta.button }} </v-btn>
+            <v-btn color="info" dark block @click="Submit()">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -97,34 +97,40 @@ export default {
   },
   methods: {
     CheckData() {
-      if (this.$props.target == 'current') {
-        this.FormValues.email = this.$props.user == null ? '' : this.$props.user.email;
-        this.FormValues.login_name = this.$props.user == null ? '' : this.$props.user.login_name;
-        this.FormValues.user_type = this.$props.user == null ? '' : this.$props.user.user_type;
-        this.FormValues.first_name = this.$props.user == null ? '' : this.$props.user.first_name;
-        this.FormValues.last_name = this.$props.user == null ? '' : this.$props.user.last_name;
-      } else {
-        //
+      if (this.$props.type == 'PUT') {
+        if (this.$props.target == '/current') {
+          this.FillUserInfos(this.$props.user);
+          this.FormValues.email = this.$props.user == null ? '' : this.$props.user.email;
+          this.FormValues.login_name = this.$props.user == null ? '' : this.$props.user.login_name;
+          this.FormValues.user_type = this.$props.user == null ? '' : this.$props.user.user_type;
+          this.FormValues.first_name = this.$props.user == null ? '' : this.$props.user.first_name;
+          this.FormValues.last_name = this.$props.user == null ? '' : this.$props.user.last_name;
+        } else {
+          var AxiosConfig = { method: 'GET', url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
+          this.$Axios(AxiosConfig)
+            .then((UserInfos) => {
+              this.FillUserInfos(UserInfos.data);
+            })
+            .catch((Error) => {
+              console.log(Error);
+            });
+        }
       }
+    },
+    FillUserInfos(UserInfos) {
+      this.FormValues.email = UserInfos == null ? '' : UserInfos.email;
+      this.FormValues.login_name = UserInfos == null ? '' : UserInfos.login_name;
+      this.FormValues.user_type = UserInfos == null ? '' : UserInfos.user_type;
+      this.FormValues.first_name = UserInfos == null ? '' : UserInfos.first_name;
+      this.FormValues.last_name = UserInfos == null ? '' : UserInfos.last_name;
     },
     Submit() {
       if (this.$refs.Submit.validate()) {
-        var AxiosConfig = {
-          method: this.$props.type,
-          url: this.$General.APIUsers() + '/' + this.$props.target,
-          headers: {
-            'x-access-tokens': this.$General.GetLSSettings().Token,
-            'Content-Type': 'application/json',
-          },
-          data: this.FormValues,
-        };
+        var AxiosConfig = { method: this.$props.type, url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
         this.$Axios(AxiosConfig)
           .then(() => {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
             this.GeneralValues.AlertMessage.Color = 'success';
-            setTimeout(() => {
-              this.$General.ReloadPage();
-            }, 2000);
           })
           .catch((Error) => {
             console.log(Error);
