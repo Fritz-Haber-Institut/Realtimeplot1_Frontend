@@ -27,6 +27,7 @@ Vue.config.productionTip = false
 if (Vue.prototype.$General.GetLSSettings() == null) {
   var LS = new Object();
   LS.Token = null;
+  LS.preferred_language = 'en';  
   Vue.prototype.$General.SetLSSettings(LS);
 }
 

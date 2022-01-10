@@ -1,5 +1,5 @@
 <template>
-  <Userform :user="this.$props.user" type="PUT" target="current" />
+  <Userform :user="this.$props.user" type="PUT" target="/current" />
 </template>
 
 <script>

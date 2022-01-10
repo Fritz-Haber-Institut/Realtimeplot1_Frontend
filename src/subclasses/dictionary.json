@@ -1,0 +1,120 @@
+{
+    "Strings": [
+        {
+            "value": "profile",
+            "en": "My Account"
+        },
+        {
+            "value": "logout",
+            "en": "Logout"
+        },
+        {
+            "value": "login",
+            "en": "Login"
+        },
+        {
+            "value": "dashboard",
+            "en": "Dashboard"
+        },
+        {
+            "value": "loginname",
+            "en": "Login Name"
+        },
+        {
+            "value": "password",
+            "en": "Password"
+        },
+        {
+            "value": "userrole",
+            "en": "User Role"
+        },
+        {
+            "value": "firstname",
+            "en": "First Name"
+        },
+        {
+            "value": "lastname",
+            "en": "Last Name"
+        },
+        {
+            "value": "email",
+            "en": "Email Address"
+        },
+        {
+            "value": "manageusers",
+            "en": "Manage Users"
+        },
+        {
+            "value": "apply",
+            "en": "Apply"
+        },
+        {
+            "value": "sure",
+            "en": "Are you sure?"
+        },
+        {
+            "value": "update",
+            "en": "Update User"
+        },
+        {
+            "value": "cancel",
+            "en": "Cancel"
+        },
+        {
+            "value": "new",
+            "en": "Add New User"
+        },
+        {
+            "value": "noempty",
+            "en": "Field cannot be empty!"
+        },
+        {
+            "value": "wronginfos",
+            "en": "Wrong login name or password!"
+        },
+        {
+            "value": "wronginfos2",
+            "en": "Informations are not Complete"
+        },
+        {
+            "value": "wronginfos3",
+            "en": "Username already exists"
+        },
+        {
+            "value": "wrongemailformat",
+            "en": "Wrong Email format!"
+        },
+        {
+            "value": "passwordsdontmatch",
+            "en": "Password values do not match"
+        },   
+        {
+            "value": "usertableupdatedialogsuccess",
+            "en": "User changes saved successfully!"
+        },           
+        {
+            "value": "success",
+            "en": "Operations successfully completed!"
+        },
+        {
+            "value": "loading",
+            "en": "Loading ... Please wait"
+        },
+        {
+            "value": "search",
+            "en": "Search"
+        },
+        {
+            "value": "nodata",
+            "en": "No Data Found"
+        },
+        {
+            "value": "doubleemail",
+            "en": "Email already exists"
+        },
+        {
+            "value": "noemail",
+            "en": "[ No Email ]"
+        }
+    ]
+}
