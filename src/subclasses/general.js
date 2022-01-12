@@ -11,6 +11,9 @@ export default {
   APIUsers() {
     return this.MainDomain + "/auth/users"
   },
+  APIPVs() {
+    return this.MainDomain + "/experiments/pvs"
+  },
   // General Functions
   LSSettings: 'ZgjdLNewsboV3LRxOgaw',
   GetLSSettings() {
@@ -42,24 +45,29 @@ export default {
   },
 
   GetString: function (String, WantedLanguage) {
-    if (WantedLanguage == null) {
-      var Language = this.GetLSSettings().preferred_language;
-      try {
-        return Dictionary.Strings.find(Word => Word.value === String)[Language]
+    try {
+      if (WantedLanguage == null) {
+        var Language = this.GetLSSettings().preferred_language;
+        try {
+          return Dictionary.Strings.find(Word => Word.value === String)[Language]
+        }
+        catch
+        {
+          console.log("404 '" + Language + "' : " + String);
+        }
       }
-      catch
-      {
-        console.log("404 '" + Language + "' : " + String);
+      else {
+        try {
+          return Dictionary.Strings.find(Word => Word.value === String)[WantedLanguage]
+        }
+        catch
+        {
+          console.log("404 '" + WantedLanguage + "' : " + String);
+        }
       }
     }
-    else {
-      try {
-        return Dictionary.Strings.find(Word => Word.value === String)[WantedLanguage]
-      }
-      catch
-      {
-        console.log("404 '" + WantedLanguage + "' : " + String);
-      }
+    catch {
+      //
     }
   },
 

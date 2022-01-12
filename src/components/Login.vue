@@ -10,7 +10,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            <v-alert icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Login()">{{ $General.GetString('login') }} </v-btn>
@@ -34,13 +34,13 @@ export default {
     },
     LoginValues: {
       username: '',
-      password: ''
+      password: '',
     },
   }),
   methods: {
-    initiateLoginOnEnterKey (e) {
+    initiateLoginOnEnterKey(e) {
       if (e.key === 'Enter' && this.LoginValues.username !== '' && this.LoginValues.password !== '') {
-        this.Login()
+        this.Login();
       }
     },
     Login() {
@@ -51,7 +51,7 @@ export default {
             console.log(LoginResult);
             this.LocalStorage.Token = LoginResult.data.access_token;
             this.$General.SetLSSettings(this.LocalStorage);
-            this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
+            this.GeneralValues.AlertMessage.Message = this.$General.GetString('successwithtimer').replace('@@', '2');
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
               this.$General.ReloadPage('/dashboard');
@@ -69,7 +69,7 @@ export default {
     setInterval(() => {
       this.LocalStorage = this.$General.GetLSSettings();
     }, 100);
-    document.addEventListener('keydown', this.initiateLoginOnEnterKey)
+    document.addEventListener('keydown', this.initiateLoginOnEnterKey);
   },
 };
 </script>

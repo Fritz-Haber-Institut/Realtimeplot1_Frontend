@@ -1,11 +1,20 @@
 <template>
   <v-container fluid>
-    <v-card class="pa-5"> {{ $General.GetString('dashboard') }} </v-card>
+    <Users />
   </v-container>
 </template>
 
 <script>
+import Users from '../components/Users.vue';
+
 export default {
-  components: {},
+  components: {
+    Users,
+  },
+  data() {
+    return {};
+  },
+  methods: {},
+  mounted() {},
 };
 </script>

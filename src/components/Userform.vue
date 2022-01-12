@@ -35,7 +35,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            <v-alert icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Submit()">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
@@ -96,6 +96,9 @@ export default {
     },
   },
   methods: {
+    ParentPassing(Value) {
+      this.$emit('clicked', Value);
+    },
     CheckData() {
       if (this.$props.type == 'PUT') {
         if (this.$props.target == '/current') {
@@ -131,6 +134,7 @@ export default {
           .then(() => {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
             this.GeneralValues.AlertMessage.Color = 'success';
+            this.ParentPassing(this.GeneralValues.AlertMessage);
           })
           .catch((Error) => {
             console.log(Error);

@@ -29,6 +29,7 @@ if (Vue.prototype.$General.GetLSSettings() == null) {
   LS.Token = null;
   LS.preferred_language = 'en';  
   Vue.prototype.$General.SetLSSettings(LS);
+  window.location.reload();
 }
 
 new Vue({

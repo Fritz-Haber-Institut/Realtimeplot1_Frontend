@@ -105,6 +105,7 @@ export default {
       this.GeneralSettings.Navigation = [
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
         { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
+        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },        
         { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/accounts' },
         { title: this.$General.GetString('manageusers') + '2', icon: 'mdi-account-multiple-outline', url: '/users' },        
       ];

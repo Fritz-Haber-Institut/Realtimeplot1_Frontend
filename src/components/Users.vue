@@ -1,14 +1,20 @@
 <template>
   <v-container fluid>
     <v-dialog v-model="Users.Dialog">
-      <Userform v-if="Users.Dialog" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
+      <Userform v-if="Users.Dialog" @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
     </v-dialog>
     <v-card>
+      <v-card-actions>
+        <v-alert icon="mdi-check-circle-outline" rounded="md" class="mx-2 mt-1" width="100%" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+          {{ GeneralValues.AlertMessage.Message }}
+        </v-alert>
+      </v-card-actions>
       <v-card-title>
         <v-text-field autocomplete="new-search" full-width hide-details="" filled prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="Users.Search"></v-text-field>
         <v-btn fab color="info" class="ml-5"><v-icon @click="AddUser()"> mdi-account-multiple-plus </v-icon></v-btn>
       </v-card-title>
       <v-card-text>
+        <v-divider />
         <v-data-table :headers="Users.Headers" :items="Users.Items" :loading="Users.Loading" :no-results-text="$General.GetString('nodata')" :no-data-text="$General.GetString('nodata')" :loading-text="$General.GetString('loading')" :search="Users.Search">
           <template v-slot:[`item.settings`]="{ item }">
             <v-icon color="warning" small @click="EditUser(item.url.split('/')[3])"> mdi-pencil </v-icon>
@@ -27,6 +33,12 @@ export default {
     Userform,
   },
   data: () => ({
+    GeneralValues: {
+      AlertMessage: {
+        Message: '',
+        Color: '',
+      },
+    },
     Users: {
       Loading: true,
       Dialog: false,
@@ -59,6 +71,11 @@ export default {
     },
   },
   methods: {
+    onClickChild(Value) {
+      this.GeneralValues.AlertMessage.Message = Value.Message; 
+      this.GeneralValues.AlertMessage.Color = Value.Color;
+      this.Users.Dialog = false;
+    },
     GetUsers() {
       var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
       this.$Axios(AxiosConfig)
