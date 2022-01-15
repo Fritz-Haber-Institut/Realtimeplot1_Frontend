@@ -81,11 +81,11 @@ export default {
       this.$Axios
         .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((LoginResult) => {
-          this.GeneralSettings.UserInfos = LoginResult.data;
+          this.GeneralSettings.UserInfos = LoginResult.data.user;
           if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
-            this.LocalStorage.preferred_language = LoginResult.data.preferred_language;
+            this.LocalStorage.Token = this.$General.GetLSSettings().Token;            
+            this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;
             this.$General.SetLSSettings(this.LocalStorage);
-            this.$General.ReloadPage();
           }
         })
         .catch((Error) => {
@@ -105,15 +105,15 @@ export default {
       this.GeneralSettings.Navigation = [
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
         { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
-        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },        
+        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },
         { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/accounts' },
-        { title: this.$General.GetString('manageusers') + '2', icon: 'mdi-account-multiple-outline', url: '/users' },        
+        { title: this.$General.GetString('manageusers') + '2', icon: 'mdi-account-multiple-outline', url: '/users' },
       ];
-      this.GetInfos();
-      setInterval(() => {
-        this.GetInfos();
-      }, 300000);
     }
+    this.GetInfos();
+    setInterval(() => {
+      this.GetInfos();
+    }, 300000);
     setInterval(() => {
       this.LocalStorage = this.$General.GetLSSettings();
     }, 100);

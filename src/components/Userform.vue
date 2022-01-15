@@ -112,7 +112,7 @@ export default {
           var AxiosConfig = { method: 'GET', url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
           this.$Axios(AxiosConfig)
             .then((UserInfos) => {
-              this.FillUserInfos(UserInfos.data);
+              this.FillUserInfos(UserInfos.data.user);
             })
             .catch((Error) => {
               console.log(Error);

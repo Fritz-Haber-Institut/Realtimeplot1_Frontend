@@ -50,6 +50,7 @@ export default {
           .then((LoginResult) => {
             console.log(LoginResult);
             this.LocalStorage.Token = LoginResult.data.access_token;
+            this.LocalStorage.preferred_language = 'en';            
             this.$General.SetLSSettings(this.LocalStorage);
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('successwithtimer').replace('@@', '2');
             this.GeneralValues.AlertMessage.Color = 'success';
