@@ -258,7 +258,13 @@
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
-            <!-- <v-alert>Deletion alert</v-alert> -->
+            <v-alert
+              :value="dialogAlert.isVisible"
+              :type="dialogAlert.type"
+              transition="fade-transition"
+            >
+              {{ dialogAlert.text }}
+            </v-alert>
           </v-dialog>
         </v-toolbar>
       </template>
@@ -418,8 +424,31 @@ export default {
     activateUpdateUserButton() {
       this.isUpdateUserButtonActive = true;
     },
+    showSuccessAlert(text) {
+      this.dialogAlert.isVisible = true;
+      this.dialogAlert.type = 'success';
+      this.dialogAlert.text = text
+      this.$emit('reload-users')
+    },
     deleteUserConfirm() {
-      this.users.splice(this.editedIndex, 1);
+      // this.users.splice(this.editedIndex, 1);
+      const requestConfig = {
+        method: 'DELETE',
+        url: this.$General.APIUsers() + tempUser.login_name,
+        headers: {
+          'x-access-tokens': this.$General.GetLSSettings().Token,
+          'Content-Type': 'application/json',
+        },
+      }
+
+      this.$Axios(requestConfig)
+      .then(() => {
+        const alertMessage = this.$General.userTableNewUserDialogSuccess
+        this.showSuccess(alertMessage)
+      }).catch(e => {
+
+      })
+
       this.closeDeleteDialog();
     },
     closeNewOrUpdateDialog(dialogType) {

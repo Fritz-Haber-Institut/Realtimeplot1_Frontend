@@ -51,5 +51,7 @@ export default {
     userTableUpdateDialogSuccess: 'User changes saved successfully!',
     userTableUpdateDialogError: errorStatusCode => `Failed to save user changes. HTTP Error ${errorStatusCode}`,
     userTableNewUserDialogSuccess: (username, userType) => `New ${userType.toLowerCase()} ${username} saved successfully!`,
-    userTableNewUserDialogError: errorStatusCode => `Failed to save a new user. HTTP Error ${errorStatusCode}`
+    userTableNewUserDialogError: errorStatusCode => `Failed to save a new user. HTTP Error ${errorStatusCode}`,
+    userTableDeleteDialogSuccess: 'User deleted successfully!',
+    userTableDeleteDialogError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error ${errorStatusCode}`,
 }
