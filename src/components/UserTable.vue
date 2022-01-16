@@ -301,7 +301,7 @@ export default {
       // this.users.splice(this.editedIndex, 1);
       const requestConfig = {
         method: 'DELETE',
-        url: this.$General.APIUsers() + tempUser.login_name,
+        url: this.$General.APIUsers() + this.tempUser.login_name,
         headers: {
           'x-access-tokens': this.$General.GetLSSettings().Token,
           'Content-Type': 'application/json',
@@ -313,7 +313,7 @@ export default {
         const alertMessage = this.$General.userTableNewUserDialogSuccess
         this.showSuccess(alertMessage)
       }).catch(e => {
-
+        console.log(e)
       })
 
       this.closeDeleteDialog();
