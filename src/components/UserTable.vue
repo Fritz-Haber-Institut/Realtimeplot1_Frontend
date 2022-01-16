@@ -118,9 +118,11 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" max-width="700px">
             <v-card>
-              <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+              <v-card-title class="text-h5 justify-center">
+                Are you sure you want to delete user {{ tempUser.login_name }}?
+              </v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDeleteDialog">Cancel</v-btn>
@@ -128,6 +130,13 @@
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
+            <v-alert
+              :value="dialogAlert.isVisible"
+              :type="dialogAlert.type"
+              transition="fade-transition"
+            >
+              {{ dialogAlert.text }}
+            </v-alert>
           </v-dialog>
         </v-toolbar>
       </template>
@@ -282,8 +291,31 @@ export default {
     activateUpdateUserButton() {
       this.isUpdateUserButtonActive = true;
     },
+    showSuccessAlert(text) {
+      this.dialogAlert.isVisible = true;
+      this.dialogAlert.type = 'success';
+      this.dialogAlert.text = text
+      this.$emit('reload-users')
+    },
     deleteUserConfirm() {
-      this.users.splice(this.editedIndex, 1);
+      // this.users.splice(this.editedIndex, 1);
+      const requestConfig = {
+        method: 'DELETE',
+        url: this.$General.APIUsers() + tempUser.login_name,
+        headers: {
+          'x-access-tokens': this.$General.GetLSSettings().Token,
+          'Content-Type': 'application/json',
+        },
+      }
+
+      this.$Axios(requestConfig)
+      .then(() => {
+        const alertMessage = this.$General.userTableNewUserDialogSuccess
+        this.showSuccess(alertMessage)
+      }).catch(e => {
+
+      })
+
       this.closeDeleteDialog();
     },
     closeNewOrUpdateDialog(dialogType) {
@@ -403,9 +435,4 @@ export default {
 </script>
 
 <style scoped>
-.data-table {
-  /* margin: 50px auto 0;
-  max-width: 80%; */
-  /* border: 1px solid black; */
-}
 </style>
