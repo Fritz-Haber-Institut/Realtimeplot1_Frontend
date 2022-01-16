@@ -15,7 +15,7 @@
         <v-list-item dark>
           <v-list-item-content>
             <v-list-item-title class="text-h6"> {{ GeneralSettings.UserInfos.login_name }} </v-list-item-title>
-            <v-list-item-subtitle class="mt-2">{{ GeneralSettings.UserInfos.email || '[ No Email ]' }}</v-list-item-subtitle>
+            <v-list-item-subtitle class="mt-2">{{ GeneralSettings.UserInfos.email || $General.GetString('noemail') }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -34,7 +34,7 @@
         <div class="pa-2">
           <v-btn color="warning" block @click="Logout()">
             <v-icon small class="mr-2">mdi-logout</v-icon>
-            Logout
+            {{ $General.GetString('logout') }}
           </v-btn>
         </div>
       </template>
@@ -57,14 +57,11 @@ export default {
     Header,
   },
   data: () => ({
+    LocalStorage: {},
     GeneralSettings: {
       Drawer: false,
       UserInfos: null,
-      Navigation: [
-        { title: 'My Account', icon: 'mdi-cogs', url: '/profile' },
-        { title: 'Dashboard', icon: 'mdi-view-dashboard', url: '/dashboard' },
-        { title: 'Manage Users', icon: 'mdi-account-multiple-outline', url: '/accounts' },
-      ],
+      Navigation: null,
     },
   }),
   watch: {
@@ -84,7 +81,12 @@ export default {
       this.$Axios
         .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((LoginResult) => {
-          this.GeneralSettings.UserInfos = LoginResult.data;
+          this.GeneralSettings.UserInfos = LoginResult.data.user;
+          if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
+            this.LocalStorage.Token = this.$General.GetLSSettings().Token;            
+            this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;
+            this.$General.SetLSSettings(this.LocalStorage);
+          }
         })
         .catch((Error) => {
           console.log(Error);
@@ -99,7 +101,22 @@ export default {
     },
   },
   mounted() {
+    if (this.$route.path != '/login') {
+      this.GeneralSettings.Navigation = [
+        { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
+        { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
+        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },
+        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/accounts' },
+        { title: this.$General.GetString('manageusers') + '2', icon: 'mdi-account-multiple-outline', url: '/users' },
+      ];
+    }
     this.GetInfos();
+    setInterval(() => {
+      this.GetInfos();
+    }, 300000);
+    setInterval(() => {
+      this.LocalStorage = this.$General.GetLSSettings();
+    }, 100);
   },
 };
 </script>

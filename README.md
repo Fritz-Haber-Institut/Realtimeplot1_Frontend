@@ -1,6 +1,12 @@
 # Realtimeplot Frontend
+
 Forked Version from : https://github.com/Fritz-Haber-Institut/Realtimeplot1_Frontend
 
+## Current todos
+
+Check out the [TODOS.md](docs/TODOS.md) file
+
+#
 ## Project setup
 ```
 npm install 

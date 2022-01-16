@@ -6,8 +6,10 @@ import General from '../subclasses/general.js';
 import Login from '../views/Login.vue'
 
 import Profile from '../views/Profile.vue'
+import PVs from '../views/PVs.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Accounts from '../views/Accounts.vue'
+import Users from '../views/Users.vue'
 
 Vue.use(VueRouter)
 
@@ -16,11 +18,13 @@ const routes = [
     path: '*',
     redirect: '/login'
   },
-  { path: '/login', component: Login, meta: { requiresAuth: false, title: "Login", icon: "mdi-information-outline" } },
-  
-  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: "My Profile",button:"Update My Profile", icon: "mdi-information-outline" } },  
-  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true, title: "Dashboard", icon: "mdi-information-outline" } },
-  { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: "Accounts", icon: "mdi-information-outline" } },  
+  { path: '/login', component: Login, meta: { requiresAuth: false, title: General.GetString('login'), icon: "mdi-information-outline" } },
+
+  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
+  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true, title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
+  { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },  
+  { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
+  { path: '/users', component: Users, meta: { requiresAuth: true, title: General.GetString('manageusers') + '2', icon: "mdi-information-outline" } },  
 ]
 
 const router = new VueRouter({

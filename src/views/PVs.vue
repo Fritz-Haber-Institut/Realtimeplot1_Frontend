@@ -1,12 +1,15 @@
 <template>
-  <Userform :user="this.$props.user" type="PUT" target="/current" />
+  <v-container fluid>
+    <PVsform :user="this.$props.user" />
+  </v-container>
 </template>
 
 <script>
-import Userform from '../components/Userform';
+import PVsform from '../components/PVs/PVsform.vue';
+
 export default {
   components: {
-    Userform,
+    PVsform,
   },
   watch: {
     user(Value) {
