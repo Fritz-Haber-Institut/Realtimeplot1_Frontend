@@ -1,4 +1,4 @@
-# Current todos
+# Current TODOs
 
 These are the current tasks that need implementation from the frontend team.
 
@@ -14,7 +14,7 @@ These are the current tasks that need implementation from the frontend team.
 
 
 
-## Secodary
+## Secondary
 
 - [ ] Dark mode (theme toggle)
 - [ ] Skeleton loaders until a fetch is successful
