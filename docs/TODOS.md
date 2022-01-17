@@ -19,3 +19,4 @@ These are the current tasks that need implementation from the frontend team.
 - [ ] Dark mode (theme toggle)
 - [ ] Skeleton loaders until a fetch is successful
 - [ ] I18n using Vuetify
+- [ ] Design unification
