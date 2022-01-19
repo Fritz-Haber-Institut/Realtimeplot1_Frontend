@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-dialog v-model="Users.Dialog">
-      <Userform v-if="Users.Dialog" @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
+      <Userform @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
     </v-dialog>
     <v-card>
       <v-card-actions>
@@ -11,7 +11,16 @@
       </v-card-actions>
       <v-card-title>
         <v-text-field autocomplete="new-search" full-width hide-details="" filled prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="Users.Search"></v-text-field>
-        <v-btn fab color="info" class="ml-5"><v-icon @click="AddUser()"> mdi-account-multiple-plus </v-icon></v-btn>
+        <v-tooltip bottom>
+          <template
+            v-slot:activator="{ on, attrs }"
+          >
+            <v-btn fab color="info" class="ml-5" v-bind="attrs" v-on="on" @click="AddUser()">
+              <v-icon> mdi-account-multiple-plus </v-icon>
+            </v-btn>
+          </template>
+          {{ $General.GetString('addNewUserTooltip') }}
+        </v-tooltip>
       </v-card-title>
       <v-card-text>
         <v-divider />
@@ -99,7 +108,8 @@ export default {
       this.UserOp.UserID = '/' + Value;
     },
     DeleteUser(Value) {
-      this.$General.ConfirmAlert().then((Result) => {
+      const userLoginName = this.Users.Items.filter(userObj => userObj.user_id === Value)[0].login_name
+      this.$General.ConfirmDeleteAlert(userLoginName).then((Result) => {
         if (Result) {
           var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
           this.$Axios(AxiosConfig)
