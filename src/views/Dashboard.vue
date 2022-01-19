@@ -1,15 +1,15 @@
 <template>
   <v-container fluid>
-    <Users />
+    <Graphics />
   </v-container>
 </template>
 
 <script>
-import Users from '../components/Users.vue';
+import Graphics from '../components/PVs/Graphics.vue';
 
 export default {
   components: {
-    Users,
+    Graphics,
   },
   data() {
     return {};

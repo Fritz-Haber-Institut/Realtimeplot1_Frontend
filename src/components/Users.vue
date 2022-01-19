@@ -11,14 +11,37 @@
       </v-card-actions>
       <v-card-title>
         <v-text-field autocomplete="new-search" full-width hide-details="" filled prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="Users.Search"></v-text-field>
-        <v-btn fab color="info" class="ml-5"><v-icon @click="AddUser()"> mdi-account-multiple-plus </v-icon></v-btn>
+        <v-btn @click="AddUser()" fab color="info" class="ml-5"><v-icon> mdi-account-multiple-plus </v-icon></v-btn>
       </v-card-title>
       <v-card-text>
         <v-divider />
         <v-data-table :headers="Users.Headers" :items="Users.Items" :loading="Users.Loading" :no-results-text="$General.GetString('nodata')" :no-data-text="$General.GetString('nodata')" :loading-text="$General.GetString('loading')" :search="Users.Search">
+          <template v-slot:[`item.user_type`]="{ item }">
+            <v-chip :class="item.user_type == 'Admin' ? 'success' : 'info'" small> {{ item.user_type }} </v-chip>
+          </template>
           <template v-slot:[`item.settings`]="{ item }">
-            <v-icon color="warning" small @click="EditUser(item.url.split('/')[3])"> mdi-pencil </v-icon>
-            <v-icon color="error" small class="ml-2" @click="DeleteUser(item.url.split('/')[3])"> mdi-delete </v-icon>
+            <v-row>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="info" fab x-small :to="'/users/experiments/' + item.url.split('/')[3]" v-bind="attrs" v-on="on"> <v-icon> mdi-playlist-star</v-icon> </v-btn>
+                </template>
+                <span>{{ $General.GetString('showexperiment') }}</span>
+              </v-tooltip>
+
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="warning" fab x-small class="ml-2" @click="EditUser(item.url.split('/')[3])" v-bind="attrs" v-on="on"> <v-icon> mdi-pencil</v-icon> </v-btn>
+                </template>
+                <span>{{ $General.GetString('update') }}</span>
+              </v-tooltip>
+
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="error" fab x-small class="ml-2" @click="DeleteUser(item.url.split('/')[3])" v-bind="attrs" v-on="on"> <v-icon> mdi-delete</v-icon></v-btn>
+                </template>
+                <span>{{ $General.GetString('delete') }}</span>
+              </v-tooltip>
+            </v-row>
           </template>
         </v-data-table>
       </v-card-text>
@@ -72,7 +95,7 @@ export default {
   },
   methods: {
     onClickChild(Value) {
-      this.GeneralValues.AlertMessage.Message = Value.Message; 
+      this.GeneralValues.AlertMessage.Message = Value.Message;
       this.GeneralValues.AlertMessage.Color = Value.Color;
       this.Users.Dialog = false;
     },
@@ -117,12 +140,12 @@ export default {
   mounted() {
     this.GetUsers();
     this.Users.Headers = [
-      { text: this.$General.GetString('email'), value: 'email' },
       { text: this.$General.GetString('loginname'), value: 'login_name' },
-      { text: this.$General.GetString('userrole'), value: 'user_type' },
       { text: this.$General.GetString('firstname'), value: 'first_name' },
       { text: this.$General.GetString('lastname'), value: 'last_name' },
-      { value: 'settings', sortable: false },
+      { text: this.$General.GetString('email'), value: 'email' },
+      { text: this.$General.GetString('userrole'), value: 'user_type', width: '120' },
+      { value: 'settings', sortable: false, width: '150' },
     ];
   },
 };

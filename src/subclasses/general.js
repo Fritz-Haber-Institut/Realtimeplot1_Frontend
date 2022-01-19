@@ -11,9 +11,15 @@ export default {
   APIUsers() {
     return this.MainDomain + "/auth/users"
   },
+  APIExperiments() {
+    return this.MainDomain + "/experiments/"
+  },  
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
+  APIData() {
+    return this.MainDomain + "/data/"
+  },  
   // General Functions
   LSSettings: 'ZgjdLNewsboV3LRxOgaw',
   GetLSSettings() {
@@ -23,7 +29,7 @@ export default {
     return localStorage.setItem(this.LSSettings, JSON.stringify(NewLSSetting))
   },
   ReloadPage(URL) {
-    return URL === null ? window.location.reload() : window.location.replace(URL)
+    return URL == null ? window.location.reload() : window.location.replace(URL)
   },
   GetHeaderValue(Authorization, Bearer) {
     if (Bearer) {

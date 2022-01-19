@@ -69,6 +69,18 @@
             "en": "Update Record"
         },
         {
+            "value": "delete",
+            "en": "Delete Record"
+        },
+        {
+            "value": "showexperiment",
+            "en": "Show Experiments"
+        },                
+        {
+            "value": "darkmode",
+            "en": "Dark Mode?"
+        },        
+        {
             "value": "cancel",
             "en": "Cancel"
         },
