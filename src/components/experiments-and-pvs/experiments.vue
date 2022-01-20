@@ -19,6 +19,13 @@
           @item-expanded="expandItem"
           class=""
         >
+          <template v-slot:[`item.pvs`]="{ item }">
+            <tr v-for="(pv, idx) in item.pvs" :key="idx">
+              <v-chip class="my-2">
+                {{ pv }}
+              </v-chip>
+            </tr>
+          </template>
           <template v-slot:expanded-item="{ headers }">
             <td :colspan="headers.length" class="pt-3">
               <span v-for="(userFullName, idx) in usersfullNames" :key="idx">
@@ -76,6 +83,13 @@ export default {
       usersfullNames: []
     }
   },
+  computed: {
+    experimentsWithPvNames() {
+      this.experiments.map(exp => {
+        
+      })
+    },
+  },
   methods: {
     // API calls
     getUserFirstAndLastName(userUrl) {
@@ -104,6 +118,9 @@ export default {
             });
         }
       });
+    },
+    getPVNames() {
+
     },
     // UI methods
     openCreatePVDialog() {

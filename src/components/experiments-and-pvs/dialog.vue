@@ -197,6 +197,7 @@ export default {
             this.tempExp.human_readable_name =
               res.data.experiment.human_readable_name;
             this.tempExp.user_urls = res.data.experiment.user_urls;
+            this.getExpUserNames()
           } else {
             this.tempPV.human_readable_name =
               res.data.process_variable.human_readable_name;
@@ -351,7 +352,6 @@ export default {
   mounted() {
     if (this.$props.method === "PUT") {
       this.getResource();
-      this.$props.type === "exp" && this.getExpUserNames();
     } else if (this.$props.method === 'DELETE') {
       // this.getResource();
       this.deleteResource()

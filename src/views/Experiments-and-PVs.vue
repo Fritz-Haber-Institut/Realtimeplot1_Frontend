@@ -57,19 +57,38 @@ export default {
         console.log(e)
       })
     },
+    getPVNamesForExp(pvsUrls) {
+      // console.log(pvsUrls)
+      const pvsNames = []
+      let pvUrl
+      for (pvUrl in pvsUrls) {
+        this.$Axios
+        .get(this.$General.MainDomain + pvUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then(res => {
+          pvsNames.push(res.data.process_variable.human_readable_name)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      }
+      console.log(pvsNames)
+      return pvsNames
+    },
     transformFetchedData(type, data) {
-      return type === 'exp' ?
-        data.map(exp => {
+      if (type === 'exp') {
+        // this.getPVNamesForExp()
+        return data.map(exp => {
           return {
             short_id: exp['short_id'],
             name: exp['human_readable_name'],
             pvsUrls: exp['process_variable_urls'],
             pvs: exp['process_variable_urls'].map(pvUrl => pvUrl.split('pvs/')[1]),
+            pvsNames: this.getPVNamesForExp(exp['process_variable_urls']),
             userUrls: exp['user_urls'],
             users: exp['user_urls'].map(userUrl => userUrl.split('users/')[1])
           }
         })
-        :
+      } else {
         data.map(pv => {
           return {
             pv_string: pv['pv_string'],
@@ -77,6 +96,7 @@ export default {
             experimentId: pv['experiment_short_id']
           }
         })
+      }
     },
   },
   mounted() {
