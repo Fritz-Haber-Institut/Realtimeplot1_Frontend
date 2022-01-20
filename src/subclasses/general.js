@@ -11,6 +11,9 @@ export default {
   APIUsers() {
     return this.MainDomain + "/auth/users"
   },
+  APIExperiments() {
+    return this.MainDomain + "/experiments"
+  },
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
@@ -71,11 +74,12 @@ export default {
     }
   },
 
-  ConfirmAlert: function () {
+  ConfirmDeleteAlert: function(resourceId, text = '') {
     return Swal.fire({
       position: 'center',
       icon: 'warning',
-      title: this.GetString('sure'),
+      title: this.GetString('sureDelete').replace('<id>', resourceId),
+      text,
       showCancelButton: true,
       confirmButtonColor: '#1C2D59',
       cancelButtonColor: '#CC4C4C',
@@ -108,4 +112,8 @@ export default {
   userTableNewUserDialogError: errorStatusCode => `Failed to save a new user. HTTP Error ${errorStatusCode}`,
   userTableDeleteDialogSuccess: 'User deleted successfully!',
   userTableDeleteDialogError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error ${errorStatusCode}`,
+  sheetNewPVSuccess: 'PV created successfully!',
+  sheetNewPVError: errorStatusCode => errorStatusCode === 400 ? `Failed to save a new PV. No PV String was specified.` : `Failed to save a new PV. HTTP Error ${errorStatusCode}`,
+  sheetUpdateExpSuccess: 'Experiment changes saved successfully!',
+  sheetUpdateExpError: errorStatusCode => `Failed to save experiment changes. HTTP Error ${errorStatusCode}`,
 }
