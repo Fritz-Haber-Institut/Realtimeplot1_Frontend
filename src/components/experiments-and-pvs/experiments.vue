@@ -15,31 +15,18 @@
           :no-results-text="$General.GetString('nodata')"
           :search="searchFieldValue"
           show-expand
-          :expanded.sync="expandedRows"
           item-key="short_id"
+          @item-expanded="expandItem"
           class=""
         >
-          <template v-slot:[`item.users`]="{ item }">
-            <v-row v-for="(userUrl, idx) in item.userUrls" :key="idx">
-              <v-chip
-                color="primary"
-              >
-                <v-avatar class="accent white--text" left>
-                  <v-icon>mdi-account-circle</v-icon>
-                </v-avatar>
-                {{ /* getUserFirstAndLastName(userUrl)*/ }}
-              </v-chip>
-            </v-row>
-          </template>
-          <template v-slot:expanded-item="{ headers, item }">
+          <template v-slot:expanded-item="{ headers }">
             <td :colspan="headers.length" class="pt-3">
-              <span v-for="(userUrl, idx) in item.userUrls" :key="idx">
+              <span v-for="(userFullName, idx) in usersfullNames" :key="idx">
                 <v-chip color="primary" class="mr-2 mb-2">
                   <v-avatar class="accent white--text" left>
                     <v-icon>mdi-account-circle</v-icon>
                   </v-avatar>
-                  {{userUrl + idx}}
-                  {{ /* getUserFirstAndLastName(userUrl)*/ }}
+                  {{ userFullName }}
                 </v-chip>
               </span>
             </td>
@@ -86,21 +73,20 @@ export default {
         type: 'exp',
         short_id: ''
       },
-      expandedRows: []
+      usersfullNames: []
     }
   },
   methods: {
     // API calls
     getUserFirstAndLastName(userUrl) {
-      let fullName = ''
+      // let fullName = ''
       this.$Axios.get(this.$General.MainDomain + userUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then(res => {
-          fullName = `${res.data.user.first_name} ${res.data.user.last_name}`
+          this.usersfullNames.push(`${res.data.user.first_name} ${res.data.user.last_name}`)
         })
         .catch((e) => {
           console.log(e);
         });
-      return fullName
     },
     deleteExp(short_id) {
       const reqUrl = `${this.$General.APIExperiments()}/${short_id}`
@@ -135,6 +121,17 @@ export default {
       this.$emit('reload-experiments')
       this.dialog.open=false
     },
+    expandItem({ item, value }) {
+      console.log(value)
+      console.log(item.users)
+      if (value) {
+        for (let userUrl of item.userUrls) {
+          this.getUserFirstAndLastName(userUrl)
+        }
+      } else {
+        this.usersfullNames = []
+      }
+    }
   },
   // mounted() {
   //   this.getExperiments()
