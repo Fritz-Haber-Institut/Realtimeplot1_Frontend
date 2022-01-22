@@ -65,12 +65,20 @@
       "en": "Are you sure?"
     },
     {
-      "value": "sureDelete",
-      "en": "Are you sure you want to delete <id>?"
-    },
-    {
       "value": "update",
       "en": "Update Record"
+    },
+    {
+      "value": "delete",
+      "en": "Delete Record"
+    },
+    {
+      "value": "showexperiment",
+      "en": "Show Experiments"
+    },
+    {
+      "value": "darkmode",
+      "en": "Dark Mode?"
     },
     {
       "value": "cancel",
@@ -114,7 +122,7 @@
     },
     {
       "value": "successwithtimer",
-      "en": "Operations successfully completed! Redirection in @@ seconds ..."
+      "en": "Operations successfully completed! redirection in @@ seconds ..."
     },
     {
       "value": "loading",
@@ -126,19 +134,19 @@
     },
     {
       "value": "nodata",
-      "en": "No data found"
+      "en": "No Data Found"
     },
     {
       "value": "doubleemail",
-      "en": "E-Mail already exists"
+      "en": "Email already exists"
     },
     {
       "value": "noemail",
       "en": "[ No Email ]"
     },
     {
-      "value": "addNewUserTooltip",
-      "en": "Add a new user"
+      "value": "graphicsettings",
+      "en": "Graphic Settings"
     },
     {
       "value": "addNewPVTooltip",

@@ -1,27 +1,40 @@
 <template>
   <v-container fluid>
-    <v-card class="pa-5">
-      <v-row>
-        <v-col cols="6">
-          <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceDate" type="date" />
-          <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceTime" type="time" />
-        </v-col>
-        <v-col cols="6">
-          <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilDate" type="date" />
-          <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilTime" type="time" />
-        </v-col>
-        <v-col cols="12">
-          <v-select filled prepend-inner-icon="mdi-key" v-model="ChartSettings.PVString" :items="ChartSettings.ExperimentsList" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
-          <v-btn block color="info" @click="UpdateData()">
-            <v-icon>mdi-update</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
+    <v-expansion-panels accordion>
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          ><h2>{{ $General.GetString('graphicsettings') }}</h2></v-expansion-panel-header
+        >
+        <v-expansion-panel-content>
+          <v-card flat>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceDate" type="date" />
+                <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceTime" type="time" />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilDate" type="date" />
+                <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilTime" type="time" />
+              </v-col>
+              <v-col cols="12">
+                <v-select filled prepend-inner-icon="mdi-key" v-model="ChartSettings.PVString" :items="ChartSettings.ExperimentsList" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
+                <v-btn block color="info" @click="UpdateData()">
+                  <v-icon>mdi-update</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
     <v-divider class="my-5" />
-    <v-card class="pa-5">
+    <v-card class="pa-5" color="white">
       <div id="chart">
-        <apexchart width="100%" type="area" :options="options" :series="series"> </apexchart>
+        <div v-if="ChartSettings.Loading" class="text-center">
+          <v-progress-circular :size="200" width="25" color="primary" indeterminate></v-progress-circular>
+          <h1 class="mt-6">{{ $General.GetString('loading') }}</h1>
+        </div>
+        <apexchart v-else width="100%" type="area" :options="options" :series="series"> </apexchart>
       </div>
     </v-card>
   </v-container>
@@ -31,29 +44,14 @@
 export default {
   data: () => ({
     ChartSettings: {
+      Loading: true,
       TimeInterval: {},
       TimeIntervalParsed: {},
       Experiment: '',
       ExperimentsList: [],
     },
-    options: {
-      type: 'line',
-      chart: {
-        id: 'vuechart-example',
-      },
-      xaxis: {
-        categories: [],
-      },
-      title: {
-        text: '',
-      },
-    },
-    series: [
-      {
-        name: 'series-1',
-        data: [],
-      },
-    ],
+    options: {},
+    series: [],
   }),
   watch: {
     user(Value) {
@@ -112,17 +110,47 @@ export default {
           });
           DataResult.data.data.process_variables_data[this.ChartSettings.PVString].forEach((Element) => {
             Series.push(Element.data.toFixed(2));
-            Labels.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm:ss'));
+            Labels.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm'));
           });
           this.options = {
+            type: 'area',
+            chart: {
+              id: 'vuechart-example',
+              zoom: {
+                enabled: true,
+                type: 'xy',
+                autoScaleYaxis: false,
+                zoomedArea: {
+                  fill: {
+                    color: 'blue',
+                    opacity: 0.5,
+                  },
+                  stroke: {
+                    color: 'black',
+                    opacity: 0.5,
+                    width: 2,
+                  },
+                },
+              },
+            },
             title: {
               text: this.ChartSettings.PVString,
             },
-            labels: Labels,
+            subtitle: {
+              text: this.$Moment(String(this.ChartSettings.TimeInterval.since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.TimeInterval.until)).format('DD.MM.YYYY'),
+            },
+            xaxis: {
+              categories: Labels,
+              labels: {
+                rotate: -90,
+              },
+            },
           };
           this.series[0] = {
+            name: 'Value ',
             data: Series,
           };
+          this.ChartSettings.Loading = false;
         })
         .catch((Error) => {
           console.log(Error);
