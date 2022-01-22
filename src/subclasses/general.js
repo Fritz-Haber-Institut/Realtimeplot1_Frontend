@@ -17,6 +17,9 @@ export default {
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
+  APIData() {
+    return this.MainDomain + "/data/"
+  },
   // General Functions
   LSSettings: 'ZgjdLNewsboV3LRxOgaw',
   GetLSSettings() {
@@ -74,7 +77,7 @@ export default {
     }
   },
 
-  ConfirmDeleteAlert: function(resourceId, text = '') {
+  ConfirmDeleteAlert: function (resourceId, text = '') {
     return Swal.fire({
       position: 'center',
       icon: 'warning',
@@ -100,7 +103,7 @@ export default {
   NoEmpty: 'Field cannot be empty!',
   WrongInfos: 'Wrong E-Mail or password!',
   WrongInfos2: 'Informations are not Complete',
-  WrongInfos3: 'Username already exists',    
+  WrongInfos3: 'Username already exists',
   WrongEmailFormat: 'Wrong E-Mail format!',
   Success: 'Operations successfully completed!',
   DoubleEmail: 'Email already exists',
