@@ -10,7 +10,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="secondary" app right temporary>
+    <v-navigation-drawer width="300" v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="secondary" app right temporary>
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
@@ -83,7 +83,7 @@ export default {
         .then((LoginResult) => {
           this.GeneralSettings.UserInfos = LoginResult.data.user;
           if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
-            this.LocalStorage.Token = this.$General.GetLSSettings().Token;            
+            this.LocalStorage.Token = this.$General.GetLSSettings().Token;
             this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;
             this.$General.SetLSSettings(this.LocalStorage);
           }
@@ -106,9 +106,8 @@ export default {
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
         { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
         // { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },
-        { title: this.$General.GetString('managepvs') + ' 2', icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
-        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/accounts' },
-        { title: this.$General.GetString('manageusers') + '2', icon: 'mdi-account-multiple-outline', url: '/users' },
+        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
+        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' },
       ];
     }
     this.GetInfos();
