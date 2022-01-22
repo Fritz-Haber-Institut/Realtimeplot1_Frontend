@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar small v-if="GeneralSettings.UserInfos != null" app color="info" dark>
+    <v-app-bar small v-if="GeneralSettings.UserInfos != null" app color="info" dark style="z-index: 12 !important">
       <v-btn small to="/dashboard" link fab>
         <v-icon>mdi-home</v-icon>
       </v-btn>
@@ -10,7 +10,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer width="300" v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="secondary" app right temporary>
+    <v-navigation-drawer width="300" v-if="GeneralSettings.UserInfos != null" v-model="GeneralSettings.Drawer" color="secondary" app right temporary style="z-index: 12 !important">
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
@@ -31,6 +31,8 @@
         </v-list-item>
       </v-list>
       <template v-slot:append>
+        <v-switch class="mx-5" dark v-model="GeneralSettings.DarkMode" inset flat :label="$General.GetString('darkmode')" @change="ChangeTheme"></v-switch>
+        <v-divider />
         <div class="pa-2">
           <v-btn color="warning" block @click="Logout()">
             <v-icon small class="mr-2">mdi-logout</v-icon>
@@ -61,6 +63,7 @@ export default {
     GeneralSettings: {
       Drawer: false,
       UserInfos: null,
+      DarkMode: null,
       Navigation: null,
     },
   }),
@@ -85,6 +88,7 @@ export default {
           if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
             this.LocalStorage.Token = this.$General.GetLSSettings().Token;
             this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;
+            this.LocalStorage.dark_theme = this.$General.GetLSSettings().dark_theme;
             this.$General.SetLSSettings(this.LocalStorage);
           }
         })
@@ -99,9 +103,18 @@ export default {
       this.$General.SetLSSettings(this.LocalStorage);
       this.$General.ReloadPage('/login');
     },
+    ChangeTheme: function () {
+      try {
+        this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
+        this.$General.SetLSSettings(this.LocalStorage);
+      } finally {
+        window.location.href = '';
+      }
+    },
   },
   mounted() {
     if (this.$route.path != '/login') {
+      this.GeneralSettings.DarkMode = this.$General.GetLSSettings().dark_theme;
       this.GeneralSettings.Navigation = [
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
         { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
