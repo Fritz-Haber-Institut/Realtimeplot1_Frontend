@@ -1,8 +1,7 @@
 <template>
-  <v-dialog v-model="isDialogOpen" max-width="500px">
+  <v-dialog v-model="isDialogOpen" max-width="700px">
     <v-card>
       <v-card-title>
-        <!-- <span class="headline">{{ formTitle }}</span> -->
         {{ getDialogTitle }}
       </v-card-title>
       <v-card-text>
@@ -10,24 +9,20 @@
           <v-row>
             <v-col cols="12" v-if="isExperiment">
               <v-text-field
-                v-if="isExperiment"
                 label="Name"
                 v-model="tempExp.human_readable_name"
+                @keydown="activateConfirmButton"
               />
             </v-col>
             <v-col cols="6" v-if="!isExperiment">
-              <v-text-field label="PV String" v-model="tempPV.pv_string" />
+              <v-text-field label="PV String" v-model="tempPV.pv_string" @keydown="activateConfirmButton" />
             </v-col>
             <v-col cols="6" v-if="!isExperiment">
-              <v-text-field
-                label="Name (optional)"
-                v-model="tempPV.human_readable_name"
-              />
+              <v-text-field label="Name (optional)" v-model="tempPV.human_readable_name" @keydown="activateConfirmButton" />
             </v-col>
           </v-row>
           <v-row v-if="isExperiment">
             <v-col cols="12">
-              <!-- no-data-text="There are no users assigned to this experiment" -->
               <v-combobox
                 v-model="expUserNames"
                 :items="allUserNames"
@@ -36,6 +31,7 @@
                 multiple
                 chips
                 @focus="getAllUserNames"
+                @change="activateConfirmButton"
               >
                 <template v-slot:selection="data">
                   <v-chip
@@ -44,10 +40,9 @@
                     :input-value="data.selected"
                     :disabled="data.disabled"
                     @click:close="data.parent.selectItem(data.item)"
+                    color="primary"
                   >
-                    <v-avatar class="accent white--text" left>
-                      <v-icon>mdi-account-circle</v-icon>
-                    </v-avatar>
+                    <v-icon left>mdi-account-circle-outline</v-icon>
                     {{ data.item.text }}
                   </v-chip>
                 </template>
@@ -58,33 +53,29 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click.native="closeDialog"
-          >Cancel</v-btn
-        >
-        <v-btn
-          v-if="$props.method === 'POST'"
-          color="blue darken-1"
-          text
-          @click.native="createNewPV"
-          >Create</v-btn
-        >
-        <v-btn v-else color="blue darken-1" text @click.native="updateResource"
-          >Update</v-btn
-        >
+        <v-btn color="blue darken-1" text @click.native="closeDialog">Cancel</v-btn>
+        <!-- <v-btn v-if="$props.method === 'POST'" color="blue darken-1" text :disabled="confirmButtonDisabled" @click.native="createNewPV">Create</v-btn>
+        <v-btn v-else color="blue darken-1" text @click.native="updateResource" :disabled="confirmButtonDisabled">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</v-btn> -->
+        <ButtonWithLoading v-if="isCreating" :disabled="confirmButtonDisabled" @clicked="createNewPV" :loading="reqLoading">Create</ButtonWithLoading>
+        <ButtonWithLoading v-else :disabled="confirmButtonDisabled" @clicked="updateResource" :loading="reqLoading">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</ButtonWithLoading>
+        <!-- <v-progress-circular v-else indeterminate color="primary" /> -->
       </v-card-actions>
     </v-card>
-    <v-bottom-sheet v-model="isSheetOpen" width="20%">
-      <v-sheet class="text-center rounded" height="55px">
-        <v-alert full-width height="100%" :type="sheetAlert.success">{{
-          sheetAlert.text
-        }}</v-alert>
-      </v-sheet>
-    </v-bottom-sheet>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-dialog>
 </template>
 
 <script>
+import ButtonWithLoading from '../button-with-loading.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
+
 export default {
+  components: {
+    ButtonWithLoading,
+    BottomSheetAlert
+  },
   props: {
     type: {
       type: String,
@@ -93,8 +84,8 @@ export default {
     method: {
       type: String,
       required: true,
-      default: "POST",
-      validator: (val) => ["POST", "PUT", "DELETE"].includes(val),
+      default: 'POST',
+      validator: val => ["POST", "PUT", "DELETE"].includes(val)
     },
     open: {
       type: Boolean,
@@ -115,42 +106,39 @@ export default {
         users_to_remove: [],
         users_to_add: []
       },
+      tempExp_human_readable_name_COPY: '',
       tempPV: {
         pv_string: "",
         human_readable_name: "", // optional
       },
-      emptyExp: {
-        short_id: "",
-        human_readable_name: "",
-        user_urls: [],
-        users_to_remove: [],
-        users_to_add: []
-      },
-      emptyPV: {
-        pv_string: "",
-        human_readable_name: "",
-      },
+      tempPV_pv_string_COPY: '',
+      tempPV_human_readable_name_COPY: '',
       axiosConfig: {},
       allUserNames: [],
       expUserNames: [],
       expUserNames_COPY: [],
-      isSheetOpen: false,
+      confirmButtonDisabled: true,
       sheetAlert: {
-        type: "success",
+        open: false,
+        type: 'sucess',
         text: "",
       },
+      reqLoading: false
     };
   },
   computed: {
     isExperiment() {
-      return this.$props.type === "exp";
+      return this.type === "exp";
+    },
+    isCreating() {
+      return this.method === "POST"
     },
     isUpdating() {
-      return this.$props.method === "PUT";
+      return this.method === "PUT";
     },
     isDialogOpen: {
       get() {
-        return this.$props.open;
+        return this.open;
       },
       set() {
         this.closeDialog();
@@ -161,46 +149,69 @@ export default {
       if (this.isExperiment && this.isUpdating)
         return "Update experiment " + this.tempExp.short_id;
       if (!this.isExperiment && this.isUpdating)
-        return "Update PV " + this.tempPV.pv_string;
+        return "Update PV " + this.tempPV_pv_string_COPY;
       else return "Create PV";
     },
   },
   methods: {
-    // HTTP-Requests methods
+    // API methods
     createNewPV() {
-      this.axiosConfig = {
-        method: "POST",
-        url: this.$General.APIPVs(),
-        headers: {
-          "x-access-tokens": this.$General.GetLSSettings().Token,
-          "Content-Type": "application/json",
-        },
-        data: this.tempPV,
-      };
-      this.$Axios(this.axiosConfig)
-        .then((res) => {
-          console.log("createNewPV");
-          console.log(res.data);
-          this.showSheet("success", this.$General.sheetNewPVSuccess);
-        })
-        .catch((e) => {
-          console.log(e);
-          this.showSheet("error", this.$General.sheetNewPVError(e.response.status));
-        });
+      if (!this.tempPV.pv_string) {
+        this.showSheet('info', this.$General.GetString('sheetCreatePVEmptyPVString'), false)
+        return
+      }
+      this.reqLoading = true
+      this.isPVInArchiver()
+      .then(isIt => {
+        if (!isIt) {
+          this.showSheet('error', this.$General.GetString('sheetPVNotInArchiver'))
+          return Promise.reject('ERROR: ' + this.$General.GetString('sheetPVNotInArchiver'))
+        } else {
+          return {
+            method: "POST",
+            url: this.$General.APIPVs(),
+            headers: {
+              "x-access-tokens": this.$General.GetLSSettings().Token,
+              "Content-Type": "application/json",
+            },
+            data: this.tempPV,
+          };
+        }
+      })
+      .then(config => this.$Axios(config))
+      .then(() => {
+        this.reqLoading = false
+        this.showSheet("success", this.$General.GetString('sheetNewPVSuccess'))
+      })
+      .catch(e => {
+        console.log(e)
+        e.response && this.showSheet("error", this.$General.sheetNewPVError(e.response.status))
+      })
+
+
+    },
+    isPVInArchiver() {
+      return this.$Axios.get(this.$General.APIValidatePVString(this.tempPV.pv_string), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .then(res => res.pv_string_exists)
     },
     getResource() {
       const reqUrl = `${this.isExperiment ? this.$General.APIExperiments() : this.$General.APIPVs()}/${this.$props.identifier}`
       this.$Axios.get(reqUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((res) => {
           if (this.isExperiment) {
-            this.tempExp.short_id = res.data.experiment.short_id;
-            this.tempExp.human_readable_name =
-              res.data.experiment.human_readable_name;
+            this.tempExp.short_id = res.data.experiment.short_id
+            this.tempExp.human_readable_name = res.data.experiment.human_readable_name;
+            // making a copy of human_readable_name so it can be later compared
+            this.tempExp_human_readable_name_COPY = res.data.experiment.human_readable_name;
             this.tempExp.user_urls = res.data.experiment.user_urls;
+            this.getUsersFullNamesForExp()
           } else {
-            this.tempPV.human_readable_name =
-              res.data.process_variable.human_readable_name;
+            this.tempPV.human_readable_name = res.data.process_variable.human_readable_name;
+            // copy of pv name for later comparisson
+            this.tempPV_human_readable_name_COPY = res.data.process_variable.human_readable_name
             this.tempPV.pv_string = res.data.process_variable.pv_string;
+            // making a copy of pv_string and so it can be used as a title in the update dialog
+            this.tempPV_pv_string_COPY = res.data.process_variable.pv_string;
           }
         })
         .catch((e) => {
@@ -212,15 +223,27 @@ export default {
       if (this.isExperiment) {
         this.compareExpUsers()
         reqUrl = `${this.$General.APIExperiments()}/${this.$props.identifier}`;
-        reqData = this.tempExp;
-        for (let prop in reqData) {
-          (!reqData[prop] || reqData[prop].length === 0 || prop === 'short_id' || prop === 'user_urls') && delete reqData[prop]
-        }
+        const hasExpNameChanged = this.tempExp.human_readable_name !== this.tempExp_human_readable_name_COPY
+        reqData = { 
+          ...(hasExpNameChanged && {human_readable_name: this.tempExp.human_readable_name}),
+          ...(this.tempExp.users_to_add.length && {users_to_add: this.tempExp.users_to_add}),
+          ...(this.tempExp.users_to_remove.length && {users_to_remove: this.tempExp.users_to_remove})
+        };
       } else {
         reqUrl = `${this.$General.APIPVs()}/${this.$props.identifier}`;
-        reqData = this.tempPV;
+        const hasPVStringChanged = this.tempPV.pv_string !== this.tempPV_pv_string_COPY
+        const hasPVNameChanged = this.tempPV.human_readable_name !== this.tempPV_human_readable_name_COPY
+        reqData = { 
+          ...(hasPVStringChanged && {pv_string: this.tempPV.pv_string}),
+          ...(hasPVNameChanged && {human_readable_name: this.tempPV.human_readable_name})
+        };
       }
-
+      if (!Object.keys(reqData).length) {
+        this.showSheet('info', this.$General.GetString('sheetUpdateNoChanges'), false)
+        this.confirmButtonDisabled = true
+        return
+      }
+      this.reqLoading = true
       this.axiosConfig = {
         method: "PUT",
         url: reqUrl,
@@ -230,27 +253,22 @@ export default {
         },
         data: reqData,
       };
-
       this.$Axios(this.axiosConfig)
-        .then(res => {
-          console.log("updateResource");
-          console.log(res.data);
-          this.showSheet("success", this.$General.sheetUpdateExpSuccess);
+        .then(() => {
+          // console.log("updateResource");
+          // console.log(res.data);
+          const successMessage = this.isExperiment ? this.$General.GetString('sheetUpdateExpSuccess') : this.$General.GetString('sheetUpdatePVSuccess')
+          this.showSheet("success", successMessage);
+          this.reqLoading = false
         })
         .catch((e) => {
-          console.log(e);
           this.showSheet("error", this.$General.sheetUpdateExpError(e.response.status));
+          console.log(e);
         });
     },
     getAllUserNames() {
       this.$Axios
-        .get(
-          this.$General.APIUsers(),
-          this.$General.GetHeaderValue(
-            this.$General.GetLSSettings().Token,
-            true
-          )
-        )
+        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((res) => {
           // console.log(res.data)
           this.allUserNames = res.data.users.map(user => {
@@ -260,102 +278,91 @@ export default {
             }
           });
         })
-        .catch((e) => {
-          console.log(e);
-        });
+        .catch(e => console.log(e));
     },
-    getExpUserNames() {
-      // console.log(this.tempExp.user_urls)
-      for (let userUrl of this.tempExp.user_urls) {
-        // console.log('expUserNames loop')
-        this.$Axios.get(this.$General.MainDomain + userUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-          .then((res) => {
-            console.log('expUserNames')
-            console.log(res.data);
-            this.expUserNames.push({
+    getUsersFullNamesForExp() {
+      Promise.all(
+        this.tempExp.user_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        .then(resArray => resArray.forEach(res => {
+          this.expUserNames.push({
               value: res.data.user.user_id,
               text: res.data.user.first_name + ' ' + res.data.user.last_name
             });
-            // this.expUserNames.push(res.data.user.first_name + ' ' + res.data.user.last_name)
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      }
-      this.expUserNames_COPY = JSON.parse(JSON.stringify(this.expUserNames))
+            this.expUserNames_COPY.push({
+              value: res.data.user.user_id,
+              text: res.data.user.first_name + ' ' + res.data.user.last_name
+            });
+        }))
+        // .then(() => this.finishedLoading = true)
+        .catch(e => console.log(e))
     },
     // Logic methods
     compareExpUsers() {
       const expUserIDs = this.expUserNames.map(el => el.value)
       const expUserIDs_COPY = this.expUserNames_COPY.map(el => el.value)
-      console.log('expUserIDs')
-      console.log(expUserIDs)
-      console.log('expUserIDs_COPY')
-      console.log(expUserIDs_COPY)
+      // console.log('expUserIDs')
+      // console.log(expUserIDs)
+      // console.log('expUserIDs_COPY')
+      // console.log(expUserIDs_COPY)
       let id
 
+      // Users were added
       if (expUserIDs.length > expUserIDs_COPY.length) {
         // were the previous users removed?
-        // let tempArray = []
-        // tempArray.push(expUserIDs)
         if (expUserIDs_COPY.length > 0) {
           for (id of expUserIDs_COPY) {
             expUserIDs.includes(id) ? expUserIDs.splice(expUserIDs.indexOf(id), 1) : this.tempExp.users_to_remove.push(id)
           }
         }
         this.tempExp.users_to_add = expUserIDs
+      // Users were removed
       } else if (expUserIDs.length < expUserIDs_COPY.length) {
         for (id of expUserIDs_COPY) {
           !expUserIDs.includes(id) && this.tempExp.users_to_remove.push(id)
         }
+      // The users count did not change
       } else {
-        // if the arrays are not equal
-        if (expUserIDs.join('') !== expUserIDs_COPY.join('')) {
-          // add new users
-          for (id of expUserIDs) {
-            !expUserIDs_COPY.includes(id) && this.tempExp.users_to_add.push(id)
-          }
-          // remove old users
-          for (id of expUserIDs_COPY) {
-            !expUserIDs_COPY.includes(id) && this.tempExp.users_to_remove.push(id)
-          }
+        // add new users
+        for (id of expUserIDs) {
+          !expUserIDs_COPY.includes(id) && this.tempExp.users_to_add.push(id)
+        }
+        // remove old users
+        for (id of expUserIDs_COPY) {
+          !expUserIDs.includes(id) && this.tempExp.users_to_remove.push(id)
         }
       }
     },
     // UI methods
-    showSheet(type, text) {
+    showSheet(type, text, doCloseDialog = true) {
       this.sheetAlert.type = type;
       this.sheetAlert.text = text;
-      this.isSheetOpen = true;
+      this.sheetAlert.open = true;
+      let time
+      if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
+      } else {
+        time = 1000
+      }
+      this.$emit('reload-data')
       setTimeout(() => {
-        this.isSheetOpen = false;
-      }, 750);
-      this.closeDialog();
+        this.sheetAlert.open = false;
+        doCloseDialog && this.closeDialog();
+      }, time);
+    },
+    activateConfirmButton() {
+      this.confirmButtonDisabled = false
     },
     closeDialog() {
-      // if (dialogType === 'new') {
-      //   this.dialogNew = false;
-      // } else {
-      //   this.dialogUpdate = false;
-      //   this.isUpdateUserButtonActive = false;
-      // }
+      // waiting for the closing animation to finish
       setTimeout(() => {
         this.$emit("close-dialog");
-        this.$nextTick(() => {
-          this.isExperiment ? (this.tempExp = Object.assign({}, this.emptyExp)) :  (this.tempPV = Object.assign({}, this.emptyPV));
-          // this.sheetAlert.isVisible = false;
-        });
       }, 200);
     },
   },
   mounted() {
-    if (this.$props.method === "PUT") {
-      this.getResource();
-      this.$props.type === "exp" && this.getExpUserNames();
-    } else if (this.$props.method === 'DELETE') {
-      // this.getResource();
-      this.deleteResource()
-    }
+    this.isUpdating && this.getResource()
   },
 };
 </script>

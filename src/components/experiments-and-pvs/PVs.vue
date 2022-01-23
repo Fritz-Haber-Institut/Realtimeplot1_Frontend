@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="mt-10">
-    <Dialog v-if="dialog.open" :type="dialog.type" :method="dialog.method" :identifier="dialog.pv_string" :open="dialog.open" @close-dialog="closeDialog"/>
+    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getPVs" />
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
@@ -24,72 +24,85 @@
           :loading-text="$General.GetString('loading')"
           :no-results-text="$General.GetString('nodata')"
           :search="searchFieldValue"
-          class=""
+          :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
           <template v-slot:[`item.settings`]="{ item }">
             <v-icon color="warning" small @click="openEditPVDialog(item)"> mdi-pencil </v-icon>
             <v-icon color="error" small class="ml-2" @click="deletePV(item)"> mdi-delete </v-icon>
           </template>
           <template v-slot:no-data>
-            There are no saved PVs. <span class="DialogLink" @click="openCreatePVDialog">Click here</span> or the "+" button to create a new one.
+            {{ $General.GetString('emptyTablePVsPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('clickHere') }}</span> {{ $General.GetString('emptyTablePVsPart2') }}
           </template>
         </v-data-table>
       </v-card-text>
     </v-card>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-container>
 </template>
 
 <script>
 import Dialog from './dialog.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
 
 export default {
-  props: {
-    pvs: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
-    Dialog
+    Dialog,
+    BottomSheetAlert
+  },
+  props: {
+    hasActiveTab: {
+      type: Boolean,
+      default: false,
+      required: true
+    }
   },
   data() {
     return {
+      pvs: [],
       searchFieldValue: '',
       headers: [
         { text: 'PV String', value: 'pv_string' },
-        { text: 'Name', value: 'name' },
+        { text: 'Name', value: 'human_readable_name' },
         { value: 'settings', sortable: false }
       ],
       dialog: {
         open: false,
         method: 'POST',
         type: 'pv',
-        pv_string: ''
+        identifier: ''
+      },
+      sheetAlert: {
+        open: false,
+        type: 'sucess',
+        text: '',
       },
     }
   },
-
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "New PV" : "Edit PV";
-    },
-  },
-
   watch: {
-    dialog(val) {
-      val || this.close();
-    },
+    hasActiveTab(val) {
+      val && this.getPVs()
+    }
   },
-
   methods: {
     // API calls
-    isPVLastOfExperiment(experimentId, pv_string) {
+    getPVs() {
       this.$Axios
-      .get(`${this.$General.APIExperiments()}/${experimentId}`, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
       .then(res => {
-        // console.log(res.data)
-        const experimentPVs = res.data.experiment.process_variable_urls.map(pvUrl => pvUrl.split('pvs/')[1])
-        return experimentPVs.length === 1 && experimentPVs[0] === pv_string
+        this.pvs = res.data.process_variables
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    },
+    isPVLastOfExperiment(expId, pv_string) {
+      return this.$Axios
+      .get(`${this.$General.APIExperiments()}/${expId}`, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .then(res => {
+        const experimentPVs = res.data.experiment.process_variable_urls
+        return experimentPVs.length === 1 && experimentPVs[0].split('pvs/')[1] === pv_string
       })
       .catch(e => {
         console.log(e)
@@ -97,21 +110,23 @@ export default {
     },
     deletePV(item) {
       const reqUrl = `${this.$General.APIPVs()}/${item.pv_string}`
-      const alertText = this.isPVLastOfExperiment(item.experimentId, item.pv_string) ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : ''
-      this.$General.ConfirmDeleteAlert(item.pv_string, alertText).then((Result) => {
-        if (Result) {
-          var AxiosConfig = { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } };
-          this.$Axios(AxiosConfig)
-            .then((Result) => {
-              console.log(Result)
-              this.$emit('reload-pvs')
-              this.isPVLastOfExperiment(item.experimentId, item.pv_string) && this.$emit('reload-experiments')
-            })
-            .catch((Error) => {
-              console.log(Error);
-            });
-        }
-      });
+      // const alertText = this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string) ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : ''
+      // console.log(alertText)
+      this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string)
+      .then(isLastPv => isLastPv ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : '')
+      .then(alertText => this.$General.ConfirmDeleteAlert(item.pv_string, alertText))
+      .then(isConfirmed => 
+        isConfirmed ? 
+        { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } } : 
+        Promise.reject('Delete request cancelled.'))
+      .then(config => this.$Axios(config))
+      .then(() => {
+        this.showSheet('success', this.$General.GetString('sheetDeletePVSuccess')) 
+      })
+      .catch(e => {
+        console.log(e)
+        e.response && this.showSheet('error', this.$General.sheetDeletePVError(e.response.status))
+      })
     },
     // UI Methods
     openCreatePVDialog() {
@@ -120,22 +135,32 @@ export default {
     },
     openEditPVDialog(exp) {
       this.dialog.method='PUT'
-      this.dialog.pv_string=exp.pv_string
+      this.dialog.identifier=exp.pv_string
       this.dialog.open = true
     },
     closeDialog() {
-      this.$emit('reload-pvs')
       this.dialog.open=false
-    }
+    },
+    showSheet(type, text, doCloseDialog = true) {
+      this.sheetAlert.type = type;
+      this.sheetAlert.text = text;
+      this.sheetAlert.open = true;
+      let time
+      if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
+      } else {
+        time = 1000
+      }
+      this.getPVs()
+      setTimeout(() => {
+        this.sheetAlert.open = false
+      }, time);
+    },
   },
-  // mounted() {
-  //   this.getPVs()
-  // }
+  mounted() {
+    this.getPVs()
+  }
 };
 </script>
-<style>
-  .DialogLink {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-</style>

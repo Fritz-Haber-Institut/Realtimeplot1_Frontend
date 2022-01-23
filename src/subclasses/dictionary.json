@@ -38,7 +38,7 @@
     },
     {
       "value": "email",
-      "en": "Email Address"
+      "en": "E-mail Address"
     },
     {
       "value": "manageusers",
@@ -106,15 +106,31 @@
     },
     {
       "value": "wrongemailformat",
-      "en": "Wrong Email format!"
+      "en": "Wrong E-Mail format!"
     },
     {
       "value": "passwordsdontmatch",
       "en": "Password values do not match"
     },
     {
-      "value": "usertableupdatedialogsuccess",
+      "value": "userTableUpdateDialogSuccess",
       "en": "User changes saved successfully!"
+    },
+    {
+      "value": "sheetNewPVSuccess",
+      "en": "PV created successfully!"
+    },
+    {
+      "value": "sheetUpdatePVSuccess",
+      "en": "PV changes saved successfully!"
+    },
+    {
+      "value": "sheetUpdateExpSuccess",
+      "en": "Experiment changes saved successfully!"
+    },
+    {
+      "value": "sheetUpdateNoChanges",
+      "en": "Please update some of the properties first."
     },
     {
       "value": "success",
@@ -122,7 +138,7 @@
     },
     {
       "value": "successwithtimer",
-      "en": "Operations successfully completed! redirection in @@ seconds ..."
+      "en": "Operations successfully completed! Redirection in @@ seconds ..."
     },
     {
       "value": "loading",
@@ -138,11 +154,11 @@
     },
     {
       "value": "doubleemail",
-      "en": "Email already exists"
+      "en": "E-Mail already exists"
     },
     {
       "value": "noemail",
-      "en": "[ No Email ]"
+      "en": "[ No E-Mail ]"
     },
     {
       "value": "graphicsettings",
@@ -151,6 +167,58 @@
     {
       "value": "addNewPVTooltip",
       "en": "Add a new PV"
+    },
+    {
+      "value": "noAssignedUsers",
+      "en": "No assigned users"
+    },
+    {
+      "value": "emptyTableExpPart1",
+      "en": "There are no saved experiments."
+    },
+    {
+      "value": "emptyTableExpPart2",
+      "en": "to set up an experiment."
+    },
+    {
+      "value": "emptyTablePVsPart1",
+      "en": "There are no saved PVs."
+    },
+    {
+      "value": "emptyTablePVsPart2",
+      "en": "or the \"+\" button to create a new one."
+    },
+    {
+      "value": "clickHere",
+      "en": "Click here"
+    },
+    {
+      "value": "createNewPV",
+      "en": "Create a new PV"
+    },
+    {
+      "value": "sheetCreatePVEmptyPVString",
+      "en": "Please enter a PV String first."
+    },
+    {
+      "value": "sheetPVNotInArchiver",
+      "en": "This PV was not found in the archiver. Please insert a correct PV String."
+    },
+    {
+      "value": "sureDelete",
+      "en": "Are you sure you want to delete <id>?"
+    },
+    {
+      "value": "addNewUserTooltip",
+      "en": "Add a new user"
+    },
+    {
+      "value": "sheetDeleteExpSuccess",
+      "en": "The experiment was deleted successfully!"
+    },
+    {
+      "value": "sheetDeletePVSuccess",
+      "en": "The PV was deleted successfully!"
     }
   ]
 }

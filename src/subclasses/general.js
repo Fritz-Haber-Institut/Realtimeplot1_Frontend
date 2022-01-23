@@ -20,6 +20,9 @@ export default {
   APIData() {
     return this.MainDomain + "/data/"
   },
+  APIValidatePVString(pvString) {
+    return this.MainDomain + `/data/validate_pv_string/${pvString}`
+  },
   // General Functions
   LSSettings: 'ZgjdLNewsboV3LRxOgaw',
   GetLSSettings() {
@@ -88,14 +91,7 @@ export default {
       cancelButtonColor: '#CC4C4C',
       confirmButtonText: this.GetString('apply'),
       cancelButtonText: this.GetString('cancel'),
-    }).then((Result) => {
-      if (Result.isConfirmed) {
-        return true
-      }
-      else {
-        return false
-      }
-    })
+    }).then(Result => Result.isConfirmed)
   },
   // E-Mail validation Regex
   emailRegex: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -109,14 +105,12 @@ export default {
   DoubleEmail: 'Email already exists',
   passwordsDontMatch: 'Password values do not match',
   maxCharactersAllowed: maxChars => `A maximum of ${maxChars} characters is allowed`,
-  userTableUpdateDialogSuccess: 'User changes saved successfully!',
   userTableUpdateDialogError: errorStatusCode => `Failed to save user changes. HTTP Error ${errorStatusCode}`,
   userTableNewUserDialogSuccess: (username, userType) => `New ${userType.toLowerCase()} ${username} saved successfully!`,
   userTableNewUserDialogError: errorStatusCode => `Failed to save a new user. HTTP Error ${errorStatusCode}`,
-  userTableDeleteDialogSuccess: 'User deleted successfully!',
   userTableDeleteDialogError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error ${errorStatusCode}`,
-  sheetNewPVSuccess: 'PV created successfully!',
   sheetNewPVError: errorStatusCode => errorStatusCode === 400 ? `Failed to save a new PV. No PV String was specified.` : `Failed to save a new PV. HTTP Error ${errorStatusCode}`,
-  sheetUpdateExpSuccess: 'Experiment changes saved successfully!',
   sheetUpdateExpError: errorStatusCode => `Failed to save experiment changes. HTTP Error ${errorStatusCode}`,
+  sheetDeleteExpError: errorStatusCode => `Failed to delete this experiment. HTTP Error ${errorStatusCode}`,
+  sheetDeletePVError: errorStatusCode => `Failed to delete this PV. HTTP Error ${errorStatusCode}`,
 }

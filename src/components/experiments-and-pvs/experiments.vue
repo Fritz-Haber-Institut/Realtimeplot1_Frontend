@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="mt-10">
-    <Dialog v-if="dialog.open" :type="dialog.type" :method="dialog.method" :identifier="dialog.short_id" :open="dialog.open" @close-dialog="closeDialog"/>
+    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getExperiments"/>
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
@@ -16,54 +16,72 @@
           :search="searchFieldValue"
           show-expand
           item-key="short_id"
-          @item-expanded="expandItem"
-          class=""
+          :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
-          <template v-slot:expanded-item="{ headers }">
-            <td :colspan="headers.length" class="pt-3">
-              <span v-for="(userFullName, idx) in usersfullNames" :key="idx">
-                <v-chip color="primary" class="mr-2 mb-2">
-                  <v-avatar class="accent white--text" left>
-                    <v-icon>mdi-account-circle</v-icon>
-                  </v-avatar>
-                  {{ userFullName }}
-                </v-chip>
-              </span>
-            </td>
+          <template v-slot:[`item.process_variable_urls`]="{ item }">
+            <PVsTableTitles v-if="shouldRenderPVsTitles" :pvsUrls="item.process_variable_urls" />
+          </template>
+            <!-- { headers, item, isMobile } -->
+          <template v-slot:expanded-item="{ headers, item }">
+            <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" />
+          </template>
+          <template v-slot:[`item.data-table-expand`]="{ item, isExpanded, expand }">
+            <v-btn v-if="item.user_urls.length" icon :class="`v-data-table__expand-icon v-icon--link ${isExpanded && 'v-data-table__expand-icon--active'}`" @click="expand(!isExpanded)">
+              <v-icon>mdi-chevron-down</v-icon>
+            </v-btn>
+            <v-tooltip v-else bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-row justify="center">
+                  <v-icon class="mx-auto" v-bind="attrs" v-on="on">mdi-account-off</v-icon>
+                </v-row>
+              </template>
+              {{ $General.GetString('noAssignedUsers') }}
+            </v-tooltip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <v-icon color="warning" small @click="openEditExpDialog(item)"> mdi-pencil </v-icon>
             <v-icon color="error" small class="ml-2" @click="deleteExp(item.short_id)"> mdi-delete </v-icon>
           </template>
           <template v-slot:no-data>
-            There are no saved experiments. <span class="DialogLink" @click="openCreatePVDialog">Create a new PV</span> to set up an experiment.
+            {{ $General.GetString('emptyTableExpPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('createNewPV') }}</span> {{ $General.GetString('emptyTableExpPart2') }}
           </template>
         </v-data-table>
       </v-card-text>
     </v-card>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-container>
 </template>
 
 <script>
 import Dialog from './dialog.vue'
+import PVsTableTitles from './pvs-table-titles.vue'
+import ExpUsersNames from './exp-users-names.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
 
 export default {
-  props: {
-    experiments: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
-    Dialog
+    Dialog,
+    PVsTableTitles,
+    ExpUsersNames,
+    BottomSheetAlert
+  },
+  props: {
+    hasActiveTab: {
+      type: Boolean,
+      default: true,
+      required: true
+    }
   },
   data() {
     return {
+      experiments: [],
       searchFieldValue: '',
       headers: [
         { text: 'ID', value: 'short_id' },
-        { text: 'Name', value: 'name' },
-        { text: 'PVs', value: 'pvs' },
+        { text: 'Name', value: 'human_readable_name' },
+        { text: 'PVs', value: 'process_variable_urls' },
         { text: 'Users', value: 'data-table-expand' },
         { value: 'settings', sortable: false }
       ],
@@ -71,39 +89,51 @@ export default {
         open: false,
         method: 'POST',
         type: 'exp',
-        short_id: ''
+        identifier: ''
       },
-      usersfullNames: []
+      sheetAlert: {
+        open: false,
+        type: 'sucess',
+        text: '',
+      },
+      shouldRenderPVsTitles: true
+    }
+  },
+  watch: {
+    hasActiveTab(val) {
+      val || setTimeout(() => this.shouldRenderPVsTitles = false, 500) // waiting for the fade-out to complete
+      val && this.getExperiments()
     }
   },
   methods: {
     // API calls
-    getUserFirstAndLastName(userUrl) {
-      // let fullName = ''
-      this.$Axios.get(this.$General.MainDomain + userUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-        .then(res => {
-          this.usersfullNames.push(`${res.data.user.first_name} ${res.data.user.last_name}`)
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    getExperiments() {
+      this.$Axios
+      .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .then(res => {
+        this.experiments = res.data.experiments
+        this.shouldRenderPVsTitles = true
+      })
+      .catch(e => {
+        console.log(e)
+      })
     },
     deleteExp(short_id) {
       const reqUrl = `${this.$General.APIExperiments()}/${short_id}`
       const alertText = 'All corresponding PVs will also be deleted.'
-      this.$General.ConfirmDeleteAlert(short_id, alertText).then((Result) => {
-        if (Result) {
-          var AxiosConfig = { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } };
-          this.$Axios(AxiosConfig)
-            .then((Result) => {
-              console.log(Result)
-              this.$emit('reload-experiments')
-            })
-            .catch((Error) => {
-              console.log(Error);
-            });
-        }
-      });
+      this.$General.ConfirmDeleteAlert(short_id, alertText)
+      .then(isConfirmed => 
+        isConfirmed ? 
+        { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } } : 
+        Promise.reject('Delete request cancelled.'))
+      .then(config => this.$Axios(config))
+      .then(() => {
+        this.showSheet('success', this.$General.GetString('sheetDeleteExpSuccess')) 
+      })
+      .catch(e => {
+        console.log(e)
+        e.response && this.showSheet('error', this.$General.sheetDeleteExpError(e.response.status))
+      })
     },
     // UI methods
     openCreatePVDialog() {
@@ -114,27 +144,34 @@ export default {
     openEditExpDialog(exp) {
       this.dialog.type='exp'
       this.dialog.method='PUT'
-      this.dialog.short_id=exp.short_id
+      this.dialog.identifier=exp.short_id
       this.dialog.open = true
     },
     closeDialog() {
-      this.$emit('reload-experiments')
-      this.dialog.open=false
+      setTimeout(() => {
+        this.dialog.open=false
+      }, 500)
     },
-    expandItem({ item, value }) {
-      console.log(value)
-      console.log(item.users)
-      if (value) {
-        for (let userUrl of item.userUrls) {
-          this.getUserFirstAndLastName(userUrl)
-        }
+    showSheet(type, text, doCloseDialog = true) {
+      this.sheetAlert.type = type;
+      this.sheetAlert.text = text;
+      this.sheetAlert.open = true;
+      let time
+      if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
       } else {
-        this.usersfullNames = []
+        time = 1000
       }
-    }
+      this.getExperiments()
+      setTimeout(() => {
+        this.sheetAlert.open = false
+      }, time);
+    },
   },
-  // mounted() {
-  //   this.getExperiments()
-  // }
+  mounted() {
+    this.getExperiments()
+  }
 };
 </script>
