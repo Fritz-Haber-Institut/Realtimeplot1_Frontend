@@ -54,23 +54,28 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click.native="closeDialog">Cancel</v-btn>
-        <v-btn v-if="$props.method === 'POST'" color="blue darken-1" text :disabled="confirmButtonDisabled" @click.native="createNewPV">Create</v-btn>
-        <v-btn v-else color="blue darken-1" text @click.native="updateResource" :disabled="confirmButtonDisabled">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</v-btn>
+        <!-- <v-btn v-if="$props.method === 'POST'" color="blue darken-1" text :disabled="confirmButtonDisabled" @click.native="createNewPV">Create</v-btn>
+        <v-btn v-else color="blue darken-1" text @click.native="updateResource" :disabled="confirmButtonDisabled">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</v-btn> -->
+        <ButtonWithLoading v-if="isCreating" :disabled="confirmButtonDisabled" @clicked="createNewPV" :loading="reqLoading">Create</ButtonWithLoading>
+        <ButtonWithLoading v-else :disabled="confirmButtonDisabled" @clicked="updateResource" :loading="reqLoading">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</ButtonWithLoading>
         <!-- <v-progress-circular v-else indeterminate color="primary" /> -->
       </v-card-actions>
     </v-card>
-    <v-bottom-sheet v-model="sheetAlert.open" width="30%" content-class="elevation-0">
-      <v-sheet class="text-center rounded">
-        <v-alert full-width height="100%" :type="sheetAlert.type">
-          {{ sheetAlert.text }}
-        </v-alert>
-      </v-sheet>
-    </v-bottom-sheet>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-dialog>
 </template>
 
 <script>
+import ButtonWithLoading from '../button-with-loading.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
+
 export default {
+  components: {
+    ButtonWithLoading,
+    BottomSheetAlert
+  },
   props: {
     type: {
       type: String,
@@ -80,7 +85,7 @@ export default {
       type: String,
       required: true,
       default: 'POST',
-      validator: (val) => ["POST", "PUT", "DELETE"].includes(val),
+      validator: val => ["POST", "PUT", "DELETE"].includes(val)
     },
     open: {
       type: Boolean,
@@ -118,11 +123,15 @@ export default {
         type: 'sucess',
         text: "",
       },
+      reqLoading: false
     };
   },
   computed: {
     isExperiment() {
       return this.type === "exp";
+    },
+    isCreating() {
+      return this.method === "POST"
     },
     isUpdating() {
       return this.method === "PUT";
@@ -151,6 +160,7 @@ export default {
         this.showSheet('info', this.$General.GetString('sheetCreatePVEmptyPVString'), false)
         return
       }
+      this.reqLoading = true
       this.isPVInArchiver()
       .then(isIt => {
         if (!isIt) {
@@ -169,7 +179,10 @@ export default {
         }
       })
       .then(config => this.$Axios(config))
-      .then(() => this.showSheet("success", this.$General.GetString('sheetNewPVSuccess')))
+      .then(() => {
+        this.reqLoading = false
+        this.showSheet("success", this.$General.GetString('sheetNewPVSuccess'))
+      })
       .catch(e => {
         console.log(e)
         e.response && this.showSheet("error", this.$General.sheetNewPVError(e.response.status))
@@ -230,6 +243,7 @@ export default {
         this.confirmButtonDisabled = true
         return
       }
+      this.reqLoading = true
       this.axiosConfig = {
         method: "PUT",
         url: reqUrl,
@@ -245,6 +259,7 @@ export default {
           // console.log(res.data);
           const successMessage = this.isExperiment ? this.$General.GetString('sheetUpdateExpSuccess') : this.$General.GetString('sheetUpdatePVSuccess')
           this.showSheet("success", successMessage);
+          this.reqLoading = false
         })
         .catch((e) => {
           this.showSheet("error", this.$General.sheetUpdateExpError(e.response.status));
@@ -330,9 +345,9 @@ export default {
       } else {
         time = 1000
       }
+      this.$emit('reload-data')
       setTimeout(() => {
         this.sheetAlert.open = false;
-        this.$emit('reload-data')
         doCloseDialog && this.closeDialog();
       }, time);
     },
@@ -347,11 +362,7 @@ export default {
     },
   },
   mounted() {
-    if (this.$props.method === "PUT") {
-      this.getResource();
-    } else if (this.$props.method === 'DELETE') {
-      this.deleteResource()
-    }
+    this.isUpdating && this.getResource()
   },
 };
 </script>

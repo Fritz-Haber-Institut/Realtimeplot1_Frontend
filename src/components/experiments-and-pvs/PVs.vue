@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="mt-10">
-    <Dialog v-if="dialog.open" :type="dialog.type" :method="dialog.method" :identifier="dialog.pv_string" :open="dialog.open" @close-dialog="closeDialog" @reload-data="getPVs" />
+    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getPVs" />
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
@@ -36,15 +36,20 @@
         </v-data-table>
       </v-card-text>
     </v-card>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-container>
 </template>
 
 <script>
 import Dialog from './dialog.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
 
 export default {
   components: {
-    Dialog
+    Dialog,
+    BottomSheetAlert
   },
   props: {
     hasActiveTab: {
@@ -66,7 +71,12 @@ export default {
         open: false,
         method: 'POST',
         type: 'pv',
-        pv_string: ''
+        identifier: ''
+      },
+      sheetAlert: {
+        open: false,
+        type: 'sucess',
+        text: '',
       },
     }
   },
@@ -105,20 +115,18 @@ export default {
       this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string)
       .then(isLastPv => isLastPv ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : '')
       .then(alertText => this.$General.ConfirmDeleteAlert(item.pv_string, alertText))
-      .then(result => {
-        if (result) {
-          const AxiosConfig = { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } };
-          this.$Axios(AxiosConfig)
-          .then((result) => {
-            console.log(result)
-            this.getPVs()
-            // this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string) && this.$emit('reload-experiments')
-          })
-          .catch((Error) => {
-            console.log(Error);
-          });
-        }
-      });
+      .then(isConfirmed => 
+        isConfirmed ? 
+        { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } } : 
+        Promise.reject('Delete request cancelled.'))
+      .then(config => this.$Axios(config))
+      .then(() => {
+        this.showSheet('success', this.$General.GetString('sheetDeletePVSuccess')) 
+      })
+      .catch(e => {
+        console.log(e)
+        e.response && this.showSheet('error', this.$General.sheetDeletePVError(e.response.status))
+      })
     },
     // UI Methods
     openCreatePVDialog() {
@@ -127,21 +135,32 @@ export default {
     },
     openEditPVDialog(exp) {
       this.dialog.method='PUT'
-      this.dialog.pv_string=exp.pv_string
+      this.dialog.identifier=exp.pv_string
       this.dialog.open = true
     },
     closeDialog() {
       this.dialog.open=false
-    }
+    },
+    showSheet(type, text, doCloseDialog = true) {
+      this.sheetAlert.type = type;
+      this.sheetAlert.text = text;
+      this.sheetAlert.open = true;
+      let time
+      if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
+      } else {
+        time = 1000
+      }
+      this.getPVs()
+      setTimeout(() => {
+        this.sheetAlert.open = false
+      }, time);
+    },
   },
   mounted() {
     this.getPVs()
   }
 };
 </script>
-<style>
-  .DialogLink {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-</style>
