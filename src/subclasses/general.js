@@ -80,12 +80,7 @@ export default {
     }
   },
 
-<<<<<<< HEAD
-  ConfirmDeleteAlert: function(resourceId, text = '') {
-    console.log(text)
-=======
   ConfirmDeleteAlert: function (resourceId, text = '') {
->>>>>>> main
     return Swal.fire({
       position: 'center',
       icon: 'warning',
