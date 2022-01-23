@@ -26,6 +26,11 @@
           :search="searchFieldValue"
           :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
+          <template v-slot:[`item.pv_string`]="{ item }">
+            <router-link :to="`/dashboard?pvstring=${item.pv_string}`">
+              {{ item.pv_string }}
+            </router-link>
+          </template>
           <template v-slot:[`item.settings`]="{ item }">
             <v-icon color="warning" small @click="openEditPVDialog(item)"> mdi-pencil </v-icon>
             <v-icon color="error" small class="ml-2" @click="deletePV(item)"> mdi-delete </v-icon>
