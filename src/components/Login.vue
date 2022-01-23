@@ -55,7 +55,7 @@ export default {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('successwithtimer').replace('@@', '2');
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
-              this.$General.ReloadPage('/dashboard');
+              this.$General.ReloadPage('/experiments-and-pvs');
             }, 2000);
           })
           .catch((Error) => {

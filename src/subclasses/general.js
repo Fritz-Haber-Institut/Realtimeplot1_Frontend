@@ -17,6 +17,9 @@ export default {
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
+  APIData() {
+    return this.MainDomain + "/data/"
+  },
   APIValidatePVString(pvString) {
     return this.MainDomain + `/data/validate_pv_string/${pvString}`
   },
@@ -77,8 +80,12 @@ export default {
     }
   },
 
+<<<<<<< HEAD
   ConfirmDeleteAlert: function(resourceId, text = '') {
     console.log(text)
+=======
+  ConfirmDeleteAlert: function (resourceId, text = '') {
+>>>>>>> main
     return Swal.fire({
       position: 'center',
       icon: 'warning',
@@ -97,7 +104,7 @@ export default {
   NoEmpty: 'Field cannot be empty!',
   WrongInfos: 'Wrong E-Mail or password!',
   WrongInfos2: 'Informations are not Complete',
-  WrongInfos3: 'Username already exists',    
+  WrongInfos3: 'Username already exists',
   WrongEmailFormat: 'Wrong E-Mail format!',
   Success: 'Operations successfully completed!',
   DoubleEmail: 'Email already exists',
