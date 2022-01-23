@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="mt-10">
-    <Dialog v-if="dialog.open" :type="dialog.type" :method="dialog.method" :identifier="dialog.short_id" :open="dialog.open" @close-dialog="closeDialog"/>
+    <Dialog v-if="dialog.open" :type="dialog.type" :method="dialog.method" :identifier="dialog.short_id" :open="dialog.open" @close-dialog="closeDialog" @reload-data="getExperiments"/>
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
@@ -16,34 +16,34 @@
           :search="searchFieldValue"
           show-expand
           item-key="short_id"
-          @item-expanded="expandItem"
-          class=""
+          :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
-          <template v-slot:[`item.pvs`]="{ item }">
-            <tr v-for="(pv, idx) in item.pvs" :key="idx">
-              <v-chip class="my-2">
-                {{ pv }}
-              </v-chip>
-            </tr>
+          <template v-slot:[`item.process_variable_urls`]="{ item }">
+            <PVsTableTitles v-if="shouldRenderPVsTitles" :pvsUrls="item.process_variable_urls" />
           </template>
-          <template v-slot:expanded-item="{ headers }">
-            <td :colspan="headers.length" class="pt-3">
-              <span v-for="(userFullName, idx) in usersfullNames" :key="idx">
-                <v-chip color="primary" class="mr-2 mb-2">
-                  <v-avatar class="accent white--text" left>
-                    <v-icon>mdi-account-circle</v-icon>
-                  </v-avatar>
-                  {{ userFullName }}
-                </v-chip>
-              </span>
-            </td>
+            <!-- { headers, item, isMobile } -->
+          <template v-slot:expanded-item="{ headers, item }">
+            <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" />
+          </template>
+          <template v-slot:[`item.data-table-expand`]="{ item, isExpanded, expand }">
+            <v-btn v-if="item.user_urls.length" icon :class="`v-data-table__expand-icon v-icon--link ${isExpanded && 'v-data-table__expand-icon--active'}`" @click="expand(!isExpanded)">
+              <v-icon>mdi-chevron-down</v-icon>
+            </v-btn>
+            <v-tooltip v-else bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-row justify="center">
+                  <v-icon class="mx-auto" v-bind="attrs" v-on="on">mdi-account-off</v-icon>
+                </v-row>
+              </template>
+              {{ $General.GetString('noAssignedUsers') }}
+            </v-tooltip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <v-icon color="warning" small @click="openEditExpDialog(item)"> mdi-pencil </v-icon>
             <v-icon color="error" small class="ml-2" @click="deleteExp(item.short_id)"> mdi-delete </v-icon>
           </template>
           <template v-slot:no-data>
-            There are no saved experiments. <span class="DialogLink" @click="openCreatePVDialog">Create a new PV</span> to set up an experiment.
+            {{ $General.GetString('emptyTableExpPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('createNewPV') }}</span> {{ $General.GetString('emptyTableExpPart2') }}
           </template>
         </v-data-table>
       </v-card-text>
@@ -53,24 +53,30 @@
 
 <script>
 import Dialog from './dialog.vue'
+import PVsTableTitles from './pvs-table-titles.vue'
+import ExpUsersNames from './exp-users-names.vue'
 
 export default {
-  props: {
-    experiments: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
-    Dialog
+    Dialog,
+    PVsTableTitles,
+    ExpUsersNames
+  },
+  props: {
+    hasActiveTab: {
+      type: Boolean,
+      default: true,
+      required: true
+    }
   },
   data() {
     return {
+      experiments: [],
       searchFieldValue: '',
       headers: [
         { text: 'ID', value: 'short_id' },
-        { text: 'Name', value: 'name' },
-        { text: 'PVs', value: 'pvs' },
+        { text: 'Name', value: 'human_readable_name' },
+        { text: 'PVs', value: 'process_variable_urls' },
         { text: 'Users', value: 'data-table-expand' },
         { value: 'settings', sortable: false }
       ],
@@ -80,27 +86,27 @@ export default {
         type: 'exp',
         short_id: ''
       },
-      usersfullNames: []
+      shouldRenderPVsTitles: true
     }
   },
-  computed: {
-    experimentsWithPvNames() {
-      this.experiments.map(exp => {
-        
-      })
-    },
+  watch: {
+    hasActiveTab(val) {
+      val || setTimeout(() => this.shouldRenderPVsTitles = false, 500) // waiting for the fade-out to complete
+      val && this.getExperiments()
+    }
   },
   methods: {
     // API calls
-    getUserFirstAndLastName(userUrl) {
-      // let fullName = ''
-      this.$Axios.get(this.$General.MainDomain + userUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-        .then(res => {
-          this.usersfullNames.push(`${res.data.user.first_name} ${res.data.user.last_name}`)
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    getExperiments() {
+      this.$Axios
+      .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .then(res => {
+        this.experiments = res.data.experiments
+        this.shouldRenderPVsTitles = true
+      })
+      .catch(e => {
+        console.log(e)
+      })
     },
     deleteExp(short_id) {
       const reqUrl = `${this.$General.APIExperiments()}/${short_id}`
@@ -109,18 +115,15 @@ export default {
         if (Result) {
           var AxiosConfig = { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } };
           this.$Axios(AxiosConfig)
-            .then((Result) => {
-              console.log(Result)
-              this.$emit('reload-experiments')
+            .then(() => {
+              // console.log(Result)
+              this.getExperiments()
             })
-            .catch((Error) => {
-              console.log(Error);
+            .catch(e => {
+              console.log(e);
             });
         }
       });
-    },
-    getPVNames() {
-
     },
     // UI methods
     openCreatePVDialog() {
@@ -135,23 +138,13 @@ export default {
       this.dialog.open = true
     },
     closeDialog() {
-      this.$emit('reload-experiments')
-      this.dialog.open=false
-    },
-    expandItem({ item, value }) {
-      console.log(value)
-      console.log(item.users)
-      if (value) {
-        for (let userUrl of item.userUrls) {
-          this.getUserFirstAndLastName(userUrl)
-        }
-      } else {
-        this.usersfullNames = []
-      }
+      setTimeout(() => {
+        this.dialog.open=false
+      }, 500)
     }
   },
-  // mounted() {
-  //   this.getExperiments()
-  // }
+  mounted() {
+    this.getExperiments()
+  }
 };
 </script>
