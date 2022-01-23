@@ -402,7 +402,7 @@ export default {
           .then(() => {
             this.dialogAlert.isVisible = true;
             this.dialogAlert.type = 'success';
-            this.dialogAlert.text = this.$General.GetString('usertableupdatedialogsuccess');
+            this.dialogAlert.text = this.$General.GetString('userTableUpdateDialogSuccess');
             this.$emit('reload-users');
           })
           .catch((e) => {
