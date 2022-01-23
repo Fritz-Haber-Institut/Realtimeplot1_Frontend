@@ -38,7 +38,7 @@
     },
     {
       "value": "email",
-      "en": "Email Address"
+      "en": "E-mail Address"
     },
     {
       "value": "manageusers",
@@ -106,7 +106,7 @@
     },
     {
       "value": "wrongemailformat",
-      "en": "Wrong Email format!"
+      "en": "Wrong E-Mail format!"
     },
     {
       "value": "passwordsdontmatch",
@@ -138,7 +138,7 @@
     },
     {
       "value": "successwithtimer",
-      "en": "Operations successfully completed! redirection in @@ seconds ..."
+      "en": "Operations successfully completed! Redirection in @@ seconds ..."
     },
     {
       "value": "loading",
@@ -154,11 +154,11 @@
     },
     {
       "value": "doubleemail",
-      "en": "Email already exists"
+      "en": "E-Mail already exists"
     },
     {
       "value": "noemail",
-      "en": "[ No Email ]"
+      "en": "[ No E-Mail ]"
     },
     {
       "value": "graphicsettings",
@@ -203,6 +203,22 @@
     {
       "value": "sheetPVNotInArchiver",
       "en": "This PV was not found in the archiver. Please insert a correct PV String."
+    },
+    {
+      "value": "sureDelete",
+      "en": "Are you sure you want to delete <id>?"
+    },
+    {
+      "value": "addNewUserTooltip",
+      "en": "Add a new user"
+    },
+    {
+      "value": "sheetDeleteExpSuccess",
+      "en": "The experiment was deleted successfully!"
+    },
+    {
+      "value": "sheetDeletePVSuccess",
+      "en": "The PV was deleted successfully!"
     }
   ]
 }

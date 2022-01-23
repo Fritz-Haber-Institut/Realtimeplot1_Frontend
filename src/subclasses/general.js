@@ -111,4 +111,6 @@ export default {
   userTableDeleteDialogError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error ${errorStatusCode}`,
   sheetNewPVError: errorStatusCode => errorStatusCode === 400 ? `Failed to save a new PV. No PV String was specified.` : `Failed to save a new PV. HTTP Error ${errorStatusCode}`,
   sheetUpdateExpError: errorStatusCode => `Failed to save experiment changes. HTTP Error ${errorStatusCode}`,
+  sheetDeleteExpError: errorStatusCode => `Failed to delete this experiment. HTTP Error ${errorStatusCode}`,
+  sheetDeletePVError: errorStatusCode => `Failed to delete this PV. HTTP Error ${errorStatusCode}`,
 }
