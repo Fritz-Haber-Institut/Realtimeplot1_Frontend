@@ -4,8 +4,8 @@
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model="FormValues.email"></v-text-field>
-            <v-text-field autocomplete="new-loginname" filled prepend-inner-icon="mdi-star" :label="$General.GetString('loginname')" v-model="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
+            <v-text-field autocomplete="new-loginname" filled prepend-inner-icon="mdi-star" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
             <v-select
               filled
               prepend-inner-icon="mdi-key"
@@ -27,10 +27,10 @@
             ></v-select>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-first_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('firstname')" v-model="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-first_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('lastname')" v-model="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
         </v-row>
         <v-row no-gutters>

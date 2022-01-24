@@ -10,15 +10,15 @@
             <v-col cols="12" v-if="isExperiment">
               <v-text-field
                 label="Name"
-                v-model="tempExp.human_readable_name"
+                v-model.trim="tempExp.human_readable_name"
                 @keydown="activateConfirmButton"
               />
             </v-col>
             <v-col cols="6" v-if="!isExperiment">
-              <v-text-field label="PV String" v-model="tempPV.pv_string" @keydown="activateConfirmButton" />
+              <v-text-field label="PV String" v-model.trim="tempPV.pv_string" @keydown="activateConfirmButton" />
             </v-col>
             <v-col cols="6" v-if="!isExperiment">
-              <v-text-field label="Name (optional)" v-model="tempPV.human_readable_name" @keydown="activateConfirmButton" />
+              <v-text-field label="Name (optional)" v-model.trim="tempPV.human_readable_name" @keydown="activateConfirmButton" />
             </v-col>
           </v-row>
           <v-row v-if="isExperiment">
