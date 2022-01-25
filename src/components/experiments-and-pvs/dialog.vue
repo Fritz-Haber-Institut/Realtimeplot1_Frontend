@@ -54,11 +54,8 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click.native="closeDialog">Cancel</v-btn>
-        <!-- <v-btn v-if="$props.method === 'POST'" color="blue darken-1" text :disabled="confirmButtonDisabled" @click.native="createNewPV">Create</v-btn>
-        <v-btn v-else color="blue darken-1" text @click.native="updateResource" :disabled="confirmButtonDisabled">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</v-btn> -->
-        <ButtonWithLoading v-if="isCreating" :disabled="confirmButtonDisabled" @clicked="createNewPV" :loading="reqLoading">Create</ButtonWithLoading>
+        <ButtonWithLoading v-if="isCreating" :disabled="confirmButtonDisabled" @clicked="initiatePVCreation" :loading="reqLoading">Create</ButtonWithLoading>
         <ButtonWithLoading v-else :disabled="confirmButtonDisabled" @clicked="updateResource" :loading="reqLoading">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</ButtonWithLoading>
-        <!-- <v-progress-circular v-else indeterminate color="primary" /> -->
       </v-card-actions>
     </v-card>
     <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
@@ -154,45 +151,45 @@ export default {
     },
   },
   methods: {
+    initiatePVCreation() {
+      this.reqLoading = true
+      this.$emit('reload-data', this.checkAndCreatePV)
+    },
     // API methods
-    createNewPV() {
+    checkAndCreatePV() {
       if (!this.tempPV.pv_string) {
         this.showSheet('info', this.$General.GetString('sheetCreatePVEmptyPVString'), false)
+        this.reqLoading = false
         return
       }
-      this.reqLoading = true
-      this.isPVInArchiver()
-      .then(isIt => {
-        if (!isIt) {
-          this.showSheet('error', this.$General.GetString('sheetPVNotInArchiver'))
-          return Promise.reject('ERROR: ' + this.$General.GetString('sheetPVNotInArchiver'))
-        } else {
-          return {
-            method: "POST",
-            url: this.$General.APIPVs(),
-            headers: {
-              "x-access-tokens": this.$General.GetLSSettings().Token,
-              "Content-Type": "application/json",
-            },
-            data: this.tempPV,
-          };
-        }
-      })
-      .then(config => this.$Axios(config))
-      .then(() => {
-        this.reqLoading = false
-        this.showSheet("success", this.$General.GetString('sheetNewPVSuccess'))
-      })
-      .catch(e => {
-        console.log(e)
-        e.response && this.showSheet("error", this.$General.sheetNewPVError(e.response.status))
-      })
-
-
+      const allPVs = this.$parent.pvs.map(({ pv_string }) => pv_string)
+      if (allPVs.includes(this.tempPV.pv_string)) {
+        this.showSheet('error', this.$General.GetString('sheetCreatePVAlreadyCreated'), false)
+      } else {
+        this.isPVInArchiver()
+        .then(isIt => {
+          if (!isIt) {
+            this.showSheet('error', this.$General.GetString('sheetPVNotInArchiver'))
+            return Promise.reject('ERROR: ' + this.$General.GetString('sheetPVNotInArchiver'))
+          } else {
+            return { method: "POST", url: this.$General.APIPVs(), headers: { "x-access-tokens": this.$General.GetLSSettings().Token, "Content-Type": "application/json" }, data: this.tempPV }
+          }
+        })
+        .then(config => this.$Axios(config))
+        .then(() => {
+          this.reqLoading = false
+          this.showSheet("success", this.$General.GetString('sheetNewPVSuccess'))
+        })
+        .catch(e => {
+          e.response && console.log(e)
+          e.response && this.showSheet("error", this.$General.sheetNewPVError(e.response.status))
+          e[0] === 'E' && this.showSheet('error', this.$General.GetString('sheetPVNotInArchiver')) 
+        })
+      }
     },
     isPVInArchiver() {
       return this.$Axios.get(this.$General.APIValidatePVString(this.tempPV.pv_string), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-      .then(res => res.pv_string_exists)
+      .then(res => res.data.pv_string_exists)
     },
     getResource() {
       const reqUrl = `${this.isExperiment ? this.$General.APIExperiments() : this.$General.APIPVs()}/${this.$props.identifier}`
@@ -255,8 +252,6 @@ export default {
       };
       this.$Axios(this.axiosConfig)
         .then(() => {
-          // console.log("updateResource");
-          // console.log(res.data);
           const successMessage = this.isExperiment ? this.$General.GetString('sheetUpdateExpSuccess') : this.$General.GetString('sheetUpdatePVSuccess')
           this.showSheet("success", successMessage);
           this.reqLoading = false
@@ -293,17 +288,12 @@ export default {
               text: res.data.user.first_name + ' ' + res.data.user.last_name
             });
         }))
-        // .then(() => this.finishedLoading = true)
         .catch(e => console.log(e))
     },
     // Logic methods
     compareExpUsers() {
       const expUserIDs = this.expUserNames.map(el => el.value)
       const expUserIDs_COPY = this.expUserNames_COPY.map(el => el.value)
-      // console.log('expUserIDs')
-      // console.log(expUserIDs)
-      // console.log('expUserIDs_COPY')
-      // console.log(expUserIDs_COPY)
       let id
 
       // Users were added
@@ -345,16 +335,16 @@ export default {
       } else {
         time = 1000
       }
-      this.$emit('reload-data')
       setTimeout(() => {
         this.sheetAlert.open = false;
-        doCloseDialog && this.closeDialog();
+        doCloseDialog ? this.closeDialog() : this.$emit('reload-data')
       }, time);
     },
     activateConfirmButton() {
       this.confirmButtonDisabled = false
     },
     closeDialog() {
+      this.$emit('reload-data')
       // waiting for the closing animation to finish
       setTimeout(() => {
         this.$emit("close-dialog");
