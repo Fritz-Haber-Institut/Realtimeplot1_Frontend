@@ -1,15 +1,15 @@
 <template>
-  <v-container fluid>
-    <v-card class="pa-5">
+  <v-container>
+    <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
       <v-form ref="Login" lazy-validation autocomplete="off">
         <v-row>
-          <v-col cols="12">
-            <v-text-field autocomplete="new-username" filled prepend-inner-icon="mdi-star" :label="$General.GetString('loginname')" v-model="LoginValues.username" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-            <v-text-field autocomplete="new-password" filled prepend-inner-icon="mdi-star" :label="$General.GetString('password')" v-model="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.GetString('noempty')]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
+          <v-col>
+            <v-text-field autocomplete="new-username" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="LoginValues.username" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('password')" v-model.trim="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.GetString('noempty')]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
           </v-col>
         </v-row>
-        <v-row no-gutters>
-          <v-col cols="12">
+        <v-row>
+          <v-col>
             <v-alert icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
@@ -52,7 +52,7 @@ export default {
             this.LocalStorage.Token = LoginResult.data.access_token;
             this.LocalStorage.preferred_language = 'en';            
             this.$General.SetLSSettings(this.LocalStorage);
-            this.GeneralValues.AlertMessage.Message = this.$General.GetString('successwithtimer').replace('@@', '2');
+            this.GeneralValues.AlertMessage.Message = this.$General.GetString('successfullLogin');
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
               this.$General.ReloadPage('/experiments-and-pvs');

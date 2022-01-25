@@ -17,7 +17,7 @@
                 <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilTime" type="time" />
               </v-col>
               <v-col cols="12">
-                <v-select filled prepend-inner-icon="mdi-key" v-model="ChartSettings.PVString" :items="ChartSettings.ExperimentsList" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
+                <v-select prepend-inner-icon="mdi-key" v-model="ChartSettings.PVString" :items="ChartSettings.ExperimentsList" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
                 <v-btn block color="info" @click="UpdateData()">
                   <v-icon>mdi-update</v-icon>
                 </v-btn>

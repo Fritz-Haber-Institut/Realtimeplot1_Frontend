@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="mt-10">
+  <v-container class="mt-10">
     <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getPVs" />
     <v-card>
       <v-card-title>
@@ -26,9 +26,24 @@
           :search="searchFieldValue"
           :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
+          <template v-slot:[`item.pv_string`]="{ item }">
+            <router-link :to="`/dashboard?pvstring=${item.pv_string}`">
+              {{ item.pv_string }}
+            </router-link>
+          </template>
           <template v-slot:[`item.settings`]="{ item }">
-            <v-icon color="warning" small @click="openEditPVDialog(item)"> mdi-pencil </v-icon>
-            <v-icon color="error" small class="ml-2" @click="deletePV(item)"> mdi-delete </v-icon>
+            <div v-if="$vuetify.breakpoint.smAndDown" :class="actionButtonsWrapperClasses">
+              <v-btn small fab color="warning" @click="openEditPVDialog(item)">
+                <v-icon> mdi-pencil </v-icon>
+              </v-btn>
+              <v-btn fab color="error" small :class="deleteButtonClasses" @click="deletePV(item)">
+                <v-icon> mdi-delete </v-icon>
+              </v-btn>
+            </div>
+            <div v-else :class="actionButtonsWrapperClasses">
+              <v-icon color="warning" small @click="openEditPVDialog(item)"> mdi-pencil </v-icon>
+              <v-icon color="error" small :class="deleteButtonClasses" @click="deletePV(item)"> mdi-delete </v-icon>
+            </div>
           </template>
           <template v-slot:no-data>
             {{ $General.GetString('emptyTablePVsPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('clickHere') }}</span> {{ $General.GetString('emptyTablePVsPart2') }}
@@ -80,6 +95,23 @@ export default {
       },
     }
   },
+  computed: {
+    deleteButtonClasses() {
+      return {
+        'ml-2': this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.xs,
+        // 'ml-2': this.$vuetify.breakpoint.smAndDown,
+        'mt-2': this.$vuetify.breakpoint.smOnly
+      }
+    },
+    actionButtonsWrapperClasses() {
+      return {
+        'd-flex': true,
+        'my-3': true,
+        'flex-column': this.$vuetify.breakpoint.smOnly,
+        'mb-3': this.$vuetify.breakpoint.xs
+      }
+    }
+  },
   watch: {
     hasActiveTab(val) {
       val && this.getPVs()
@@ -87,11 +119,12 @@ export default {
   },
   methods: {
     // API calls
-    getPVs() {
+    getPVs(signalCompletion) {
       this.$Axios
       .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
       .then(res => {
         this.pvs = res.data.process_variables
+        signalCompletion && signalCompletion()
       })
       .catch(e => {
         console.log(e)

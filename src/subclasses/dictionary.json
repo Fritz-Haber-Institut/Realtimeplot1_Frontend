@@ -141,8 +141,12 @@
       "en": "Operations successfully completed! Redirection in @@ seconds ..."
     },
     {
+      "value": "successfullLogin",
+      "en": "Login successfull!"
+    },
+    {
       "value": "loading",
-      "en": "Loading ... Please wait"
+      "en": "Loading ... Please wait."
     },
     {
       "value": "search",
@@ -219,6 +223,10 @@
     {
       "value": "sheetDeletePVSuccess",
       "en": "The PV was deleted successfully!"
+    },
+    {
+      "value": "sheetCreatePVAlreadyCreated",
+      "en": "This PV is already available in the database. You can search for it in the PVs' table."
     }
   ]
 }

@@ -104,12 +104,9 @@ export default {
       this.$General.ReloadPage('/login');
     },
     ChangeTheme: function () {
-      try {
-        this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
-        this.$General.SetLSSettings(this.LocalStorage);
-      } finally {
-        window.location.href = '';
-      }
+      this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
+      this.$General.SetLSSettings(this.LocalStorage);
+      this.$vuetify.theme.dark = this.GeneralSettings.DarkMode
     },
   },
   mounted() {
