@@ -2,12 +2,12 @@
   <table>
     <tr v-for="(_, idx) in pvsUrls" :key="idx">
       <router-link v-if="finishedLoading" :to="`/dashboard?pvstring=${pvsStrings[idx]}`">
-        <v-chip label class="my-2" color="default" style="cursor: pointer;">
+        <v-chip label class="my-2" color="secondary" style="cursor: pointer;">
           <v-icon left>mdi-text-box-outline</v-icon>
           {{ pvsTitles[idx] }}
         </v-chip>
       </router-link>
-      <v-skeleton-loader v-else class="my-2" type="chip" tile />
+      <v-skeleton-loader v-else :class="skeletonClasses" type="chip" tile/>
     </tr>
   </table>
 </template>
@@ -26,15 +26,22 @@ export default {
       finishedLoading: false
     }
   },
+  computed: {
+    pvsStrings(){
+      return this.pvsUrls.map(url => url.split('pvs/')[1])
+    },
+    skeletonClasses() {
+      return {
+        'my-2' : true,
+        'pvs-titles-width--desktop': !this.$vuetify.breakpoint.mobile,
+        'pvs-titles-width--mobile': this.$vuetify.breakpoint.mobile
+      }
+    },
+  },
   watch: {
     pvsUrls() {
       this.getPVTitles()
     },
-  },
-  computed: {
-    pvsStrings(){
-      return this.pvsUrls.map(url => url.split('pvs/')[1])
-    }
   },
   methods: {
     getPVTitles() {
@@ -55,3 +62,14 @@ export default {
   }
 }
 </script>
+<style>
+  .pvs-titles-width--desktop {
+    width: 400px;
+  }
+  .pvs-titles-width--mobile {
+    width: 150px;
+  }
+  [class*="pvs-titles-width"] > .v-skeleton-loader__chip {
+    width: 100%;
+  }
+</style>
