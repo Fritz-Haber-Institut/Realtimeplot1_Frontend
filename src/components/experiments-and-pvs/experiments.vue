@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="mt-10">
+  <v-container class="mt-10">
     <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getExperiments"/>
     <v-card>
       <v-card-title>
@@ -39,8 +39,14 @@
             </v-tooltip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
-            <v-icon color="warning" small @click="openEditExpDialog(item)"> mdi-pencil </v-icon>
-            <v-icon color="error" small class="ml-2" @click="deleteExp(item.short_id)"> mdi-delete </v-icon>
+            <div :class="actionButtonsWrapperClasses">
+              <v-btn small fab color="warning" @click="openEditExpDialog(item)">
+                <v-icon> mdi-pencil </v-icon>
+              </v-btn>
+              <v-btn fab color="error" small :class="deleteButtonClasses" @click="deleteExp(item.short_id)">
+                <v-icon> mdi-delete </v-icon>
+              </v-btn>
+            </div>
           </template>
           <template v-slot:no-data>
             {{ $General.GetString('emptyTableExpPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('createNewPV') }}</span> {{ $General.GetString('emptyTableExpPart2') }}
@@ -97,6 +103,21 @@ export default {
         text: '',
       },
       shouldRenderPVsTitles: true
+    }
+  },
+  computed:{
+    deleteButtonClasses() {
+      return {
+        'ml-2': this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.xs,
+        'mt-2': this.$vuetify.breakpoint.smOnly
+      }
+    },
+    actionButtonsWrapperClasses() {
+      return {
+        'd-flex': true,
+        'flex-column': this.$vuetify.breakpoint.smOnly,
+        'mb-3': this.$vuetify.breakpoint.xs
+      }
     }
   },
   watch: {
