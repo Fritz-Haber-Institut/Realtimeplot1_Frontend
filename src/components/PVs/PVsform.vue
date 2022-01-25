@@ -4,8 +4,8 @@
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-pvstring" filled prepend-inner-icon="mdi-star" :label="$General.GetString('pvstring')" v-model="FormValues.pv_string" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-            <v-text-field autocomplete="new-humanreadablename" filled prepend-inner-icon="mdi-star" :label="$General.GetString('humanreadablename')" v-model="FormValues.human_readable_name"></v-text-field>
+            <v-text-field autocomplete="new-pvstring" prepend-inner-icon="mdi-star" :label="$General.GetString('pvstring')" v-model="FormValues.pv_string" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-humanreadablename" prepend-inner-icon="mdi-star" :label="$General.GetString('humanreadablename')" v-model="FormValues.human_readable_name"></v-text-field>
           </v-col>
         </v-row>
         <v-row no-gutters>

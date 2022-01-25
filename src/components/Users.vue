@@ -10,7 +10,7 @@
         </v-alert>
       </v-card-actions>
       <v-card-title>
-        <v-text-field autocomplete="new-search" full-width hide-details="" filled prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="Users.Search"></v-text-field>
+        <v-text-field autocomplete="new-search" full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="Users.Search"></v-text-field>
         <v-tooltip bottom>
           <template
             v-slot:activator="{ on, attrs }"
