@@ -1,14 +1,13 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <v-card class="pa-5">
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" filled prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
-            <v-text-field autocomplete="new-loginname" filled prepend-inner-icon="mdi-star" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
+            <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
             <v-select
-              filled
-              prepend-inner-icon="mdi-key"
+              prepend-inner-icon="mdi-badge-account-horizontal"
               label="User Role"
               v-model="FormValues.user_type"
               :items="[
@@ -27,27 +26,39 @@
             ></v-select>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-first_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-last_name" filled prepend-inner-icon="mdi-star" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
         </v-row>
-        <v-row no-gutters>
-          <v-col cols="12">
-            <v-alert icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+        <v-row>
+          <v-col cols="3" class="mx-auto">
+            <v-btn color="info" dark block @click="Submit()">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="6" class="mx-auto">
+            <v-alert class="d-flex justify-center" icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
-            <v-btn color="info" dark block @click="Submit()">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
           </v-col>
         </v-row>
       </v-form>
     </v-card>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-container>
 </template>
 
 <script>
+import BottomSheetAlert from './bottom-sheet-alert.vue'
+
 export default {
+  components: {
+    BottomSheetAlert
+  },
   data: () => ({
     LocalStorage: {},
     GeneralValues: {
@@ -63,6 +74,11 @@ export default {
       user_type: '',
       first_name: '',
       last_name: '',
+    },
+    sheetAlert: {
+      open: false,
+      type: 'sucess',
+      text: '',
     },
   }),
   watch: {
@@ -109,7 +125,7 @@ export default {
           this.FormValues.first_name = this.$props.user == null ? '' : this.$props.user.first_name;
           this.FormValues.last_name = this.$props.user == null ? '' : this.$props.user.last_name;
         } else {
-          var AxiosConfig = { method: 'GET', url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
+          const AxiosConfig = { method: 'GET', url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
           this.$Axios(AxiosConfig)
             .then((UserInfos) => {
               this.FillUserInfos(UserInfos.data.user);
@@ -129,7 +145,7 @@ export default {
     },
     Submit() {
       if (this.$refs.Submit.validate()) {
-        var AxiosConfig = { method: this.$props.type, url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
+        const AxiosConfig = { method: this.$props.type, url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
         this.$Axios(AxiosConfig)
           .then(() => {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
@@ -142,6 +158,24 @@ export default {
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
+    },
+    // UI methods
+    showSheet(type, text, doCloseDialog = true) {
+      this.sheetAlert.type = type;
+      this.sheetAlert.text = text;
+      this.sheetAlert.open = true;
+      let time
+      if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
+      } else {
+        time = 1000
+      }
+      setTimeout(() => {
+        this.sheetAlert.open = false;
+        doCloseDialog ? this.closeDialog() : this.$emit('reload-data')
+      }, time);
     },
   },
   mounted() {
