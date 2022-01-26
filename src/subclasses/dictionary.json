@@ -149,6 +149,10 @@
       "en": "Loading ... Please wait."
     },
     {
+      "value": "last7records",
+      "en": "Last 7 Hours ..."
+    },
+    {
       "value": "search",
       "en": "Search"
     },
