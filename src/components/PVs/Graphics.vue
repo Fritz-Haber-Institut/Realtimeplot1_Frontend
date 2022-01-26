@@ -2,22 +2,22 @@
   <v-container fluid>
     <v-expansion-panels accordion>
       <v-expansion-panel>
-        <v-expansion-panel-header
-          ><h2>{{ $General.GetString('graphicsettings') }}</h2></v-expansion-panel-header
-        >
+        <v-expansion-panel-header class="display-1">
+          {{ $General.GetString('graphicsettings') }}
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-card flat>
             <v-row>
               <v-col cols="6">
-                <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceDate" type="date" />
-                <v-text-field v-model="ChartSettings.TimeIntervalParsed.SinceTime" type="time" />
+                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.SinceDate" type="date" />
+                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.SinceTime" type="time" />
               </v-col>
               <v-col cols="6">
-                <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilDate" type="date" />
-                <v-text-field v-model="ChartSettings.TimeIntervalParsed.UntilTime" type="time" />
+                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.UntilDate" type="date" />
+                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.UntilTime" type="time" />
               </v-col>
               <v-col cols="12">
-                <v-select prepend-inner-icon="mdi-key" v-model="ChartSettings.PVString" :items="ChartSettings.ExperimentsList" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
+                <v-select solo-inverted prepend-inner-icon="mdi-key" v-model="ChartSettings.URLParamenters.PVString" :items="ChartSettings.ExperimentsList.Items" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
                 <v-btn block color="info" @click="UpdateData()">
                   <v-icon>mdi-update</v-icon>
                 </v-btn>
@@ -31,8 +31,8 @@
     <v-card class="pa-5" color="white">
       <div id="chart">
         <div v-if="ChartSettings.Loading" class="text-center">
-          <v-progress-circular :size="200" width="25" color="primary" indeterminate></v-progress-circular>
-          <h1 class="mt-6">{{ $General.GetString('loading') }}</h1>
+          <v-progress-circular :size="200" width="25" color="info" indeterminate></v-progress-circular>
+          <h1 class="mt-6 info--text">{{ $General.GetString('loading') }}</h1>
         </div>
         <apexchart v-else width="100%" type="area" :options="options" :series="series"> </apexchart>
       </div>
@@ -45,10 +45,13 @@ export default {
   data: () => ({
     ChartSettings: {
       Loading: true,
-      TimeInterval: {},
-      TimeIntervalParsed: {},
-      Experiment: '',
-      ExperimentsList: [],
+      UpdatedData: {},
+      URLParamenters: {},
+      ExperimentsList: {
+        Items: [],
+        Labels: [],
+        Series: [],
+      },
     },
     options: {},
     series: [],
@@ -66,51 +69,39 @@ export default {
   },
   methods: {
     UpdateData() {
-      var NewSinceDate = this.$Moment(String(this.ChartSettings.TimeIntervalParsed.SinceDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.TimeIntervalParsed.SinceTime + ':00';
-      var NewUntilDate = this.$Moment(String(this.ChartSettings.TimeIntervalParsed.UntilDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.TimeIntervalParsed.UntilTime + ':00';
-      window.location.href = '/dashboard?pvstring=' + this.ChartSettings.PVString + '&since=' + NewSinceDate + '&until=' + NewUntilDate;
+      var NewSinceDate = this.$Moment(String(this.ChartSettings.URLParamenters.SinceDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.SinceTime + ':00';
+      var NewUntilDate = this.$Moment(String(this.ChartSettings.URLParamenters.UntilDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.UntilTime + ':00';
+      window.location.href = '/dashboard?pvstring=' + this.ChartSettings.URLParamenters.PVString + '&since=' + NewSinceDate + '&until=' + NewUntilDate;
     },
-    PostPPBData() {
-      var PVStrings = ['PPB:VmeCrateAfm:FanSpeed1', 'PPB:VmeCrateAfm:IM12', 'PPB:VmeCrateAfm:IP12', 'PPB:VmeCrateAfm:IP3', 'PPB:VmeCrateAfm:IP5', 'PPB:VmeCrateAfm:Temp1', 'PPB:VmeCrateAfm:Temp2', 'PPB:VmeCrateAfm:Temp3', 'PPB:VmeCrateAfm:VM12', 'PPB:VmeCrateAfm:VP12', 'PPB:VmeCrateAfm:VP3', 'PPB:VmeCrateAfm:VP5'];
-      PVStrings.forEach((Eelement) => {
-        var FormValues = {
-          pv_string: Eelement,
-          human_readable_name: 'Desc : ' + Eelement,
-        };
-        var AxiosConfig = { method: 'POST', url: this.$General.APIPVs(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: FormValues };
-        this.$Axios(AxiosConfig)
-          .then(() => {})
-          .catch((Error) => {
-            console.log(Error);
-          });
-      });
+    LoadParamenters() {
+      this.ChartSettings.URLParamenters = {
+        PVString: this.$route.query.pvstring,
+        ShortID: this.$route.query.pvstring.split(':')[0],
+        Val1: this.$route.query.pvstring.split(':')[1],
+        Val2: this.$route.query.pvstring.split(':')[2],
+        Since: this.$route.query.since,
+        Until: this.$route.query.until,
+        SinceDate: this.$Moment(String(this.$route.query.since)).format('YYYY-MM-DD'),
+        SinceTime: this.$Moment(String(this.$route.query.since)).format('HH:mm'),
+        UntilDate: this.$Moment(String(this.$route.query.until)).format('YYYY-MM-DD'),
+        UntilTime: this.$Moment(String(this.$route.query.until)).format('HH:mm'),
+      };
     },
     GetData() {
-      this.ChartSettings.TimeInterval.since = this.$route.query.since;
-      this.ChartSettings.TimeInterval.until = this.$route.query.until;
-
-      this.ChartSettings.TimeIntervalParsed.SinceDate = this.$Moment(String(this.ChartSettings.TimeInterval.since)).format('YYYY-MM-DD');
-      this.ChartSettings.TimeIntervalParsed.SinceTime = this.$Moment(String(this.ChartSettings.TimeInterval.since)).format('HH:mm');
-
-      this.ChartSettings.TimeIntervalParsed.UntilDate = this.$Moment(String(this.ChartSettings.TimeInterval.until)).format('YYYY-MM-DD');
-      this.ChartSettings.TimeIntervalParsed.UntilTime = this.$Moment(String(this.ChartSettings.TimeInterval.until)).format('HH:mm');
-
-      this.ChartSettings.PVString = this.$route.query.pvstring;
-      this.ChartSettings.ShortID = this.$route.query.pvstring.split(':')[0];
-      this.ChartSettings.Var1 = this.$route.query.pvstring.split(':')[1];
-      this.ChartSettings.Var2 = this.$route.query.pvstring.split(':')[2];
-
-      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0], headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: this.ChartSettings.TimeInterval };
+      var Data = {
+        since: this.ChartSettings.URLParamenters.Since,
+        until: this.ChartSettings.URLParamenters.Until,
+      };
+      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0], headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
+      var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
       this.$Axios(AxiosConfig)
         .then((DataResult) => {
-          var Labels = [];
-          var Series = [];
           DataResult.data.data.experiment.process_variable_urls.forEach((Element) => {
-            this.ChartSettings.ExperimentsList.push(Element.split('/')[3]);
+            this.ChartSettings.ExperimentsList.Items.push(Element.split('/')[3]);
           });
-          DataResult.data.data.process_variables_data[this.ChartSettings.PVString].forEach((Element) => {
-            Series.push(Element.data.toFixed(2));
-            Labels.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm'));
+          DataResult.data.data.process_variables_data[this.ChartSettings.URLParamenters.PVString].forEach((Element) => {
+            this.ChartSettings.ExperimentsList.Series.push(Element.data.toFixed(2));
+            this.ChartSettings.ExperimentsList.Labels.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm'));
           });
           this.options = {
             type: 'area',
@@ -134,13 +125,13 @@ export default {
               },
             },
             title: {
-              text: this.ChartSettings.PVString,
+              text: this.ChartSettings.URLParamenters.PVString,
             },
             subtitle: {
-              text: this.$Moment(String(this.ChartSettings.TimeInterval.since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.TimeInterval.until)).format('DD.MM.YYYY'),
+              text: Subtitle,
             },
             xaxis: {
-              categories: Labels,
+              categories: this.ChartSettings.ExperimentsList.Labels,
               labels: {
                 rotate: -90,
               },
@@ -148,7 +139,7 @@ export default {
           };
           this.series[0] = {
             name: 'Value ',
-            data: Series,
+            data: this.ChartSettings.ExperimentsList.Series,
           };
           this.ChartSettings.Loading = false;
         })
@@ -156,10 +147,30 @@ export default {
           console.log(Error);
         });
     },
+    PostPPBData() {
+      var PVStrings = ['PPB:VmeCrateAfm:FanSpeed1', 'PPB:VmeCrateAfm:IM12', 'PPB:VmeCrateAfm:IP12', 'PPB:VmeCrateAfm:IP3', 'PPB:VmeCrateAfm:IP5', 'PPB:VmeCrateAfm:Temp1', 'PPB:VmeCrateAfm:Temp2', 'PPB:VmeCrateAfm:Temp3', 'PPB:VmeCrateAfm:VM12', 'PPB:VmeCrateAfm:VP12', 'PPB:VmeCrateAfm:VP3', 'PPB:VmeCrateAfm:VP5'];
+      PVStrings.forEach((Eelement) => {
+        var FormValues = {
+          pv_string: Eelement,
+          human_readable_name: 'Desc : ' + Eelement,
+        };
+        var AxiosConfig = { method: 'POST', url: this.$General.APIPVs(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: FormValues };
+        this.$Axios(AxiosConfig)
+          .then(() => {})
+          .catch((Error) => {
+            console.log(Error);
+          });
+      });
+    },
   },
-  mounted() {
+  async mounted() {
+    if (this.$route.query.pvstring != null) {
+      await this.LoadParamenters();
+      await this.GetData();
+    } else {
+      window.location.href = '/experiments-and-pvs';
+    }
     // this.PostPPBData();
-    this.GetData();
   },
 };
 </script>

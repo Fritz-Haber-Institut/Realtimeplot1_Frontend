@@ -4,9 +4,10 @@
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
-            <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field solo-inverted autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
+            <v-text-field solo-inverted autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
             <v-select
+              solo-inverted
               prepend-inner-icon="mdi-badge-account-horizontal"
               label="User Role"
               v-model="FormValues.user_type"
@@ -26,10 +27,10 @@
             ></v-select>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field solo-inverted autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field solo-inverted autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -53,11 +54,11 @@
 </template>
 
 <script>
-import BottomSheetAlert from './bottom-sheet-alert.vue'
+import BottomSheetAlert from './bottom-sheet-alert.vue';
 
 export default {
   components: {
-    BottomSheetAlert
+    BottomSheetAlert,
   },
   data: () => ({
     LocalStorage: {},
@@ -164,17 +165,17 @@ export default {
       this.sheetAlert.type = type;
       this.sheetAlert.text = text;
       this.sheetAlert.open = true;
-      let time
+      let time;
       if (type === 'error') {
-        time = 4000
+        time = 4000;
       } else if (!doCloseDialog) {
-        time = 3000
+        time = 3000;
       } else {
-        time = 1000
+        time = 1000;
       }
       setTimeout(() => {
         this.sheetAlert.open = false;
-        doCloseDialog ? this.closeDialog() : this.$emit('reload-data')
+        doCloseDialog ? this.closeDialog() : this.$emit('reload-data');
       }, time);
     },
   },
