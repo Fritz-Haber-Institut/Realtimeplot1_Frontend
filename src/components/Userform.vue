@@ -1,13 +1,12 @@
 <template>
   <v-container>
-    <v-card class="pa-5">
+    <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
       <v-form ref="Submit" lazy-validation autocomplete="off">
         <v-row>
           <v-col cols="12">
-            <v-text-field solo-inverted autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
-            <v-text-field solo-inverted autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
+            <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
             <v-select
-              solo-inverted
               prepend-inner-icon="mdi-badge-account-horizontal"
               label="User Role"
               v-model="FormValues.user_type"
@@ -27,10 +26,10 @@
             ></v-select>
           </v-col>
           <v-col cols="6">
-            <v-text-field solo-inverted autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field solo-inverted autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -46,10 +45,10 @@
           </v-col>
         </v-row>
       </v-form>
+      <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
+        {{ sheetAlert.text }}
+      </BottomSheetAlert>
     </v-card>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
-      {{ sheetAlert.text }}
-    </BottomSheetAlert>
   </v-container>
 </template>
 
@@ -174,10 +173,12 @@ export default {
         time = 1000;
       }
       setTimeout(() => {
-        this.sheetAlert.open = false;
-        doCloseDialog ? this.closeDialog() : this.$emit('reload-data');
+        this.closeBottomSheet()
       }, time);
     },
+    closeBottomSheet() {
+      this.sheetAlert.open = false
+    }
   },
   mounted() {
     this.CheckData();
