@@ -58,7 +58,7 @@
         <ButtonWithLoading v-else :disabled="confirmButtonDisabled" @clicked="updateResource" :loading="reqLoading">{{ `Update${isExperiment ? ' experiment' : ' PV'}` }}</ButtonWithLoading>
       </v-card-actions>
     </v-card>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
       {{ sheetAlert.text }}
     </BottomSheetAlert>
   </v-dialog>
@@ -336,9 +336,13 @@ export default {
         time = 1000
       }
       setTimeout(() => {
-        this.sheetAlert.open = false;
+        this.closeBottomSheet()
         doCloseDialog ? this.closeDialog() : this.$emit('reload-data')
       }, time);
+    },
+    closeBottomSheet() {
+      this.sheetAlert.open = false
+      this.sheetAlert.type !== 'info' && this.closeDialog()
     },
     activateConfirmButton() {
       this.confirmButtonDisabled = false

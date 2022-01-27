@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-sheet v-model="open" width="30%" content-class="elevation-0">
+  <v-bottom-sheet v-model="isSheetOpen" width="30%" content-class="elevation-0">
     <v-sheet class="text-center rounded">
       <v-alert full-width height="100%" :type="type">
         <slot></slot>
@@ -19,6 +19,16 @@ export default {
       type: String,
       required: true
     },
+  },
+  computed: {
+    isSheetOpen: {
+      get() {
+        return this.open
+      },
+      set() {
+        this.$emit('close-sheet')
+      }
+    }
   }
 }
 </script>
