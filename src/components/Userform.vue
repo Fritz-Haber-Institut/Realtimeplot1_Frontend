@@ -1,55 +1,56 @@
 <template>
-  <v-container>
-    <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
-      <v-form ref="Submit" lazy-validation autocomplete="off">
-        <v-row>
-          <v-col cols="12">
-            <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
-            <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-            <v-select
-              prepend-inner-icon="mdi-badge-account-horizontal"
-              label="User Role"
-              v-model="FormValues.user_type"
-              :items="[
-                {
-                  text: 'Admin',
-                  value: 'Admin',
-                },
-                {
-                  text: 'User',
-                  value: 'User',
-                },
-              ]"
-              item-text="text"
-              item-value="value"
-              :rules="[(v) => !!v || $General.GetString('noempty')]"
-            ></v-select>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3" class="mx-auto">
-            <v-btn color="info" dark block @click="Submit()">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="6" class="mx-auto">
-            <v-alert class="d-flex justify-center" icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
-              {{ GeneralValues.AlertMessage.Message }}
-            </v-alert>
-          </v-col>
-        </v-row>
-      </v-form>
-      <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
-        {{ sheetAlert.text }}
-      </BottomSheetAlert>
-    </v-card>
-  </v-container>
+  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
+    <v-form ref="Submit" lazy-validation autocomplete="off">
+      <v-row>
+        <v-col cols="12">
+          <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
+          <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+          <v-select
+            prepend-inner-icon="mdi-badge-account-horizontal"
+            label="User Role"
+            v-model="FormValues.user_type"
+            :items="[
+              {
+                text: 'Admin',
+                value: 'Admin',
+              },
+              {
+                text: 'User',
+                value: 'User',
+              },
+            ]"
+            item-text="text"
+            item-value="value"
+            :rules="[(v) => !!v || $General.GetString('noempty')]"
+          ></v-select>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row justify="center">
+        <!-- <v-col class="mx-auto">
+          <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
+        </v-col> -->
+        <v-card-actions>
+          <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
+        </v-card-actions>
+      </v-row>
+      <v-row>
+        <v-col cols="6" class="mx-auto">
+          <v-alert class="d-flex justify-center" icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            {{ GeneralValues.AlertMessage.Message }}
+          </v-alert>
+        </v-col>
+      </v-row>
+    </v-form>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
+  </v-card>
 </template>
 
 <script>
@@ -110,6 +111,10 @@ export default {
       type: String,
       requred: true,
     },
+    isInDialog: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
     ParentPassing(Value) {
