@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-dialog v-model="Users.Dialog">
-      <Userform @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
+    <v-dialog v-model="Users.Dialog" max-width="700px">
+      <Userform @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" isInDialog/>
     </v-dialog>
     <v-card>
       <v-card-actions>

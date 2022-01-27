@@ -128,7 +128,6 @@ export default {
       .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
       .then(res => {
         this.pvs = res.data.process_variables
-        console.log('this.shouldOpenCreateDialog: ' + this.shouldOpenCreateDialog)
         this.shouldOpenCreateDialog && this.openCreatePVDialog()
         signalCompletion && signalCompletion()
       })
