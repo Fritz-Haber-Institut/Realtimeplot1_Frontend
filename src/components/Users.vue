@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <v-dialog v-model="Users.Dialog">
       <Userform @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
     </v-dialog>
@@ -109,7 +109,7 @@ export default {
     },
     DeleteUser(Value) {
       const userLoginName = this.Users.Items.filter(userObj => userObj.user_id === Value)[0].login_name
-      this.$General.ConfirmDeleteAlert(userLoginName).then((Result) => {
+      this.$General.ConfirmDeleteAlert('the user ' + userLoginName).then((Result) => {
         if (Result) {
           var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
           this.$Axios(AxiosConfig)

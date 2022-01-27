@@ -9,15 +9,15 @@
           <v-card flat>
             <v-row>
               <v-col cols="6">
-                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.SinceDate" type="date" />
-                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.SinceTime" type="time" />
+                <v-text-field v-model="ChartSettings.URLParamenters.SinceDate" type="date" />
+                <v-text-field v-model="ChartSettings.URLParamenters.SinceTime" type="time" />
               </v-col>
               <v-col cols="6">
-                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.UntilDate" type="date" />
-                <v-text-field solo-inverted v-model="ChartSettings.URLParamenters.UntilTime" type="time" />
+                <v-text-field v-model="ChartSettings.URLParamenters.UntilDate" type="date" />
+                <v-text-field v-model="ChartSettings.URLParamenters.UntilTime" type="time" />
               </v-col>
               <v-col cols="12">
-                <v-select solo-inverted prepend-inner-icon="mdi-key" v-model="ChartSettings.URLParamenters.PVString" :items="ChartSettings.ExperimentsList.Items" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
+                <v-select prepend-inner-icon="mdi-key" v-model="ChartSettings.URLParamenters.PVString" :items="ChartSettings.ExperimentsList.Items" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-select>
                 <v-btn block color="info" @click="UpdateData()">
                   <v-icon>mdi-update</v-icon>
                 </v-btn>

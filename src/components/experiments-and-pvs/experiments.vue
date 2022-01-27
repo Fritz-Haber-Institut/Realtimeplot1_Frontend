@@ -54,7 +54,7 @@
         </v-data-table>
       </v-card-text>
     </v-card>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
       {{ sheetAlert.text }}
     </BottomSheetAlert>
   </v-container>
@@ -158,9 +158,10 @@ export default {
     },
     // UI methods
     openCreatePVDialog() {
-      this.dialog.type='pv'
-      this.dialog.method='POST'
-      this.dialog.open = true
+      // this.dialog.type='pv'
+      // this.dialog.method='POST'
+      // this.dialog.open = true
+      this.$emit('switch-to-pv-tab')
     },
     openEditExpDialog(exp) {
       this.dialog.type='exp'
@@ -169,9 +170,7 @@ export default {
       this.dialog.open = true
     },
     closeDialog() {
-      setTimeout(() => {
-        this.dialog.open=false
-      }, 500)
+      this.dialog.open=false
     },
     showSheet(type, text, doCloseDialog = true) {
       this.sheetAlert.type = type;
@@ -187,9 +186,13 @@ export default {
       }
       this.getExperiments()
       setTimeout(() => {
-        this.sheetAlert.open = false
+        this.closeBottomSheet()
       }, time);
     },
+    closeBottomSheet() {
+      this.sheetAlert.open = false
+      this.sheetAlert.type !== 'info' && this.closeDialog()
+    }
   },
   mounted() {
     this.getExperiments()

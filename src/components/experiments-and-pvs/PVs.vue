@@ -51,7 +51,7 @@
         </v-data-table>
       </v-card-text>
     </v-card>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type">
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
       {{ sheetAlert.text }}
     </BottomSheetAlert>
   </v-container>
@@ -71,6 +71,10 @@ export default {
       type: Boolean,
       default: false,
       required: true
+    },
+    shouldOpenCreateDialog: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -124,6 +128,8 @@ export default {
       .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
       .then(res => {
         this.pvs = res.data.process_variables
+        console.log('this.shouldOpenCreateDialog: ' + this.shouldOpenCreateDialog)
+        this.shouldOpenCreateDialog && this.openCreatePVDialog()
         signalCompletion && signalCompletion()
       })
       .catch(e => {
@@ -163,6 +169,7 @@ export default {
     },
     // UI Methods
     openCreatePVDialog() {
+      this.shouldOpenCreateDialog && this.$emit('dialog-opened')
       this.dialog.method='POST'
       this.dialog.open = true
     },
@@ -188,9 +195,13 @@ export default {
       }
       this.getPVs()
       setTimeout(() => {
-        this.sheetAlert.open = false
+        this.closeBottomSheet()
       }, time);
     },
+    closeBottomSheet() {
+      this.sheetAlert.open = false
+      this.sheetAlert.type !== 'info' && this.closeDialog()
+    }
   },
   mounted() {
     this.getPVs()

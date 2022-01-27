@@ -4,8 +4,8 @@
       <v-form ref="Login" lazy-validation autocomplete="off">
         <v-row>
           <v-col>
-            <v-text-field solo-inverted autocomplete="new-username" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="LoginValues.username" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-            <v-text-field solo-inverted autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('password')" v-model.trim="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.GetString('noempty')]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
+            <v-text-field autocomplete="new-username" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="LoginValues.username" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+            <v-text-field autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('password')" v-model.trim="LoginValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :rules="[(v) => !!v || $General.GetString('noempty')]" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
