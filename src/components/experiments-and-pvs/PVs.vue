@@ -6,7 +6,7 @@
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn fab color="info" class="ml-5" v-bind="attrs" v-on="on" @click="openCreatePVDialog">
+            <v-btn v-if="user == undefined ? false : (user.user_type == 'Admin' ? true : false)" fab color="info" class="ml-5" v-bind="attrs" v-on="on" @click="openCreatePVDialog">
               <v-icon> mdi-plus </v-icon>
             </v-btn>
           </template>
@@ -57,6 +57,10 @@ export default {
     BottomSheetAlert,
   },
   props: {
+    user: {
+      type: Object,
+      requred: true,
+    },
     hasActiveTab: {
       type: Boolean,
       default: false,
@@ -110,6 +114,9 @@ export default {
     hasActiveTab(val) {
       val && this.getPVs();
     },
+    user(Value) {
+      this.user = Value;
+    },    
   },
   methods: {
     // API calls

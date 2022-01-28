@@ -4,6 +4,8 @@
       <v-btn small to="/dashboard" link fab>
         <v-icon>mdi-home</v-icon>
       </v-btn>
+  <v-chip class="elevation-2 px-10 ml-2 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'secondary'">{{ $General.GetString('loggedinas') + ' : ' + GeneralSettings.UserInfos.user_type.toUpperCase() }}</v-chip>
+                  
       <v-spacer></v-spacer>
       <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
         <v-icon>mdi-menu</v-icon>

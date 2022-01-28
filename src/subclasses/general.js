@@ -81,7 +81,7 @@ export default {
       }
     }
     catch {
-      //
+      console.log("Dictionary Error");
     }
   },
 

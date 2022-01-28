@@ -67,7 +67,12 @@ router.beforeEach((to, from, next) => {
     })
     .catch((Error) => {
       console.log(Error);
-      window.location.href = '/login';
+      if (to.matched.some(record => record.meta.Auth == 'NO')) {
+        next()
+      }
+      else {
+        window.location.href = '/login';
+      }
     });
 })
 

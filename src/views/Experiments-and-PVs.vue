@@ -6,10 +6,10 @@
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item transition="fade-transition" value="exp">
-        <Experiments :hasActiveTab="activeTab === 'exp'" @switch-to-pv-tab="switchTabForcibly" />
+        <Experiments :user="user" :hasActiveTab="activeTab === 'exp'" @switch-to-pv-tab="switchTabForcibly" />
       </v-tab-item>
       <v-tab-item transition="fade-transition" value="pvs">
-        <PVs :hasActiveTab="activeTab === 'pvs'" :shouldOpenCreateDialog="shouldOpenCreatePVDialog" @dialog-opened="openDialogCompleted" />
+        <PVs :user="user" :hasActiveTab="activeTab === 'pvs'" :shouldOpenCreateDialog="shouldOpenCreatePVDialog" @dialog-opened="openDialogCompleted" />
       </v-tab-item>
     </v-tabs-items>
   </v-container>
@@ -33,6 +33,17 @@ export default {
       shouldOpenCreatePVDialog: false,
     };
   },
+  watch: {
+    user(Value) {
+      this.user = Value;
+    },
+  },
+  props: {
+    user: {
+      type: Object,
+      requred: true,
+    },
+  },  
   methods: {
     markActiveTab(kind) {
       this.activeTab = kind;
