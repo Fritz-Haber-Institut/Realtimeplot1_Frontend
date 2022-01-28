@@ -144,6 +144,7 @@ export default {
           this.ChartSettings.Loading = false;
         })
         .catch((Error) => {
+          this.ChartSettings.Loading = false;          
           console.log(Error);
         });
     },
