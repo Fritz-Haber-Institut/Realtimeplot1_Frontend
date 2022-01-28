@@ -14,6 +14,9 @@
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
+            <v-list-item-title>
+              <v-chip class="mb-4 Full100 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'info'">{{ GeneralSettings.UserInfos.user_type }}</v-chip>
+            </v-list-item-title>
             <v-list-item-title class="text-h6"> {{ GeneralSettings.UserInfos.login_name }} </v-list-item-title>
             <v-list-item-subtitle class="mt-2">{{ GeneralSettings.UserInfos.email || $General.GetString('noemail') }}</v-list-item-subtitle>
           </v-list-item-content>
@@ -22,6 +25,16 @@
       <v-divider></v-divider>
       <v-list dense nav dark>
         <v-list-item v-for="item in GeneralSettings.Navigation" :key="item.title" link :to="item.url">
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-list dense nav dark v-if="GeneralSettings.UserInfos.user_type == 'Admin'">
+        <v-list-item v-for="item in GeneralSettings.AdminNavigation" :key="item.title" link :to="item.url">
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -106,7 +119,7 @@ export default {
     ChangeTheme: function () {
       this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
       this.$General.SetLSSettings(this.LocalStorage);
-      this.$vuetify.theme.dark = this.GeneralSettings.DarkMode
+      this.$vuetify.theme.dark = this.GeneralSettings.DarkMode;
     },
   },
   mounted() {
@@ -117,8 +130,8 @@ export default {
         // { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
         // { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },
         { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
-        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' },
       ];
+      this.GeneralSettings.AdminNavigation = [{ title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }];
     }
     this.GetInfos();
     setInterval(() => {
@@ -162,5 +175,12 @@ body {
 .slide-fade-leave-to {
   transform: translateX(10px);
   opacity: 0;
+}
+
+.Full100 {
+  width: 100%;
+}
+.Full50 {
+  width: 50%;
 }
 </style>

@@ -20,15 +20,16 @@ const routes = [
     path: '*',
     redirect: '/login'
   },
-  { path: '/login', component: Login, meta: { requiresAuth: false, title: General.GetString('login'), icon: "mdi-information-outline" } },
+  { path: '/login', component: Login, meta: { Auth: 'NO', title: General.GetString('login'), icon: "mdi-information-outline" } },
 
-  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
-  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true, title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
-  { path: '/graphics', component: Graphics, meta: { requiresAuth: true, title: General.GetString('dashboard'), icon: "mdi-information-outline" } },    
-  // { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } }, 
-  { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
+  { path: '/profile', component: Profile, meta: { Auth: 'ALL', title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
+  { path: '/dashboard', component: Dashboard, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
+  { path: '/graphics', component: Graphics, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
+  { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
+  { path: '/users', component: Users, meta: { Auth: 'ADMIN', title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
+
   // { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
-  { path: '/users', component: Users, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
+  // { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },       
 ]
 
 const router = new VueRouter({
@@ -41,20 +42,33 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    Axios
-      .get(General.APIUsers() + '/current', General.GetHeaderValue(General.GetLSSettings().Token, true))
-      .then(() => {
+  Axios
+    .get(General.APIUsers() + '/current', General.GetHeaderValue(General.GetLSSettings().Token, true))
+    .then((Result) => {
+      if (to.matched.some(record => record.meta.Auth == 'ALL')) {
+        if (Result.data.user.user_type == 'Admin' || Result.data.user.user_type == 'User') {
+          next()
+        }
+        else {
+          window.location.href = '/login';
+        }
+      }
+      else if (to.matched.some(record => record.meta.Auth == 'ADMIN')) {
+        if (Result.data.user.user_type == 'Admin') {
+          next()
+        }
+        else {
+          window.location.href = '/login';
+        }
+      }
+      else {
         next();
-      })
-      .catch((Error) => {
-        console.log(Error);
-        window.location.href = '/login';
-      });
-  }
-  else {
-    next()
-  }
+      }
+    })
+    .catch((Error) => {
+      console.log(Error);
+      window.location.href = '/login';
+    });
 })
 
 export default router

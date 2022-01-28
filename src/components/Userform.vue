@@ -32,9 +32,6 @@
         </v-col>
       </v-row>
       <v-row justify="center">
-        <!-- <v-col class="mx-auto">
-          <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
-        </v-col> -->
         <v-card-actions>
           <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
         </v-card-actions>
@@ -113,8 +110,8 @@ export default {
     },
     isInDialog: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   methods: {
     ParentPassing(Value) {
@@ -139,7 +136,7 @@ export default {
               console.log(Error);
             });
         }
-      }
+      }     
     },
     FillUserInfos(UserInfos) {
       this.FormValues.email = UserInfos == null ? '' : UserInfos.email;
@@ -158,8 +155,7 @@ export default {
             this.ParentPassing(this.GeneralValues.AlertMessage);
           })
           .catch((Error) => {
-            console.log(Error);
-            this.GeneralValues.AlertMessage.Message = this.$General.GetString('wronginfos3');
+            this.GeneralValues.AlertMessage.Message = Error.response.data.errors[0];
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
@@ -178,12 +174,12 @@ export default {
         time = 1000;
       }
       setTimeout(() => {
-        this.closeBottomSheet()
+        this.closeBottomSheet();
       }, time);
     },
     closeBottomSheet() {
-      this.sheetAlert.open = false
-    }
+      this.sheetAlert.open = false;
+    },
   },
   mounted() {
     this.CheckData();
