@@ -1,15 +1,15 @@
 <template>
   <v-container fluid>
-    <Statistics />
+    <Graphics />
   </v-container>
 </template>
 
 <script>
-import Statistics from '../components/Dashboard/Statistics.vue';
+import Graphics from '../components/PVs/Graphics.vue';
 
 export default {
   components: {
-    Statistics,
+    Graphics,
   },
   data() {
     return {};

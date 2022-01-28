@@ -27,7 +27,7 @@
           :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
         >
           <template v-slot:[`item.pv_string`]="{ item }">
-            <router-link :to="`/dashboard?pvstring=${item.pv_string}`">
+            <router-link :to="`/graphics?pvstring=${item.pv_string}`">
               {{ item.pv_string }}
             </router-link>
           </template>

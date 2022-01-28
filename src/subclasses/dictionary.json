@@ -45,8 +45,20 @@
       "en": "Manage Users"
     },
     {
+      "value": "userscount",
+      "en": "Users Count"
+    },  
+    {
+      "value": "pvscount",
+      "en": "PVs Count"
+    },   
+    {
+      "value": "experimentscount",
+      "en": "Experiments Count"
+    },            
+    {
       "value": "managepvs",
-      "en": "Manage Experements & PVs"
+      "en": "Manage Experiments & PVs"
     },
     {
       "value": "pvstring",

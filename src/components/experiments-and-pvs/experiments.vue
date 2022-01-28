@@ -130,7 +130,7 @@ export default {
     // API calls
     getExperiments() {
       this.$Axios
-      .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .get(this.$General.APIExperiments() + '/', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
       .then(res => {
         this.experiments = res.data.experiments
         this.shouldRenderPVsTitles = true

@@ -71,7 +71,7 @@ export default {
     UpdateData() {
       var NewSinceDate = this.$Moment(String(this.ChartSettings.URLParamenters.SinceDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.SinceTime + ':00';
       var NewUntilDate = this.$Moment(String(this.ChartSettings.URLParamenters.UntilDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.UntilTime + ':00';
-      window.location.href = '/dashboard?pvstring=' + this.ChartSettings.URLParamenters.PVString + '&since=' + NewSinceDate + '&until=' + NewUntilDate;
+      window.location.href = '/graphics?pvstring=' + this.ChartSettings.URLParamenters.PVString + '&since=' + NewSinceDate + '&until=' + NewUntilDate;
     },
     LoadParamenters() {
       this.ChartSettings.URLParamenters = {
