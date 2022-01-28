@@ -1,13 +1,13 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="4">
-        <Card :user="user" :settings="{ Title: $General.GetString('userscount'), Count: Statistics.Users.Count, Button: $General.GetString('manageusers'), Link: '/users', Color: 'info', Icon: 'mdi-account-group' }" />
+      <v-col cols="12" lg="4">
+        <Card v-if="user == undefined ? false : (user.user_type == 'Admin' ? true : false)" :user="user" :settings="{ Title: $General.GetString('userscount'), Count: Statistics.Users.Count, Button: $General.GetString('manageusers'), Link: '/users', Color: 'info', Icon: 'mdi-account-group' }" />
       </v-col>
-      <v-col cols="4">
+      <v-col cols="12" lg="4">
         <Card :user="user" :settings="{ Title: $General.GetString('pvscount'), Count: Statistics.PVs.Count, Button: $General.GetString('managepvs'), Link: '/experiments-and-pvs', Color: 'success', Icon: 'mdi-playlist-edit' }" />
       </v-col>
-      <v-col cols="4">
+      <v-col cols="12" lg="4">
         <Card :user="user" :settings="{ Title: $General.GetString('experimentscount'), Count: Statistics.Experiments.Count, Button: $General.GetString('managepvs'), Link: '/Experiments-and-pvs', Color: 'warning', Icon: 'mdi-camera-document' }" />
       </v-col>
     </v-row>
@@ -61,7 +61,6 @@ export default {
             });
           });
           this.Statistics.Experiments.Count = UniqueExperiments.length;
-          console.log(UniqueExperiments);
         })
         .catch((Error) => {
           console.log(Error);

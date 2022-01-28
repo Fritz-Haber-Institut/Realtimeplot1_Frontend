@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <Statistics />
+    <Statistics :user="this.$props.user" />
   </v-container>
 </template>
 
@@ -13,6 +13,17 @@ export default {
   },
   data() {
     return {};
+  },
+  watch: {
+    user(Value) {
+      this.user = Value;
+    },
+  },
+  props: {
+    user: {
+      type: Object,
+      requred: true,
+    },
   },
   methods: {},
   mounted() {},
