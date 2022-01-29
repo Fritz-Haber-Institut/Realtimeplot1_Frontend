@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-dialog v-model="Users.Dialog" max-width="700px">
-      <Userform @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" isInDialog />
+    <v-dialog v-model="Users.Dialog" width="700px">
+      <Userform v-if="Users.Dialog" @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
     </v-dialog>
     <v-card>
       <v-card-actions>
@@ -85,6 +85,10 @@ export default {
       this.GeneralValues.AlertMessage.Message = Value.Message;
       this.GeneralValues.AlertMessage.Color = Value.Color;
       this.Users.Dialog = false;
+      setInterval(() => {
+        this.GeneralValues.AlertMessage.Message = '';
+        this.GeneralValues.AlertMessage.Color = '';
+      }, 5000);
     },
     GetUsers() {
       var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
@@ -133,7 +137,7 @@ export default {
       { text: this.$General.GetString('userrole'), value: 'user_type' },
       { text: this.$General.GetString('firstname'), value: 'first_name' },
       { text: this.$General.GetString('lastname'), value: 'last_name' },
-      { value: 'settings', sortable: false, width:'105px' },
+      { value: 'settings', sortable: false, width: '105px' },
     ];
   },
 };

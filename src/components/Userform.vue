@@ -1,11 +1,23 @@
 <template>
-  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
+  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
     <v-form ref="Submit" lazy-validation autocomplete="off">
       <v-row>
         <v-col cols="12">
           <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
           <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-          <v-select v-if="$props.user == undefined ? false : ($props.user.user_type == 'Admin' ? true : false)" prepend-inner-icon="mdi-badge-account-horizontal" label="User Role" v-model="FormValues.user_type" :items="[ { text: 'Admin', value: 'Admin', }, { text: 'User', value: 'User', }, ]" item-text="text" item-value="value" :rules="[(v) => !!v || $General.GetString('noempty')]" ></v-select>
+          <v-select
+            v-if="$props.user == undefined ? false : $props.user.user_type == 'Admin' ? true : false"
+            prepend-inner-icon="mdi-badge-account-horizontal"
+            label="User Role"
+            v-model="FormValues.user_type"
+            :items="[
+              { text: 'Admin', value: 'Admin' },
+              { text: 'User', value: 'User' },
+            ]"
+            item-text="text"
+            item-value="value"
+            :rules="[(v) => !!v || $General.GetString('noempty')]"
+          ></v-select>
         </v-col>
         <v-col cols="6">
           <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
@@ -21,25 +33,17 @@
       </v-row>
       <v-row>
         <v-col cols="6" class="mx-auto">
-          <v-alert class="d-flex justify-center" icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+          <v-alert class="d-flex justify-center" icon="mdi-check-circle" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
             {{ GeneralValues.AlertMessage.Message }}
           </v-alert>
         </v-col>
       </v-row>
     </v-form>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
-      {{ sheetAlert.text }}
-    </BottomSheetAlert>
   </v-card>
 </template>
 
 <script>
-import BottomSheetAlert from './bottom-sheet-alert.vue';
-
 export default {
-  components: {
-    BottomSheetAlert,
-  },
   data: () => ({
     LocalStorage: {},
     GeneralValues: {
@@ -55,11 +59,6 @@ export default {
       user_type: '',
       first_name: '',
       last_name: '',
-    },
-    sheetAlert: {
-      open: false,
-      type: 'sucess',
-      text: '',
     },
   }),
   watch: {
@@ -90,10 +89,6 @@ export default {
     target: {
       type: String,
       requred: true,
-    },
-    isInDialog: {
-      type: Boolean,
-      default: false,
     },
   },
   methods: {
@@ -138,37 +133,15 @@ export default {
             this.ParentPassing(this.GeneralValues.AlertMessage);
           })
           .catch((Error) => {
+            console.log(Error);
             this.GeneralValues.AlertMessage.Message = Error.response.data.errors[0];
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
     },
-    // UI methods
-    showSheet(type, text, doCloseDialog = true) {
-      this.sheetAlert.type = type;
-      this.sheetAlert.text = text;
-      this.sheetAlert.open = true;
-      let time;
-      if (type === 'error') {
-        time = 4000;
-      } else if (!doCloseDialog) {
-        time = 3000;
-      } else {
-        time = 1000;
-      }
-      setTimeout(() => {
-        this.closeBottomSheet();
-      }, time);
-    },
-    closeBottomSheet() {
-      this.sheetAlert.open = false;
-    },
   },
   mounted() {
     this.CheckData();
-    setInterval(() => {
-      this.LocalStorage = this.$General.GetLSSettings();
-    }, 100);
   },
 };
 </script>
