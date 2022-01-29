@@ -5,7 +5,7 @@
     </v-dialog>
     <v-card>
       <v-card-actions>
-        <v-alert icon="mdi-check-circle-outline" rounded="md" class="mx-2 mt-1" width="100%" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+        <v-alert icon="mdi-check-circle" rounded="md" class="mx-2 mt-1" width="100%" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
           {{ GeneralValues.AlertMessage.Message }}
         </v-alert>
       </v-card-actions>

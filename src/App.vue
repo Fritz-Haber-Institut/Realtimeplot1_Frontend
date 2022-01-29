@@ -4,8 +4,8 @@
       <v-btn small to="/dashboard" link fab>
         <v-icon>mdi-home</v-icon>
       </v-btn>
-  <v-chip class="elevation-2 px-10 ml-2 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'secondary'">{{ $General.GetString('loggedinas') + ' : ' + GeneralSettings.UserInfos.user_type.toUpperCase() }}</v-chip>
-                  
+      <v-chip class="elevation-2 px-10 ml-2 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'secondary'">{{ $General.GetString('loggedinas') + ' : ' + GeneralSettings.UserInfos.user_type.toUpperCase() }}</v-chip>
+
       <v-spacer></v-spacer>
       <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
         <v-icon>mdi-menu</v-icon>
@@ -129,9 +129,9 @@ export default {
       this.GeneralSettings.DarkMode = this.$General.GetLSSettings().dark_theme;
       this.GeneralSettings.Navigation = [
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
-        // { title: this.$General.GetString('dashboard'), icon: 'mdi-view-dashboard', url: '/dashboard' },
-        // { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/pvs' },
         { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
+        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' },
+        { title: 'Import Configuration', icon: 'mdi-tray-arrow-up', url: '/import' },
       ];
       this.GeneralSettings.AdminNavigation = [{ title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }];
     }

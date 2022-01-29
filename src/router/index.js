@@ -12,6 +12,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Chart from '../views/Chart.vue'
 // import Accounts from '../views/Accounts.vue'
 import Users from '../views/Users.vue'
+import ImportFile from '../views/Import-File.vue'
 
 Vue.use(VueRouter)
 
@@ -27,6 +28,7 @@ const routes = [
   { path: '/chart', component: Chart, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
   { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
   { path: '/users', component: Users, meta: { Auth: 'ADMIN', title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
+  { path: '/import', component: ImportFile, meta: { requiresAuth: true, title: 'Import Configuration', icon: "mdi-tray-arrow-up" } },
 
   // { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
   // { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },       

@@ -10,7 +10,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="12">
-            <v-alert icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+            <v-alert icon="mdi-check-circle" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
               {{ GeneralValues.AlertMessage.Message }}
             </v-alert>
             <v-btn color="info" dark block @click="Submit()">{{ $General.GetString('new') }} </v-btn>

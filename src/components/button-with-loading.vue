@@ -1,7 +1,8 @@
 <template>
-  <div :style="wrapperStyle" ref="btnWithLoading" class="d-flex justify-center">
+  <div :style="wrapperStyle" ref="btnWithLoadingWrapper" class="d-flex justify-center">
     <v-progress-circular v-if="loading" indeterminate color="primary" />
-    <v-btn v-else color="blue darken-1" text :disabled="disabled" @click.native="emitClicked">
+    <v-btn v-else :color="color" :text="!hasBg" :disabled="disabled" @click.native="emitClicked">
+      <v-icon v-if="icon" left>{{ icon }}</v-icon>
       <slot></slot>
     </v-btn>
   </div>
@@ -17,6 +18,17 @@ export default {
     },
     disabled: {
       type: Boolean
+    },
+    color: {
+      type: String,
+      default: 'blue darken-1'
+    },
+    icon: {
+      type: String
+    },
+    hasBg: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -33,7 +45,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.wrapperStyle.width = `${this.$refs.btnWithLoading.clientWidth}px`
+      this.wrapperStyle.width = `${this.$refs.btnWithLoadingWrapper.clientWidth}px`
     })
   }
 }
