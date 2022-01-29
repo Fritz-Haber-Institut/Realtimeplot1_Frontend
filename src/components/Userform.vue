@@ -1,23 +1,18 @@
 <template>
-  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
+  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
     <v-form ref="Submit" lazy-validation autocomplete="off">
       <v-row>
         <v-col cols="12">
           <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
           <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
           <v-select
+            v-if="$props.user == undefined ? false : $props.user.user_type == 'Admin' ? true : false"
             prepend-inner-icon="mdi-badge-account-horizontal"
             label="User Role"
             v-model="FormValues.user_type"
             :items="[
-              {
-                text: 'Admin',
-                value: 'Admin',
-              },
-              {
-                text: 'User',
-                value: 'User',
-              },
+              { text: 'Admin', value: 'Admin' },
+              { text: 'User', value: 'User' },
             ]"
             item-text="text"
             item-value="value"
@@ -32,9 +27,6 @@
         </v-col>
       </v-row>
       <v-row justify="center">
-        <!-- <v-col class="mx-auto">
-          <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
-        </v-col> -->
         <v-card-actions>
           <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
         </v-card-actions>
@@ -68,11 +60,6 @@ export default {
       first_name: '',
       last_name: '',
     },
-    sheetAlert: {
-      open: false,
-      type: 'sucess',
-      text: '',
-    },
   }),
   watch: {
     user(Value) {
@@ -103,10 +90,6 @@ export default {
       type: String,
       requred: true,
     },
-    isInDialog: {
-      type: Boolean,
-      default: false
-    }
   },
   methods: {
     ParentPassing(Value) {
@@ -151,7 +134,7 @@ export default {
           })
           .catch((Error) => {
             console.log(Error);
-            this.GeneralValues.AlertMessage.Message = this.$General.GetString('wronginfos3');
+            this.GeneralValues.AlertMessage.Message = Error.response.data.errors[0];
             this.GeneralValues.AlertMessage.Color = 'error';
           });
       }
@@ -159,9 +142,6 @@ export default {
   },
   mounted() {
     this.CheckData();
-    setInterval(() => {
-      this.LocalStorage = this.$General.GetLSSettings();
-    }, 100);
   },
 };
 </script>

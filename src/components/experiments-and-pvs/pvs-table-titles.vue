@@ -1,7 +1,7 @@
 <template>
   <table>
     <tr v-for="(_, idx) in pvsUrls" :key="idx">
-      <router-link v-if="finishedLoading" :to="`/dashboard?pvstring=${pvsStrings[idx]}`">
+      <router-link v-if="finishedLoading" :to="`/chart?pvstring=${pvsStrings[idx]}`">
         <v-chip label class="my-2" color="secondary" style="cursor: pointer;">
           <v-icon left>mdi-text-box-outline</v-icon>
           {{ pvsTitles[idx] }}

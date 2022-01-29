@@ -7,7 +7,11 @@
     {
       "value": "logout",
       "en": "Logout"
-    },
+    },    
+    {
+      "value": "loggedinas",
+      "en": "Logged in as"
+    },    
     {
       "value": "login",
       "en": "Login"
@@ -45,8 +49,20 @@
       "en": "Manage Users"
     },
     {
+      "value": "userscount",
+      "en": "Users Count"
+    },  
+    {
+      "value": "pvscount",
+      "en": "PVs Count"
+    },   
+    {
+      "value": "experimentscount",
+      "en": "Experiments Count"
+    },            
+    {
       "value": "managepvs",
-      "en": "Manage Experements & PVs"
+      "en": "Manage Experiments & PVs"
     },
     {
       "value": "pvstring",
@@ -169,7 +185,7 @@
       "en": "[ No E-Mail ]"
     },
     {
-      "value": "graphicsettings",
+      "value": "chartsettings",
       "en": "Graphic Settings"
     },
     {

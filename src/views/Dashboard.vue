@@ -1,18 +1,29 @@
 <template>
   <v-container fluid>
-    <Graphics />
+    <Statistics :user="this.$props.user" />
   </v-container>
 </template>
 
 <script>
-import Graphics from '../components/PVs/Graphics.vue';
+import Statistics from '../components/Dashboard/Statistics.vue';
 
 export default {
   components: {
-    Graphics,
+    Statistics,
   },
   data() {
     return {};
+  },
+  watch: {
+    user(Value) {
+      this.user = Value;
+    },
+  },
+  props: {
+    user: {
+      type: Object,
+      requred: true,
+    },
   },
   methods: {},
   mounted() {},

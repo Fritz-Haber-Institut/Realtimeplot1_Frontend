@@ -64,7 +64,12 @@ export default {
       if (WantedLanguage == null) {
         var Language = this.GetLSSettings().preferred_language;
         try {
-          return Dictionary.Strings.find(Word => Word.value === String)[Language]
+          if (Dictionary.Strings.find(Word => Word.value === String)[Language] === undefined) {
+            return Dictionary.Strings.find(Word => Word.value === String)['en']
+          }
+          else {
+            return Dictionary.Strings.find(Word => Word.value === String)[Language]
+          }
         }
         catch
         {
@@ -82,7 +87,7 @@ export default {
       }
     }
     catch {
-      //
+      console.log("Dictionary Error");
     }
   },
 

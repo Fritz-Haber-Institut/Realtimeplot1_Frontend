@@ -55,7 +55,7 @@ export default {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('successfullLogin');
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
-              this.$General.ReloadPage('/experiments-and-pvs');
+              this.$General.ReloadPage('/dashboard');
             }, 2000);
           })
           .catch((Error) => {
