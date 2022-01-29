@@ -5,24 +5,7 @@
         <v-col cols="12">
           <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
           <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-          <v-select
-            prepend-inner-icon="mdi-badge-account-horizontal"
-            label="User Role"
-            v-model="FormValues.user_type"
-            :items="[
-              {
-                text: 'Admin',
-                value: 'Admin',
-              },
-              {
-                text: 'User',
-                value: 'User',
-              },
-            ]"
-            item-text="text"
-            item-value="value"
-            :rules="[(v) => !!v || $General.GetString('noempty')]"
-          ></v-select>
+          <v-select v-if="$props.user == undefined ? false : ($props.user.user_type == 'Admin' ? true : false)" prepend-inner-icon="mdi-badge-account-horizontal" label="User Role" v-model="FormValues.user_type" :items="[ { text: 'Admin', value: 'Admin', }, { text: 'User', value: 'User', }, ]" item-text="text" item-value="value" :rules="[(v) => !!v || $General.GetString('noempty')]" ></v-select>
         </v-col>
         <v-col cols="6">
           <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
@@ -136,7 +119,7 @@ export default {
               console.log(Error);
             });
         }
-      }     
+      }
     },
     FillUserInfos(UserInfos) {
       this.FormValues.email = UserInfos == null ? '' : UserInfos.email;

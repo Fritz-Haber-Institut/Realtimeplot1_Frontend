@@ -17,7 +17,7 @@
         <v-divider />
         <v-data-table :headers="headers" :items="pvs" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }">
           <template v-slot:[`item.pv_string`]="{ item }">
-            <router-link :to="`/graphics?pvstring=${item.pv_string}`">
+            <router-link :to="`/chart?pvstring=${item.pv_string}`">
               {{ item.pv_string }}
             </router-link>
           </template>
