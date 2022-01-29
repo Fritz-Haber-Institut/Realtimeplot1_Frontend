@@ -23,6 +23,12 @@ export default {
   APIValidatePVString(pvString) {
     return this.MainDomain + `/data/validate_pv_string/${pvString}`
   },
+  APIFileImport() {
+    return this.MainDomain + '/file/import'
+  },
+  APIFileExport() {
+    return this.MainDomain + '/file/export'
+  },
   // General Functions
   LSSettings: 'ZgjdLNewsboV3LRxOgaw',
   GetLSSettings() {
@@ -113,4 +119,5 @@ export default {
   sheetUpdateExpError: errorStatusCode => `Failed to save experiment changes. HTTP Error ${errorStatusCode}`,
   sheetDeleteExpError: errorStatusCode => `Failed to delete this experiment. HTTP Error ${errorStatusCode}`,
   sheetDeletePVError: errorStatusCode => `Failed to delete this PV. HTTP Error ${errorStatusCode}`,
+  sheetFileImportError: errorStatusCode => `Failed to import file. HTTP Error ${errorStatusCode}`,
 }

@@ -41,25 +41,17 @@
       </v-row>
       <v-row>
         <v-col cols="6" class="mx-auto">
-          <v-alert class="d-flex justify-center" icon="mdi-check-circle-outline" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+          <v-alert class="d-flex justify-center" icon="mdi-check-circle" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
             {{ GeneralValues.AlertMessage.Message }}
           </v-alert>
         </v-col>
       </v-row>
     </v-form>
-    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
-      {{ sheetAlert.text }}
-    </BottomSheetAlert>
   </v-card>
 </template>
 
 <script>
-import BottomSheetAlert from './bottom-sheet-alert.vue';
-
 export default {
-  components: {
-    BottomSheetAlert,
-  },
   data: () => ({
     LocalStorage: {},
     GeneralValues: {
@@ -164,26 +156,6 @@ export default {
           });
       }
     },
-    // UI methods
-    showSheet(type, text, doCloseDialog = true) {
-      this.sheetAlert.type = type;
-      this.sheetAlert.text = text;
-      this.sheetAlert.open = true;
-      let time;
-      if (type === 'error') {
-        time = 4000;
-      } else if (!doCloseDialog) {
-        time = 3000;
-      } else {
-        time = 1000;
-      }
-      setTimeout(() => {
-        this.closeBottomSheet()
-      }, time);
-    },
-    closeBottomSheet() {
-      this.sheetAlert.open = false
-    }
   },
   mounted() {
     this.CheckData();
