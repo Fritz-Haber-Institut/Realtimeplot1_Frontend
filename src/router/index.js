@@ -11,6 +11,7 @@ import ExperimentsAndPVs from '../views/Experiments-and-PVs.vue'
 import Dashboard from '../views/Dashboard.vue'
 // import Accounts from '../views/Accounts.vue'
 import Users from '../views/Users.vue'
+import ImportFile from '../views/Import-File.vue'
 
 Vue.use(VueRouter)
 
@@ -20,13 +21,11 @@ const routes = [
     redirect: '/login'
   },
   { path: '/login', component: Login, meta: { requiresAuth: false, title: General.GetString('login'), icon: "mdi-information-outline" } },
-
-  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
+  { path: '/profile', component: Profile, meta: { requiresAuth: true, title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-cogs" } },
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true, title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
-  // { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } }, 
-  { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
-  // { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
-  { path: '/users', component: Users, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
+  { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-camera-document" } },
+  { path: '/users', component: Users, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-account-multiple-outline" } },
+  { path: '/import', component: ImportFile, meta: { requiresAuth: true, title: 'Import Configuration', icon: "mdi-tray-arrow-up" } },
 ]
 
 const router = new VueRouter({
