@@ -231,6 +231,18 @@
     {
       "value": "sheetCreatePVAlreadyCreated",
       "en": "This PV is already available in the database. You can search for it in the PVs' table."
+    },
+    {
+      "value": "sheetFileImportSuccess",
+      "en": "File imported successfully!"
+    },
+    {
+      "value": "sheetFileUploadWrongFormat",
+      "en": "Please select a .txt file!"
+    },
+    {
+      "value": "fileUploadCopyText",
+      "en": "Click to select a configuration file or drag'n'drop it over this box"
     }
   ]
 }
