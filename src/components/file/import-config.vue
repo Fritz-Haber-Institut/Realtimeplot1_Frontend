@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import BottomSheetAlert from './bottom-sheet-alert.vue'
+import BottomSheetAlert from '../bottom-sheet-alert.vue'
 
 export default {
   components: {

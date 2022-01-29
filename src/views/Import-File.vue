@@ -1,14 +1,17 @@
 <template>
   <v-container>
-    <UploadFile />
+    <ImportConfig />
+    <ExportConfig />
   </v-container>
 </template>
 
 <script>
-import UploadFile from '../components/upload-file.vue'
+import ImportConfig from '../components/file/import-config.vue'
+import ExportConfig from '../components/file/export-config.vue'
 export default {
   components: {
-    UploadFile
+    ImportConfig,
+    ExportConfig
   }
 }
 </script>
