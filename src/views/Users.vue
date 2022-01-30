@@ -17,7 +17,6 @@ export default {
   watch: {
     user(Value) {
       this.user = Value;
-      this.CheckData();
     },
   },
   props: {

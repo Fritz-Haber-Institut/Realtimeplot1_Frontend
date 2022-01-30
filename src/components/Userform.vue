@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-5 mx-auto" :width="isInDialog || this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
+  <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
     <v-form ref="Submit" lazy-validation autocomplete="off">
       <v-row>
         <v-col cols="12">

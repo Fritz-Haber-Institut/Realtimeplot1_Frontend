@@ -8,7 +8,7 @@
         <Card :user="user" :settings="{ Title: $General.GetString('pvscount'), Count: Statistics.PVs.Count, Button: $General.GetString('managepvs'), Link: '/experiments-and-pvs', Color: 'success', Icon: 'mdi-playlist-edit' }" />
       </v-col>
       <v-col cols="12" :lg="user == undefined ? false : (user.user_type == 'Admin' ? '4' : '6')">
-        <Card :user="user" :settings="{ Title: $General.GetString('experimentscount'), Count: Statistics.Experiments.Count, Button: $General.GetString('managepvs'), Link: '/Experiments-and-pvs', Color: 'warning', Icon: 'mdi-camera-document' }" />
+        <Card :user="user" :settings="{ Title: $General.GetString('experimentscount'), Count: Statistics.Experiments.Count, Button: $General.GetString('managepvs'), Link: '/experiments-and-pvs', Color: 'warning', Icon: 'mdi-camera-document' }" />
       </v-col>
     </v-row>
   </v-container>
