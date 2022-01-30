@@ -3,7 +3,7 @@
     <v-expansion-panels accordion>
       <v-expansion-panel>
         <v-expansion-panel-header class="display-1">
-          {{ $General.GetString('chartsettings') }}
+          {{ $General.GetString('chartsettings').replace('{0}', ChartSettings.URLParamenters.PVString) }}
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-card flat>
@@ -34,18 +34,14 @@
           <v-progress-circular :size="200" width="25" color="info" indeterminate></v-progress-circular>
           <h1 class="mt-6 info--text">{{ $General.GetString('loading') }}</h1>
         </div>
-        <AreaChart v-else :title="ChartSettings.URLParamenters.PVString" :xdata="ChartSettings.ExperimentsList.XData" :ydata="ChartSettings.ExperimentsList.YData" />
+        <apexchart v-else width="100%" type="area" :options="options" :series="series"> </apexchart>
       </div>
     </v-card>
   </v-container>
 </template>
 
 <script>
-import AreaChart from './AreaChart.vue';
 export default {
-  components: {
-    AreaChart,
-  },
   data: () => ({
     ChartSettings: {
       Loading: true,
@@ -53,10 +49,12 @@ export default {
       URLParamenters: {},
       ExperimentsList: {
         Items: [],
-        XData: [],
-        YData: [],
+        Labels: [],
+        Series: [],
       },
     },
+    options: {},
+    series: [],
   }),
   watch: {
     user(Value) {
@@ -71,13 +69,9 @@ export default {
   },
   methods: {
     UpdateData() {
-      var IfDate = '';
-      if (this.ChartSettings.URLParamenters.SinceDate != 'Invalid date') {
-        var NewSinceDate = this.$Moment(String(this.ChartSettings.URLParamenters.SinceDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.SinceTime + ':00';
-        var NewUntilDate = this.$Moment(String(this.ChartSettings.URLParamenters.UntilDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.UntilTime + ':00';
-        IfDate = '&since=' + NewSinceDate + '&until=' + NewUntilDate;
-      }
-      window.location.href = '/chart?pvstring=' + this.ChartSettings.URLParamenters.PVString + IfDate;
+      var NewSinceDate = this.$Moment(String(this.ChartSettings.URLParamenters.SinceDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.SinceTime + ':00';
+      var NewUntilDate = this.$Moment(String(this.ChartSettings.URLParamenters.UntilDate)).format('YYYY-MM-DD') + ' ' + this.ChartSettings.URLParamenters.UntilTime + ':00';
+      window.location.href = '/chart?pvstring=' + this.ChartSettings.URLParamenters.PVString + '&since=' + NewSinceDate + '&until=' + NewUntilDate;
     },
     LoadParamenters() {
       this.ChartSettings.URLParamenters = {
@@ -98,18 +92,69 @@ export default {
         since: this.ChartSettings.URLParamenters.Since,
         until: this.ChartSettings.URLParamenters.Until,
       };
-      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0], headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
-      // var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
+      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
+      var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
       this.$Axios(AxiosConfig)
         .then((DataResult) => {
           DataResult.data.data.experiment.process_variable_urls.forEach((Element) => {
             this.ChartSettings.ExperimentsList.Items.push(Element.split('/')[3]);
           });
-          console.log(DataResult.data.data.process_variables_data[this.ChartSettings.URLParamenters.PVString]);
           DataResult.data.data.process_variables_data[this.ChartSettings.URLParamenters.PVString].forEach((Element) => {
-            this.ChartSettings.ExperimentsList.YData.push(Element.data.toFixed(2));
-            this.ChartSettings.ExperimentsList.XData.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm'));
+            var newArray = {
+              x: Element.time,
+              y: Element.data.toFixed(2),
+            };
+            this.ChartSettings.ExperimentsList.Series.push(newArray);
           });
+          this.options = {
+            type: 'area',
+            markers: {
+              size: 0,
+            },
+            chart: {
+              animations: {
+                enabled: false,
+              },
+              id: 'vuechart-example',
+              zoom: {
+                enabled: true,
+                type: 'xy',
+                autoScaleYaxis: false,
+                zoomedArea: {
+                  fill: {
+                    color: 'blue',
+                    opacity: 0.5,
+                  },
+                  stroke: {
+                    color: 'black',
+                    opacity: 0.5,
+                    width: 2,
+                  },
+                },
+              },
+            },
+            title: {
+              text: this.ChartSettings.URLParamenters.PVString,
+            },
+            subtitle: {
+              text: Subtitle,
+            },
+            yaxis: {
+              show: true,
+              tickAmount: 3,
+            },
+            xaxis: {
+              type: 'datetime',
+              tickAmount: 1,
+              labels: {
+                rotate: -90,
+              },
+            },
+          };
+          this.series[0] = {
+            name: 'Value ',
+            data: this.ChartSettings.ExperimentsList.Series,
+          };
           this.ChartSettings.Loading = false;
         })
         .catch((Error) => {

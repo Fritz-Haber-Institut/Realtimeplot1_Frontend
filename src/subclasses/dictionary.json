@@ -15,11 +15,11 @@
     {
       "value": "importconfigdesc",
       "en": "Application Configuration Desc"
-    }, 
+    },
     {
       "value": "exportconfigtitle",
       "en": "Export Configuration"
-    },      
+    },
     {
       "value": "loggedinas",
       "en": "Logged in as"
@@ -198,7 +198,7 @@
     },
     {
       "value": "chartsettings",
-      "en": "Graphic Settings"
+      "en": "Chart Settings für {0}"
     },
     {
       "value": "addNewPVTooltip",
@@ -224,6 +224,18 @@
       "value": "emptyTablePVsPart2",
       "en": "or the \"+\" button to create a new one."
     },
+    {
+      "value": "saveasimage",
+      "en": "Save as Image"
+    },
+    {
+      "value": "zoominst",
+      "en": "For zooming in, use the mouse wheel"
+    },    
+    {
+      "value": "resetzoom",
+      "en": "Reset Zoom Level"
+    },    
     {
       "value": "clickHere",
       "en": "Click here"
