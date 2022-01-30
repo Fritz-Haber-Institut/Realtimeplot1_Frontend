@@ -17,9 +17,7 @@
         <v-divider />
         <v-data-table :headers="headers" :items="pvs" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }">
           <template v-slot:[`item.pv_string`]="{ item }">
-            <router-link :to="`/chart?pvstring=${item.pv_string}`">
-              {{ item.pv_string }}
-            </router-link>
+            <PVStringPVsTable :pvString="item.pv_string" :currentUserExpURLs="currentUserExpURLs"/>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <div v-if="$vuetify.breakpoint.smAndDown" :class="actionButtonsWrapperClasses">
@@ -48,6 +46,7 @@
 </template>
 
 <script>
+import PVStringPVsTable from './pvs-components/pv-string-pvs-table.vue'
 import Dialog from './dialog.vue';
 import BottomSheetAlert from '../bottom-sheet-alert.vue';
 
@@ -55,6 +54,7 @@ export default {
   components: {
     Dialog,
     BottomSheetAlert,
+    PVStringPVsTable
   },
   props: {
     user: {
@@ -91,13 +91,13 @@ export default {
         type: 'sucess',
         text: '',
       },
+      currentUserExpURLs: []
     };
   },
   computed: {
     deleteButtonClasses() {
       return {
         'ml-2': this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.xs,
-        // 'ml-2': this.$vuetify.breakpoint.smAndDown,
         'mt-2': this.$vuetify.breakpoint.smOnly,
       };
     },
@@ -120,6 +120,14 @@ export default {
   },
   methods: {
     // API calls
+    getCurrentUser() {
+      this.$Axios
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then(({data}) => {
+          this.currentUserExpURLs = data.user.experiment_urls
+        })
+        .catch(e => console.log(e))
+    },
     getPVs(signalCompletion) {
       this.$Axios
         .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
@@ -128,9 +136,8 @@ export default {
           this.shouldOpenCreateDialog && this.openCreatePVDialog();
           signalCompletion && signalCompletion();
         })
-        .catch((e) => {
-          console.log(e);
-        });
+        .then(this.getCurrentUser)
+        .catch(e => console.log(e))
     },
     isPVLastOfExperiment(expId, pv_string) {
       return this.$Axios
@@ -145,8 +152,6 @@ export default {
     },
     deletePV(item) {
       const reqUrl = `${this.$General.APIPVs()}/${item.pv_string}`;
-      // const alertText = this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string) ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : ''
-      // console.log(alertText)
       this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string)
         .then((isLastPv) => (isLastPv ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : ''))
         .then((alertText) => this.$General.ConfirmDeleteAlert(item.pv_string, alertText))
@@ -197,7 +202,7 @@ export default {
     },
   },
   mounted() {
-    this.getPVs();
+    this.getPVs()
   },
 };
 </script>

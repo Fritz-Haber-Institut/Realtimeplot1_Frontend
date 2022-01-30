@@ -7,15 +7,15 @@
       </v-card-title>
       <v-card-text>
         <v-divider />
-        <v-data-table :headers="headers" :items="experiments" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" show-expand item-key="short_id" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }">
+        <v-data-table :headers="headers" :items="experiments" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" show-expand item-key="short_id" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] } ">
           <template v-slot:[`item.process_variable_urls`]="{ item }">
-            <PVsTableTitles v-if="shouldRenderPVsTitles" :pvsUrls="item.process_variable_urls" />
+            <PVsTitlesExpTable :pvsUrls="item.process_variable_urls" :currentUserExpURLs="currentUserExpURLs"/>
           </template>
-          <!-- { headers, item, isMobile } -->
           <template v-slot:expanded-item="{ headers, item }">
-            <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" />
+            <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" @closeExpanded="closeExpandedItem(item.short_id)"/>
           </template>
           <template v-slot:[`item.data-table-expand`]="{ item, isExpanded, expand }">
+            <span v-show="false" :id="`closeExpanded-${item.short_id}`" :ref="`closeExpanded-${item.short_id}`" @click="expand(false)"></span>
             <v-btn v-if="item.user_urls.length" icon :class="`v-data-table__expand-icon v-icon--link ${isExpanded && 'v-data-table__expand-icon--active'}`" @click="expand(!isExpanded)">
               <v-icon>mdi-chevron-down</v-icon>
             </v-btn>
@@ -52,14 +52,14 @@
 
 <script>
 import Dialog from './dialog.vue';
-import PVsTableTitles from './pvs-table-titles.vue';
-import ExpUsersNames from './exp-users-names.vue';
+import PVsTitlesExpTable from './experiments-components/pvs-titles-exp-table.vue';
+import ExpUsersNames from './experiments-components/exp-users-names.vue';
 import BottomSheetAlert from '../bottom-sheet-alert.vue';
 
 export default {
   components: {
     Dialog,
-    PVsTableTitles,
+    PVsTitlesExpTable,
     ExpUsersNames,
     BottomSheetAlert,
   },
@@ -69,6 +69,10 @@ export default {
       default: true,
       required: true,
     },
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {
@@ -93,6 +97,7 @@ export default {
         text: '',
       },
       shouldRenderPVsTitles: true,
+      currentUserExpURLs: []
     };
   },
   computed: {
@@ -118,16 +123,24 @@ export default {
   },
   methods: {
     // API calls
+    getCurrentUser() {
+      this.$Axios
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then(({data}) => {
+          this.currentUserExpURLs = data.user.experiment_urls
+        })
+        .catch(e => console.log(e))
+    },
     getExperiments() {
+      this.shouldRenderPVsTitles = false
       this.$Axios
         .get(this.$General.APIExperiments() + '/', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((res) => {
           this.experiments = res.data.experiments;
           this.shouldRenderPVsTitles = true;
         })
-        .catch((e) => {
-          console.log(e);
-        });
+        .then(this.getCurrentUser)
+        .catch(e => console.log(e))
     },
     deleteExp(short_id) {
       const reqUrl = `${this.$General.APIExperiments()}/${short_id}`;
@@ -146,9 +159,6 @@ export default {
     },
     // UI methods
     openCreatePVDialog() {
-      // this.dialog.type='pv'
-      // this.dialog.method='POST'
-      // this.dialog.open = true
       this.$emit('switch-to-pv-tab');
     },
     openEditExpDialog(exp) {
@@ -181,6 +191,9 @@ export default {
       this.sheetAlert.open = false;
       this.sheetAlert.type !== 'info' && this.closeDialog();
     },
+    closeExpandedItem(id) {
+      this.$refs[`closeExpanded-${id}`].click()
+    }
   },
   mounted() {
     this.getExperiments();
