@@ -22,7 +22,7 @@
             </v-col>
           </v-row>
           <v-row v-if="isExperiment">
-            <v-col cols="12">
+            <v-col cols="9">
               <v-combobox
                 v-model="expUserNames"
                 :items="allUserNames"
@@ -337,7 +337,8 @@ export default {
       }
       setTimeout(() => {
         this.closeBottomSheet()
-        doCloseDialog ? this.closeDialog() : this.$emit('reload-data')
+        this.$emit('reload-data')
+        doCloseDialog && this.closeDialog() 
       }, time);
     },
     closeBottomSheet() {
@@ -348,7 +349,6 @@ export default {
       this.confirmButtonDisabled = false
     },
     closeDialog() {
-      this.$emit('reload-data')
       // waiting for the closing animation to finish
       setTimeout(() => {
         this.$emit("close-dialog");
