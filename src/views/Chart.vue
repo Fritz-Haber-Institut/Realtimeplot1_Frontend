@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Chart from '../components/PVs/Chart.vue';
+import Chart from '../components/PVs/ChartChartjs.vue';
 
 export default {
   components: {
