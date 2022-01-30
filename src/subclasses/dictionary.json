@@ -7,11 +7,23 @@
     {
       "value": "logout",
       "en": "Logout"
-    },    
+    },
+    {
+      "value": "importconfigtitle",
+      "en": "Application Configuration"
+    },
+    {
+      "value": "importconfigdesc",
+      "en": "Application Configuration Desc"
+    }, 
+    {
+      "value": "exportconfigtitle",
+      "en": "Export Configuration"
+    },      
     {
       "value": "loggedinas",
       "en": "Logged in as"
-    },    
+    },
     {
       "value": "login",
       "en": "Login"
@@ -51,15 +63,15 @@
     {
       "value": "userscount",
       "en": "Users Count"
-    },  
+    },
     {
       "value": "pvscount",
       "en": "PVs Count"
-    },   
+    },
     {
       "value": "experimentscount",
       "en": "Experiments Count"
-    },            
+    },
     {
       "value": "managepvs",
       "en": "Manage Experiments & PVs"

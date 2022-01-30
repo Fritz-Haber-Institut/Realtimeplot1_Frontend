@@ -99,6 +99,7 @@ export default {
       this.$Axios
         .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((LoginResult) => {
+          this.$CurrentUser = LoginResult.data.user;
           this.GeneralSettings.UserInfos = LoginResult.data.user;
           if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
             this.LocalStorage.Token = this.$General.GetLSSettings().Token;
@@ -128,10 +129,9 @@ export default {
     if (this.$route.path != '/login') {
       this.GeneralSettings.DarkMode = this.$General.GetLSSettings().dark_theme;
       this.GeneralSettings.Navigation = [
+        { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
         { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
         { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
-        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' },
-        { title: 'Import Configuration', icon: 'mdi-tray-arrow-up', url: '/import' },
       ];
       this.GeneralSettings.AdminNavigation = [{ title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }];
     }
@@ -139,9 +139,6 @@ export default {
     setInterval(() => {
       this.GetInfos();
     }, 300000);
-    setInterval(() => {
-      this.LocalStorage = this.$General.GetLSSettings();
-    }, 100);
   },
 };
 </script>
