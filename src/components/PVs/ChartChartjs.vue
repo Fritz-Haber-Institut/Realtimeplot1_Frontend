@@ -35,8 +35,25 @@
         </v-expansion-panel>
       </v-expansion-panels>
       <v-divider class="my-5" />
-      <v-card class="pa-5" color="white">
-        <div id="chart">
+      <v-card class="pa-2" color="white">
+        <v-row align="start" no-gutters>
+          <v-col cols="3" class="text-start">
+            <v-switch v-model="ChartSettings.Switcher" light false-value="ApexChart" true-value="ChartJS" :label="`${ChartSettings.Switcher}`"></v-switch>
+          </v-col>
+          <v-col cols="6" class="text-end">
+            <v-alert outlined type="warning" rounded="pill">
+              {{ $General.GetString('zoominst') }}
+            </v-alert>
+          </v-col>
+          <v-col cols="3" class="text-end">
+            <v-chip class="px-5" color="success" large>
+              {{ $General.GetString('recordscount') + ' : ' + ChartSettings.ExperimentsList.XData.length }}
+            </v-chip>
+          </v-col>
+        </v-row>
+        <v-divider class="my-2" />
+        <apexchart v-if="ChartSettings.Switcher == 'ApexChart'" width="100%" type="area" :options="options" :series="series"> </apexchart>
+        <div v-else id="chart">
           <AreaChart
             :settings="{
               since: ChartSettings.URLParamenters.Since,
@@ -60,15 +77,19 @@ export default {
   },
   data: () => ({
     ChartSettings: {
+      Switcher: 'ChartJS',
       Loading: true,
       UpdatedData: {},
       URLParamenters: {},
       ExperimentsList: {
+        Series: [],
         Items: [],
         XData: [],
         YData: [],
       },
     },
+    options: {},
+    series: [],
   }),
   watch: {
     user(Value) {
@@ -110,8 +131,8 @@ export default {
         since: this.ChartSettings.URLParamenters.Since,
         until: this.ChartSettings.URLParamenters.Until,
       };
+      var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
       var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
-      // var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
       this.$Axios(AxiosConfig)
         .then((DataResult) => {
           DataResult.data.data.experiment.process_variable_urls.forEach((Element) => {
@@ -119,29 +140,68 @@ export default {
           });
           DataResult.data.data.process_variables_data[this.ChartSettings.URLParamenters.PVString].forEach((Element) => {
             this.ChartSettings.ExperimentsList.YData.push(Element.data.toFixed(2));
-            this.ChartSettings.ExperimentsList.XData.push(this.$Moment(String(Element.time)).format('DD.MM.YYYY, HH:mm'));
+            this.ChartSettings.ExperimentsList.XData.push(Element.time);
+            var newArray = {
+              x: Element.time,
+              y: Element.data.toFixed(2),
+            };
+            this.ChartSettings.ExperimentsList.Series.push(newArray);
           });
+          this.options = {
+            type: 'area',
+            markers: {
+              size: 0,
+            },
+            chart: {
+              animations: {
+                enabled: false,
+              },
+              id: 'vuechart-example',
+              zoom: {
+                enabled: true,
+                type: 'xy',
+                autoScaleYaxis: false,
+                zoomedArea: {
+                  fill: {
+                    color: 'blue',
+                    opacity: 0.5,
+                  },
+                  stroke: {
+                    color: 'black',
+                    opacity: 0.5,
+                    width: 2,
+                  },
+                },
+              },
+            },
+            title: {
+              text: this.ChartSettings.URLParamenters.PVString,
+            },
+            subtitle: {
+              text: Subtitle,
+            },
+            yaxis: {
+              show: true,
+              tickAmount: 3,
+            },
+            xaxis: {
+              type: 'datetime',
+              tickAmount: 1,
+              labels: {
+                rotate: -90,
+              },
+            },
+          };
+          this.series[0] = {
+            name: 'Value',
+            data: this.ChartSettings.ExperimentsList.Series,
+          };
           this.ChartSettings.Loading = false;
         })
         .catch((Error) => {
           this.ChartSettings.Loading = false;
           console.log(Error);
         });
-    },
-    PostPPBData() {
-      var PVStrings = ['PPB:VmeCrateAfm:FanSpeed1', 'PPB:VmeCrateAfm:IM12', 'PPB:VmeCrateAfm:IP12', 'PPB:VmeCrateAfm:IP3', 'PPB:VmeCrateAfm:IP5', 'PPB:VmeCrateAfm:Temp1', 'PPB:VmeCrateAfm:Temp2', 'PPB:VmeCrateAfm:Temp3', 'PPB:VmeCrateAfm:VM12', 'PPB:VmeCrateAfm:VP12', 'PPB:VmeCrateAfm:VP3', 'PPB:VmeCrateAfm:VP5'];
-      PVStrings.forEach((Eelement) => {
-        var FormValues = {
-          pv_string: Eelement,
-          human_readable_name: 'Desc : ' + Eelement,
-        };
-        var AxiosConfig = { method: 'POST', url: this.$General.APIPVs(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: FormValues };
-        this.$Axios(AxiosConfig)
-          .then(() => {})
-          .catch((Error) => {
-            console.log(Error);
-          });
-      });
     },
   },
   async mounted() {
@@ -151,7 +211,6 @@ export default {
     } else {
       window.location.href = '/experiments-and-pvs';
     }
-    // this.PostPPBData();
   },
 };
 </script>
