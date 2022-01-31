@@ -1,0 +1,336 @@
+{
+  "Strings": [
+    {
+      "value": "profile",
+      "en": "My Account"
+    },
+    {
+      "value": "logout",
+      "en": "Logout"
+    },
+    {
+      "value": "importconfigtitle",
+      "en": "Application Configuration"
+    },
+    {
+      "value": "importconfigdesc",
+      "en": "Use the following components to import or export an application configuration"
+    },
+    {
+      "value": "exportconfigtitle",
+      "en": "Export Configuration"
+    },
+    {
+      "value": "loggedinas",
+      "en": "Logged in as"
+    },
+    {
+      "value": "login",
+      "en": "Login"
+    },
+    {
+      "value": "dashboard",
+      "en": "Dashboard"
+    },
+    {
+      "value": "dataVisualization",
+      "en": "Data visualization"
+    },
+    {
+      "value": "loginname",
+      "en": "Login Name"
+    },
+    {
+      "value": "password",
+      "en": "Password"
+    },
+    {
+      "value": "temppassword",
+      "en": "Temporary Password"
+    },    
+    {
+    "value": "passwordcanbeempty",
+    "en": "Password (If you do not want to update, leave it empty)"
+    },
+    {
+      "value": "userrole",
+      "en": "User Role"
+    },
+    {
+      "value": "firstname",
+      "en": "First Name"
+    },
+    {
+      "value": "lastname",
+      "en": "Last Name"
+    },
+    {
+      "value": "email",
+      "en": "E-mail Address"
+    },
+    {
+      "value": "manageusers",
+      "en": "Manage Users"
+    },
+    {
+      "value": "userscount",
+      "en": "Users Count"
+    },
+    {
+      "value": "pvscount",
+      "en": "PVs Count"
+    },
+    {
+      "value": "experimentscount",
+      "en": "Experiments Count"
+    },
+    {
+      "value": "manageExpAndPVs",
+      "en": "Manage Experiments & PVs"
+    },
+    {
+      "value": "manageExperiments",
+      "en": "Manage Experiments"
+    },
+    {
+      "value": "managePVs",
+      "en": "Manage PVs"
+    },
+    {
+      "value": "experimentsTitle",
+      "en": "Experiments"
+    },
+    {
+      "value": "pvsTitle",
+      "en": "Process variables"
+    },
+    {
+      "value": "pvstring",
+      "en": "PV String"
+    },
+    {
+      "value": "humanreadablename",
+      "en": "Human Readable Name"
+    },
+    {
+      "value": "apply",
+      "en": "Apply"
+    },
+    {
+      "value": "sure",
+      "en": "Are you sure?"
+    },
+    {
+      "value": "update",
+      "en": "Update Record"
+    },
+    {
+      "value": "delete",
+      "en": "Delete Record"
+    },
+    {
+      "value": "showexperiment",
+      "en": "Show Experiments"
+    },
+    {
+      "value": "darkmode",
+      "en": "Dark Mode?"
+    },
+    {
+      "value": "cancel",
+      "en": "Cancel"
+    },
+    {
+      "value": "new",
+      "en": "Add New Record"
+    },
+    {
+      "value": "noempty",
+      "en": "Field cannot be empty!"
+    },
+    {
+      "value": "wronginfos",
+      "en": "Wrong login name or password!"
+    },
+    {
+      "value": "wronginfos2",
+      "en": "Informations are not Complete"
+    },
+    {
+      "value": "wronginfos3",
+      "en": "Username already exists"
+    },
+    {
+      "value": "wrongemailformat",
+      "en": "Wrong E-Mail format!"
+    },
+    {
+      "value": "passwordsdontmatch",
+      "en": "Password values do not match"
+    },
+    {
+      "value": "userTableUpdateDialogSuccess",
+      "en": "User changes saved successfully!"
+    },
+    {
+      "value": "sheetNewPVSuccess",
+      "en": "PV created successfully!"
+    },
+    {
+      "value": "sheetUpdatePVSuccess",
+      "en": "PV changes saved successfully!"
+    },
+    {
+      "value": "sheetUpdateExpSuccess",
+      "en": "Experiment changes saved successfully!"
+    },
+    {
+      "value": "sheetUpdateNoChanges",
+      "en": "Please update some of the properties first."
+    },
+    {
+      "value": "success",
+      "en": "Operations successfully completed!"
+    },
+    {
+      "value": "successwithtimer",
+      "en": "Operations successfully completed! Redirection in @@ seconds ..."
+    },
+    {
+      "value": "successfullLogin",
+      "en": "Login successfull!"
+    },
+    {
+      "value": "loading",
+      "en": "Loading ... Please wait."
+    },
+    {
+      "value": "last7records",
+      "en": "Last 7 Hours ..."
+    },
+    {
+      "value": "recordscount",
+      "en": "Data Records Count"
+    },    
+    {
+      "value": "search",
+      "en": "Search"
+    },
+    {
+      "value": "nodata",
+      "en": "No Data Found"
+    },
+    {
+      "value": "doubleemail",
+      "en": "E-Mail already exists"
+    },
+    {
+      "value": "noemail",
+      "en": "[ No E-Mail ]"
+    },
+    {
+      "value": "chartsettings",
+      "en": "Chart Settings für {0}"
+    },
+    {
+      "value": "chartitle",
+      "en": "Chart View"
+    },    
+    {
+      "value": "addNewPVTooltip",
+      "en": "Add a new PV"
+    },
+    {
+      "value": "noAssignedUsers",
+      "en": "No assigned users"
+    },
+    {
+      "value": "emptyTableExpAdminPart1",
+      "en": "There are no available experiments in the database."
+    },
+    {
+      "value": "emptyTableExpAdminPart2",
+      "en": "to set up an experiment."
+    },
+    {
+      "value": "emptyTableExpUser",
+      "en": "Currently there are no assigned experiments to you. Please contact an admin to receive some assignments."
+    },
+    {
+      "value": "emptyTablePVsAdminPart1",
+      "en": "There are no saved PVs."
+    },
+    {
+      "value": "emptyTablePVsAdminPart2",
+      "en": "or the \"+\" button to create a new one."
+    },
+    {
+      "value": "emptyTablePVsUser",
+      "en": "Currently there are no assigned experiments to you. Once you are assigned an experiment, its PVs will be listed here. Please contact an admin to receive some assignments."
+    },
+    {
+      "value": "saveasimage",
+      "en": "Save as Image"
+    },
+    {
+      "value": "zoominst",
+      "en": "For zooming in, use the mouse wheel"
+    },    
+    {
+      "value": "resetzoom",
+      "en": "Reset Zoom Level"
+    },    
+    {
+      "value": "clickHere",
+      "en": "Click here"
+    },
+    {
+      "value": "createNewPV",
+      "en": "Create a new PV"
+    },
+    {
+      "value": "sheetCreatePVEmptyPVString",
+      "en": "Please enter a PV String first."
+    },
+    {
+      "value": "sheetPVNotInArchiver",
+      "en": "This PV was not found in the archiver. Please insert a correct PV String."
+    },
+    {
+      "value": "sureDelete",
+      "en": "Are you sure you want to delete <id>?"
+    },
+    {
+      "value": "addNewUserTooltip",
+      "en": "Add a new user"
+    },
+    {
+      "value": "sheetDeleteExpSuccess",
+      "en": "The experiment was deleted successfully!"
+    },
+    {
+      "value": "sheetDeletePVSuccess",
+      "en": "The PV was deleted successfully!"
+    },
+    {
+      "value": "sheetCreatePVAlreadyCreated",
+      "en": "This PV is already available in the database. You can search for it in the PVs' table."
+    },
+    {
+      "value": "sheetFileImportSuccess",
+      "en": "File imported successfully!"
+    },
+    {
+      "value": "sheetFileUploadWrongFormat",
+      "en": "Please select a .txt file!"
+    },
+    {
+      "value": "fileUploadCopyText",
+      "en": "Click to select a configuration file or drag'n'drop it over this box"
+    },
+    {
+      "value": "showAssignedUsersTooltip",
+      "en": "Show assigned users"
+    }
+  ]
+}
