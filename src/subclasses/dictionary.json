@@ -73,8 +73,24 @@
       "en": "Experiments Count"
     },
     {
-      "value": "managepvs",
+      "value": "manageExpAndPVs",
       "en": "Manage Experiments & PVs"
+    },
+    {
+      "value": "manageExperiments",
+      "en": "Manage Experiments"
+    },
+    {
+      "value": "managePVs",
+      "en": "Manage PVs"
+    },
+    {
+      "value": "experimentsTitle",
+      "en": "Experiments"
+    },
+    {
+      "value": "pvsTitle",
+      "en": "Process variables"
     },
     {
       "value": "pvstring",
@@ -209,20 +225,28 @@
       "en": "No assigned users"
     },
     {
-      "value": "emptyTableExpPart1",
-      "en": "There are no saved experiments."
+      "value": "emptyTableExpAdminPart1",
+      "en": "There are no available experiments in the database."
     },
     {
-      "value": "emptyTableExpPart2",
+      "value": "emptyTableExpAdminPart2",
       "en": "to set up an experiment."
     },
     {
-      "value": "emptyTablePVsPart1",
+      "value": "emptyTableExpUser",
+      "en": "Currently there are no assigned experiments to you. Please contact an admin to receive some assignments."
+    },
+    {
+      "value": "emptyTablePVsAdminPart1",
       "en": "There are no saved PVs."
     },
     {
-      "value": "emptyTablePVsPart2",
+      "value": "emptyTablePVsAdminPart2",
       "en": "or the \"+\" button to create a new one."
+    },
+    {
+      "value": "emptyTablePVsUser",
+      "en": "Currently there are no assigned experiments to you. Once you are assigned an experiment, its PVs will be listed here. Please contact an admin to receive some assignments."
     },
     {
       "value": "clickHere",
@@ -271,6 +295,10 @@
     {
       "value": "fileUploadCopyText",
       "en": "Click to select a configuration file or drag'n'drop it over this box"
+    },
+    {
+      "value": "showAssignedUsersTooltip",
+      "en": "Show assigned users"
     }
   ]
 }
