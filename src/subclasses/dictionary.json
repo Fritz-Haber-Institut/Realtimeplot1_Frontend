@@ -15,11 +15,11 @@
     {
       "value": "importconfigdesc",
       "en": "Application Configuration Desc"
-    }, 
+    },
     {
       "value": "exportconfigtitle",
       "en": "Export Configuration"
-    },      
+    },
     {
       "value": "loggedinas",
       "en": "Logged in as"
@@ -197,6 +197,10 @@
       "en": "Last 7 Hours ..."
     },
     {
+      "value": "recordscount",
+      "en": "Data Records Count"
+    },    
+    {
       "value": "search",
       "en": "Search"
     },
@@ -214,8 +218,12 @@
     },
     {
       "value": "chartsettings",
-      "en": "Graphic Settings"
+      "en": "Chart Settings für {0}"
     },
+    {
+      "value": "chartitle",
+      "en": "Chart View"
+    },    
     {
       "value": "addNewPVTooltip",
       "en": "Add a new PV"
@@ -248,6 +256,18 @@
       "value": "emptyTablePVsUser",
       "en": "Currently there are no assigned experiments to you. Once you are assigned an experiment, its PVs will be listed here. Please contact an admin to receive some assignments."
     },
+    {
+      "value": "saveasimage",
+      "en": "Save as Image"
+    },
+    {
+      "value": "zoominst",
+      "en": "For zooming in, use the mouse wheel"
+    },    
+    {
+      "value": "resetzoom",
+      "en": "Reset Zoom Level"
+    },    
     {
       "value": "clickHere",
       "en": "Click here"
