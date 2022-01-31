@@ -33,6 +33,10 @@
       "en": "Dashboard"
     },
     {
+      "value": "dataVisualization",
+      "en": "Data visualization"
+    },
+    {
       "value": "loginname",
       "en": "Login Name"
     },
