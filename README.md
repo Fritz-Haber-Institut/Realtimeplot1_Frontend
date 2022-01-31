@@ -59,13 +59,19 @@ Nevertheless, the routes are directly accessable through the URL browser bar and
 
 ### `/profile`
 
-> A view of the profile settings of the logged in user
+> A view of the profile settings of the logged in user.
 
 **Access requirements:** Authenticated user (*simple user or administrator*)
 
 ### `/dashboard`
 
-> A view of the dashboard, serving as a homepage
+> A view of the dashboard, serving as a homepage.
+
+**Access requirements:** Authenticated user (*simple user or administrator*)
+
+### `/chart`
+
+> A view of the visualizations that show course of PV data along a given time frame.
 
 **Access requirements:** Authenticated user (*simple user or administrator*)
 
