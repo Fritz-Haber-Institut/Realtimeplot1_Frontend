@@ -5,8 +5,7 @@
     </v-dialog>
     <v-card>
       <v-card-actions>
-        <v-alert icon="mdi-check-circle" rounded="md" class="mx-2 mt-1" width="100%" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
-          {{ GeneralValues.AlertMessage.Message }}
+        <v-alert icon="mdi-check-circle" rounded="md" class="mx-2 mt-1" width="100%" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark v-html="GeneralValues.AlertMessage.Message">
         </v-alert>
       </v-card-actions>
       <v-card-title>
@@ -27,8 +26,8 @@
             <v-chip class="Full100 justify-center" v-bind:color="item.user_type == 'Admin' ? 'success' : 'info'">{{ item.user_type }}</v-chip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
-            <v-btn fab color="warning" x-small @click="EditUser(item.url.split('/')[3])"><v-icon> mdi-pencil </v-icon></v-btn>
-            <v-btn fab color="error" class="ml-2" x-small @click="DeleteUser(item.url.split('/')[3])"> <v-icon> mdi-delete </v-icon></v-btn>
+            <v-btn :disabled="item.login_name == $props.user.login_name" fab color="warning" x-small @click="EditUser(item.url.split('/')[3])"><v-icon> mdi-pencil </v-icon></v-btn>
+            <v-btn :disabled="item.login_name == $props.user.login_name" fab color="error" class="ml-2" x-small @click="DeleteUser(item.url.split('/')[3])"> <v-icon> mdi-delete </v-icon></v-btn>
           </template>
         </v-data-table>
       </v-card-text>
@@ -85,10 +84,6 @@ export default {
       this.GeneralValues.AlertMessage.Message = Value.Message;
       this.GeneralValues.AlertMessage.Color = Value.Color;
       this.Users.Dialog = false;
-      setInterval(() => {
-        this.GeneralValues.AlertMessage.Message = '';
-        this.GeneralValues.AlertMessage.Color = '';
-      }, 5000);
     },
     GetUsers() {
       var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
