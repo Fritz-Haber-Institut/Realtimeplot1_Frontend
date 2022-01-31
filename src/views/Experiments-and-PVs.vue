@@ -1,17 +1,25 @@
 <template>
-  <v-container fluid>
-    <v-tabs v-model="tab">
-      <v-tab href="#exp" @change="markActiveTab('exp')">Experiments</v-tab>
-      <v-tab href="#pvs" @change="markActiveTab('pvs')">PVs</v-tab>
-    </v-tabs>
-    <v-tabs-items v-model="tab">
-      <v-tab-item transition="fade-transition" value="exp">
+  <v-container>
+    <!-- <v-tabs v-model="tab">
+      <v-tab to="/experiments" @change="markActiveTab('exp')">Experiments</v-tab>
+      <v-tab to="/pvs" @change="markActiveTab('pvs')">PVs</v-tab>
+    </v-tabs> -->
+    <!-- <v-tabs-items v-model="tab">
+      <v-tab-item transition="fade-transition">
         <Experiments :user="user" :hasActiveTab="activeTab === 'exp'" @switch-to-pv-tab="switchTabForcibly" />
       </v-tab-item>
-      <v-tab-item transition="fade-transition" value="pvs">
+      <v-tab-item transition="fade-transition">
         <PVs :user="user" :hasActiveTab="activeTab === 'pvs'" :shouldOpenCreateDialog="shouldOpenCreatePVDialog" @dialog-opened="openDialogCompleted" />
       </v-tab-item>
-    </v-tabs-items>
+    </v-tabs-items> -->
+    <!-- <router-view></router-view> -->
+    <Experiments v-if="$route.path === '/experiments'" @switch-to-pv-tab="switchTabForcibly" />
+    <!-- <transition name="fade">
+    </transition> -->
+    <PVs v-if="$route.path === '/pvs'" :shouldOpenCreateDialog="shouldOpenCreatePVDialog" @dialog-opened="openDialogCompleted" />
+    <!-- <transition name="fade">
+    </transition> -->
+
   </v-container>
 </template>
 
@@ -24,43 +32,26 @@ export default {
     Experiments,
     PVs,
   },
-  data() {
-    return {
-      tabs: null,
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      tab: null,
-      activeTab: 'pvs',
-      shouldOpenCreatePVDialog: false,
-    };
-  },
-  watch: {
-    user(Value) {
-      this.user = Value;
-    },
-  },
   props: {
-    user: {
-      type: Object,
-      requred: true,
-    },
-  },  
+    shouldOpenCreatePVDialog: {
+      type: Boolean,
+      required: true
+    }
+  },
   methods: {
-    markActiveTab(kind) {
-      this.activeTab = kind;
-    },
     switchTabForcibly() {
-      this.tab = 1 - this.tab;
-      this.shouldOpenCreatePVDialog = true;
-      this.markActiveTab('pvs');
+      console.log('Emitting from the view')  
+      this.$emit('switch-tab')
     },
     openDialogCompleted() {
-      this.shouldOpenCreatePVDialog = false;
+      this.$emit('create-dialog-open')
     },
-  },
+  }
 };
 </script>
 <style>
 .DialogLink {
+  text-decoration: underline;
   cursor: pointer;
 }
 </style>

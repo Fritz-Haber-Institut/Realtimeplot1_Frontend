@@ -16,7 +16,7 @@ export default {
       type: String,
       required: true
     },
-    currentUserExpURLs: {
+    currentUserExperiments: {
       type: Array,
       required: true
     }
@@ -27,16 +27,17 @@ export default {
     }
   },
   watch: {
-    currentUserExpURLs() {
-      // console.log('change');
+    currentUserExperiments() {
       this.checkIfUserOwnsPV()
     }
   },
   methods: {
     checkIfUserOwnsPV() {
-      const currentUserExperiments = this.currentUserExpURLs.map(url => url.split('experiments/')[1])
-      this.isLoggedUserAssigned = currentUserExperiments.some(exp => exp === this.pvString.split(':')[0])
+      this.isLoggedUserAssigned = this.currentUserExperiments.some(exp => exp === this.pvString.split(':')[0])
     }
+  },
+  mounted() {
+    this.checkIfUserOwnsPV()
   }
 }
 </script>

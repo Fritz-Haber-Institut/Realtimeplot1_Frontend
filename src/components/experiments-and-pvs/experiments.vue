@@ -1,6 +1,6 @@
 <template>
-  <v-container class="mt-10">
-    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getExperiments" />
+  <div>
+    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="loadData" />
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
@@ -9,16 +9,26 @@
         <v-divider />
         <v-data-table :headers="headers" :items="experiments" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" show-expand item-key="short_id" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] } ">
           <template v-slot:[`item.process_variable_urls`]="{ item }">
-            <PVsTitlesExpTable :pvsUrls="item.process_variable_urls" :currentUserExpURLs="currentUserExpURLs"/>
+            <PVsTitlesExpTable :pvsUrls="item.process_variable_urls" :currentUserExperiments="currentUserExperimentsNames"/>
           </template>
           <template v-slot:expanded-item="{ headers, item }">
             <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" @closeExpanded="closeExpandedItem(item.short_id)"/>
           </template>
           <template v-slot:[`item.data-table-expand`]="{ item, isExpanded, expand }">
             <span v-show="false" :id="`closeExpanded-${item.short_id}`" :ref="`closeExpanded-${item.short_id}`" @click="expand(false)"></span>
-            <v-btn v-if="item.user_urls.length" icon :class="`v-data-table__expand-icon v-icon--link ${isExpanded && 'v-data-table__expand-icon--active'}`" @click="expand(!isExpanded)">
-              <v-icon>mdi-chevron-down</v-icon>
-            </v-btn>
+            <span v-if="item.user_urls.length">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-if="isExpanded" icon class="v-data-table__expand-icon v-icon--link v-data-table__expand-icon--active" @click="expand(false)">
+                    <v-icon>mdi-chevron-down</v-icon>
+                  </v-btn>
+                  <v-btn v-else icon class="v-data-table__expand-icon v-icon--link elevation-4" v-bind="attrs" v-on="on" @click="expand(true)">
+                    <v-icon>mdi-account-search</v-icon>
+                  </v-btn>
+                </template>
+                {{ $General.GetString('showAssignedUsersTooltip') }}
+              </v-tooltip>
+            </span>
             <v-tooltip v-else bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-row justify="center">
@@ -30,7 +40,7 @@
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <div :class="actionButtonsWrapperClasses">
-              <v-btn x-small fab color="warning" @click="openEditExpDialog(item)">
+              <v-btn v-if="currentUser.isAdmin" x-small fab color="warning" @click="openEditExpDialog(item)">
                 <v-icon> mdi-pencil </v-icon>
               </v-btn>
               <v-btn fab color="error" x-small :class="deleteButtonClasses" @click="deleteExp(item.short_id)">
@@ -39,7 +49,12 @@
             </div>
           </template>
           <template v-slot:no-data>
-            {{ $General.GetString('emptyTableExpPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('createNewPV') }}</span> {{ $General.GetString('emptyTableExpPart2') }}
+            <div v-if="currentUser.isAdmin">
+              {{ $General.GetString('emptyTableExpAdminPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('createNewPV') }}</span> {{ $General.GetString('emptyTableExpAdminPart2') }}
+            </div>
+            <div v-else>
+              {{ $General.GetString('emptyTableExpUser') }}
+            </div>
           </template>
         </v-data-table>
       </v-card-text>
@@ -47,7 +62,7 @@
     <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
       {{ sheetAlert.text }}
     </BottomSheetAlert>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -62,17 +77,6 @@ export default {
     PVsTitlesExpTable,
     ExpUsersNames,
     BottomSheetAlert,
-  },
-  props: {
-    hasActiveTab: {
-      type: Boolean,
-      default: true,
-      required: true,
-    },
-    user: {
-      type: Object,
-      required: true
-    }
   },
   data() {
     return {
@@ -97,7 +101,10 @@ export default {
         text: '',
       },
       shouldRenderPVsTitles: true,
-      currentUserExpURLs: []
+      currentUser: {
+        isAdmin: false,
+        expURLs: []
+      }
     };
   },
   computed: {
@@ -114,24 +121,22 @@ export default {
         'mb-3': this.$vuetify.breakpoint.xs,
       };
     },
-  },
-  watch: {
-    hasActiveTab(val) {
-      val || setTimeout(() => (this.shouldRenderPVsTitles = false), 500); // waiting for the fade-out to complete
-      val && this.getExperiments();
-    },
+    currentUserExperimentsNames() {
+      return this.currentUser.expURLs.map(url => url.split('experiments/')[1])
+    }
   },
   methods: {
     // API calls
     getCurrentUser() {
-      this.$Axios
+      return this.$Axios
         .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then(({data}) => {
-          this.currentUserExpURLs = data.user.experiment_urls
+          this.currentUser.isAdmin = (data.user.user_type === 'Admin')
+          this.currentUser.expURLs = data.user.experiment_urls
         })
         .catch(e => console.log(e))
     },
-    getExperiments() {
+    getAllExperiments() {
       this.shouldRenderPVsTitles = false
       this.$Axios
         .get(this.$General.APIExperiments() + '/', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
@@ -139,7 +144,13 @@ export default {
           this.experiments = res.data.experiments;
           this.shouldRenderPVsTitles = true;
         })
-        .then(this.getCurrentUser)
+        .catch(e => console.log(e))
+    },
+    getUserExperiments() {
+      this.shouldRenderPVsTitles = false // delete it later
+      Promise.all(
+        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        .then(resArray => resArray.forEach(({data}) => this.experiments.push(data.experiment)))
         .catch(e => console.log(e))
     },
     deleteExp(short_id) {
@@ -156,6 +167,14 @@ export default {
           console.log(e);
           e.response && this.showSheet('error', this.$General.sheetDeleteExpError(e.response.status));
         });
+    },
+    // Logic methods
+    loadData() {
+      this.getCurrentUser()
+      .then(() => {
+        this.currentUser.isAdmin ? this.getAllExperiments() : this.getUserExperiments()
+      })
+      .catch(e => console.log(e))
     },
     // UI methods
     openCreatePVDialog() {
@@ -182,7 +201,7 @@ export default {
       } else {
         time = 1000;
       }
-      this.getExperiments();
+      this.getAllExperiments();
       setTimeout(() => {
         this.closeBottomSheet();
       }, time);
@@ -196,7 +215,7 @@ export default {
     }
   },
   mounted() {
-    this.getExperiments();
+    this.loadData()
   },
 };
 </script>

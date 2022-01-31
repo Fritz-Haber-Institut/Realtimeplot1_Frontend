@@ -1,16 +1,20 @@
 <template>
   <table>
     <tr v-for="(_, idx) in pvsUrls" :key="idx">
-      <div v-if="isLoggedUserAssigned">
-        <router-link v-if="finishedLoading" :to="`/chart?pvstring=${pvsStrings[idx]}`">
-          <v-chip label class="my-2" color="secondary" style="cursor: pointer;">
-            <v-icon left>mdi-text-box-outline</v-icon>
-            {{ pvsTitles[idx] }}
-          </v-chip>
-        </router-link>
-        <v-skeleton-loader v-else :class="skeletonClasses" type="chip" tile/>
-      </div>
-      <div v-else class="my-2">
+      <transition name="fade" leave-class="v-leave-class" leave-active-class="v-leave-active-class">
+        <div v-show="isLoggedUserAssigned">
+          <router-link v-if="finishedLoading" :to="`/chart?pvstring=${pvsStrings[idx]}`">
+          <v-hover v-slot="{ hover }">
+            <v-chip label :class="`my-2 with-transition ${hover ? 'elevation-12 raise-up' : 'elevation-3'}`" color="secondary" style="cursor: pointer;">
+              <v-icon left>mdi-chart-line</v-icon>
+              {{ pvsTitles[idx] }}
+            </v-chip>
+          </v-hover>
+          </router-link>
+          <v-skeleton-loader v-else :class="skeletonClasses" type="chip" tile/>
+        </div>
+      </transition>
+      <div v-show="!isLoggedUserAssigned" class="my-2">
         {{ pvsTitles[idx] }}
       </div>
     </tr>
@@ -24,7 +28,7 @@ export default {
       type: Array,
       required: true
     },
-    currentUserExpURLs: {
+    currentUserExperiments: {
       type: Array,
       required: true
     }
@@ -52,7 +56,7 @@ export default {
     pvsUrls() {
       this.getPVTitles()
     },
-    currentUserExpURLs() {
+    currentUserExperiments() {
       this.checkIfUserOwnsPV()
     }
   },
@@ -70,12 +74,12 @@ export default {
         .catch(e => console.log(e))
     },
     checkIfUserOwnsPV() {
-      const currentUserExperiments = this.currentUserExpURLs.map(url => url.split('experiments/')[1])
-      this.isLoggedUserAssigned = currentUserExperiments.some(exp => exp === this.pvsStrings[0].split(':')[0])
+      this.isLoggedUserAssigned = this.currentUserExperiments.some(exp => exp === this.pvsStrings[0].split(':')[0])
     }
   },
   mounted() {
     this.getPVTitles()
+    this.checkIfUserOwnsPV()
   }
 }
 </script>
@@ -88,5 +92,13 @@ export default {
   }
   [class*="pvs-titles-width"] > .v-skeleton-loader__chip {
     width: 100%;
+  }
+</style>
+<style scoped>
+  .raise-up {
+    transform: translateY(-2px);
+  }
+  .with-transition {
+    transition: transform 200ms ease-in;
   }
 </style>
