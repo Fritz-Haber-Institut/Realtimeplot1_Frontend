@@ -24,7 +24,7 @@ const routes = [
 
   { path: '/profile', component: Profile, meta: { Auth: 'ALL', title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
   { path: '/dashboard', component: Dashboard, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
-  { path: '/chart', component: Chart, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
+  { path: '/chart', component: Chart, meta: { Auth: 'ALL', title: General.GetString('chartitle'), icon: "mdi-chart-pie" } },
   { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
   { path: '/users', component: Users, meta: { Auth: 'ADMIN', title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
 

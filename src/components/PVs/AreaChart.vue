@@ -1,16 +1,11 @@
 <template>
   <div>
-    <v-row justify="start" no-gutters>
-      <v-col class="text-start">      
-        <v-alert dense type="warning" rounded="pill">
-          {{ $General.GetString('zoominst') }}
-        </v-alert>
-      </v-col>
-      <v-col class="text-end">
+    <v-row align="center" no-gutters>
+      <v-col cols="12" class="text-end">
         <a href="#" class="NoLink" id="downloader" @click="SaveImage()" download="image.png">
-          <v-btn color="info" rounded><v-icon class="mr-2">mdi-download</v-icon>{{ $General.GetString('saveasimage') }}</v-btn>
+          <v-btn large color="info" rounded><v-icon class="mr-2">mdi-download</v-icon>{{ $General.GetString('saveasimage') }}</v-btn>
         </a>
-        <v-btn class="ml-2" color="secondary" @click="ResetZoom()" rounded><v-icon class="mr-2">mdi-home-search-outline</v-icon>{{ $General.GetString('resetzoom') }}</v-btn>
+        <v-btn large class="ml-2" color="secondary" @click="ResetZoom()" rounded><v-icon class="mr-2">mdi-home-search-outline</v-icon>{{ $General.GetString('resetzoom') }}</v-btn>
       </v-col>
     </v-row>
     <v-divider class="my-3" />
@@ -68,6 +63,16 @@ export default {
             display: false,
           },
           scales: {
+            xAxes: [
+              {
+                type: 'time',
+                time: {
+                  displayFormats: {
+                    day: 'MMM YYYY',
+                  },
+                },
+              },
+            ],
             yAxes: [
               {
                 ticks: {

@@ -181,6 +181,10 @@
       "en": "Last 7 Hours ..."
     },
     {
+      "value": "recordscount",
+      "en": "Data Records Count"
+    },    
+    {
       "value": "search",
       "en": "Search"
     },
@@ -200,6 +204,10 @@
       "value": "chartsettings",
       "en": "Chart Settings für {0}"
     },
+    {
+      "value": "chartitle",
+      "en": "Chart View"
+    },    
     {
       "value": "addNewPVTooltip",
       "en": "Add a new PV"
