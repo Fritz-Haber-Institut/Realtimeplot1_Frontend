@@ -14,7 +14,7 @@
     },
     {
       "value": "importconfigdesc",
-      "en": "Application Configuration Desc"
+      "en": "Use the following components to import or export an application configuration"
     },
     {
       "value": "exportconfigtitle",
@@ -43,6 +43,14 @@
     {
       "value": "password",
       "en": "Password"
+    },
+    {
+      "value": "temppassword",
+      "en": "Temporary Password"
+    },    
+    {
+    "value": "passwordcanbeempty",
+    "en": "Password (If you do not want to update, leave it empty)"
     },
     {
       "value": "userrole",

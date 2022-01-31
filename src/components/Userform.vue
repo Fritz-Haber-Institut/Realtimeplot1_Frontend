@@ -5,6 +5,7 @@
         <v-col cols="12">
           <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
           <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
+          <v-text-field v-if="$props.type == 'PUT'" autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('passwordcanbeempty')" v-model.trim="FormValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
           <v-select
             v-if="$props.user == undefined ? false : $props.user.user_type == 'Admin' ? true : false"
             prepend-inner-icon="mdi-badge-account-horizontal"
@@ -125,15 +126,28 @@ export default {
     },
     Submit() {
       if (this.$refs.Submit.validate()) {
-        const AxiosConfig = { method: this.$props.type, url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
+        const AxiosConfig = {
+          method: this.$props.type,
+          url: this.$General.APIUsers() + this.$props.target,
+          headers: {
+            'x-access-tokens': this.$General.GetLSSettings().Token,
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + window.btoa(this.FormValues.login_name + ':' + this.FormValues.password),
+          },
+          data: this.FormValues,
+        };
         this.$Axios(AxiosConfig)
-          .then(() => {
-            this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
+          .then((Result) => {
             this.GeneralValues.AlertMessage.Color = 'success';
-            this.ParentPassing(this.GeneralValues.AlertMessage);
+            if (this.$props.type == 'PUT') {
+              this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
+              this.ParentPassing(this.GeneralValues.AlertMessage);
+            } else {
+              this.GeneralValues.AlertMessage.Message = '<b>' + this.$General.GetString('success') + '</b><br/>' + this.$General.GetString('temppassword') + ' : ' + Result.data.user.temporary_password;
+              this.ParentPassing(this.GeneralValues.AlertMessage);
+            }
           })
           .catch((Error) => {
-            console.log(Error);
             this.GeneralValues.AlertMessage.Message = Error.response.data.errors[0];
             this.GeneralValues.AlertMessage.Color = 'error';
           });
