@@ -1,7 +1,7 @@
 <template>
   <v-dialog :max-width="$vuetify.breakpoint.smOnly ? '60%' : '100%'">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn icon class="elevation-4" v-bind="attrs" v-on="on">
+      <v-btn icon class="elevation-4 white" v-bind="attrs" v-on="on">
         <v-icon>mdi-chart-line</v-icon>
       </v-btn>
     </template>

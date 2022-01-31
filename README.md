@@ -69,11 +69,17 @@ Nevertheless, the routes are directly accessable through the URL browser bar and
 
 **Access requirements:** Authenticated user (*simple user or administrator*)
 
-### `/experiments-and-pvs`
+### `/experiments`
 
-> A view of the tables listing all experiments and PVs. The tables allow the creation of new entries, as well as the update or deletion of current entries. Both tables are synchronized with each other.
+> A view of the table listing all experiments. The table allows the update or deletion of current entries.
 
-**Access requirements:** Authenticated administrator
+**Access requirements:** Authenticated user (*simple user or administrator*)
+
+### `/pvs`
+
+> A view of the table listing all PVs. The table allows the creation of new PV entries, as well as the update or deletion of current entries. Synchronized with the experiments table due to the dependencies of the experiment and PV data types.
+
+**Access requirements:** Authenticated user (*simple user or administrator*)
 
 ### `/users`
 
