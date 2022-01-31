@@ -74,7 +74,6 @@ export default {
       headers: [
         { text: 'PV String', value: 'pv_string' },
         { text: 'Name', value: 'human_readable_name' },
-        { value: 'settings', sortable: false, width: '105px' },
       ],
       dialog: {
         open: false,
@@ -176,7 +175,17 @@ export default {
     loadData() {
       this.getCurrentUser()
       .then(() => {
-        this.currentUser.isAdmin ? this.getAllPVs() : this.getUserPVs()
+        if(this.currentUser.isAdmin) {
+          this.getAllPVs()
+          this.headers.length < 3 &&
+            this.headers.push({
+              value: 'settings',
+              sortable: false,
+              width: '105px'
+            })
+        } else {
+          this.getUserPVs()
+        }
       })
       .catch(e => console.log(e))
     },

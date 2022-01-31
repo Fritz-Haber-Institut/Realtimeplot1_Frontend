@@ -1,11 +1,11 @@
 <template>
   <td :colspan="tdColspan" class="pt-3">
-    <span v-for="(_, idx) in userUrls" :key="idx">
+    <span v-for="(_, idx) in userUrls" :key="idx" :class="$vuetify.breakpoint.smAndUp ? 'float-right' : ''">
       <v-chip v-if="!loading" class="mr-2 mb-2" color="primary">
         <v-icon left>mdi-account-circle-outline</v-icon>
         {{ usersFullNames[idx] }}
       </v-chip>
-      <v-skeleton-loader v-else :class="skeletonClasses" type="chip" />
+      <v-skeleton-loader v-else class="mr-2 mb-2 d-inline-block exp-users-names-width" type="chip" />
     </span>
   </td>
 </template>
@@ -28,16 +28,16 @@ export default {
       loading: false
     }
   },
-  computed: {
-    skeletonClasses() {
-      return {
-        'mr-2': true, 
-        'mb-2': true,
-        'd-inline-block': true,
-        'exp-users-names-width': true,
-      }
-    },
-  },
+  // computed: {
+  //   skeletonClasses() {
+  //     return {
+  //       'mr-2': true, 
+  //       'mb-2': true,
+  //       'd-inline-block': true,
+  //       'exp-users-names-width': true,
+  //     }
+  //   },
+  // },
   watch: {
     userUrls(newArray) {
       if (newArray.length) {
@@ -75,5 +75,10 @@ export default {
   } */
   [class*="exp-users-names-width"] > .v-skeleton-loader__chip {
     width: 100%;
+  }
+</style>
+<style scoped>
+  .float-right {
+    float: right;
   }
 </style>

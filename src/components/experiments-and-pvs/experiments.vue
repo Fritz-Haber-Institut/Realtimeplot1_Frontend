@@ -7,9 +7,21 @@
       </v-card-title>
       <v-card-text>
         <v-divider />
-        <v-data-table :headers="headers" :items="experiments" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" show-expand item-key="short_id" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] } ">
+        <v-data-table
+          :headers="headers"
+          :items="experiments"
+          :loading="false"
+          :loading-text="$General.GetString('loading')"
+          :no-results-text="$General.GetString('nodata')"
+          :search="searchFieldValue"
+          show-expand
+          item-key="short_id"
+          :item-class="setRowClass"
+          :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] } "
+        >
           <template v-slot:[`item.process_variable_urls`]="{ item }">
-            <PVsTitlesExpTable :pvsUrls="item.process_variable_urls" :currentUserExperiments="currentUserExperimentsNames"/>
+            <PVsTitlesDialog v-if="$vuetify.breakpoint.smAndDown" :pvsUrls="item.process_variable_urls" :currentUserExperiments="currentUserExperimentsNames"/>
+            <PVsTitles v-else :pvsUrls="item.process_variable_urls" :currentUserExperiments="currentUserExperimentsNames" @logged-user-assigned="addToAdminRows($event, item.short_id)"/>
           </template>
           <template v-slot:expanded-item="{ headers, item }">
             <ExpUsersNames :userUrls="item.user_urls" :tdColspan="headers.length" @closeExpanded="closeExpandedItem(item.short_id)"/>
@@ -22,7 +34,7 @@
                   <v-btn v-if="isExpanded" icon class="v-data-table__expand-icon v-icon--link v-data-table__expand-icon--active" @click="expand(false)">
                     <v-icon>mdi-chevron-down</v-icon>
                   </v-btn>
-                  <v-btn v-else icon class="v-data-table__expand-icon v-icon--link elevation-4" v-bind="attrs" v-on="on" @click="expand(true)">
+                  <v-btn v-else icon class="v-data-table__expand-icon v-icon--link elevation-4 white" v-bind="attrs" v-on="on" @click="expand(true)">
                     <v-icon>mdi-account-search</v-icon>
                   </v-btn>
                 </template>
@@ -31,19 +43,17 @@
             </span>
             <v-tooltip v-else bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-row justify="center">
-                  <v-icon class="mx-auto" v-bind="attrs" v-on="on">mdi-account-off</v-icon>
-                </v-row>
+                <v-icon class="mr-1 mr-sm-0 ml-sm-1" v-bind="attrs" v-on="on">mdi-account-off</v-icon>
               </template>
               {{ $General.GetString('noAssignedUsers') }}
             </v-tooltip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <div :class="actionButtonsWrapperClasses">
-              <v-btn v-if="currentUser.isAdmin" x-small fab color="warning" @click="openEditExpDialog(item)">
+              <v-btn x-small fab color="warning" @click="openEditExpDialog(item)">
                 <v-icon> mdi-pencil </v-icon>
               </v-btn>
-              <v-btn fab color="error" x-small :class="deleteButtonClasses" @click="deleteExp(item.short_id)">
+              <v-btn fab color="error" x-small class="ml-2" @click="deleteExp(item.short_id)">
                 <v-icon> mdi-delete </v-icon>
               </v-btn>
             </div>
@@ -67,14 +77,16 @@
 
 <script>
 import Dialog from './dialog.vue';
-import PVsTitlesExpTable from './experiments-components/pvs-titles-exp-table.vue';
+import PVsTitles from './experiments-components/pvs-titles-exp-table.vue';
+import PVsTitlesDialog from './experiments-components/pvs-titles-dialog.vue'
 import ExpUsersNames from './experiments-components/exp-users-names.vue';
 import BottomSheetAlert from '../bottom-sheet-alert.vue';
 
 export default {
   components: {
     Dialog,
-    PVsTitlesExpTable,
+    PVsTitles,
+    PVsTitlesDialog,
     ExpUsersNames,
     BottomSheetAlert,
   },
@@ -86,8 +98,7 @@ export default {
         { text: 'ID', value: 'short_id' },
         { text: 'Name', value: 'human_readable_name' },
         { text: 'PVs', value: 'process_variable_urls' },
-        { text: 'Users', value: 'data-table-expand' },
-        { value: 'settings', sortable: false, width: '105px' },
+        { text: 'Users', value: 'data-table-expand' }
       ],
       dialog: {
         open: false,
@@ -104,20 +115,14 @@ export default {
       currentUser: {
         isAdmin: false,
         expURLs: []
-      }
+      },
+      adminRows: []
     };
   },
   computed: {
-    deleteButtonClasses() {
-      return {
-        'ml-2': this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.xs,
-        'mt-2': this.$vuetify.breakpoint.smOnly,
-      };
-    },
     actionButtonsWrapperClasses() {
       return {
         'd-flex': true,
-        'flex-column': this.$vuetify.breakpoint.smOnly,
         'mb-3': this.$vuetify.breakpoint.xs,
       };
     },
@@ -172,7 +177,17 @@ export default {
     loadData() {
       this.getCurrentUser()
       .then(() => {
-        this.currentUser.isAdmin ? this.getAllExperiments() : this.getUserExperiments()
+        if (this.currentUser.isAdmin) {
+          this.getAllExperiments()
+          this.headers.length < 5 &&
+            this.headers.push({
+              value: 'settings',
+              sortable: false,
+              width: '105px'
+            })
+        } else {
+          this.getUserExperiments()
+        }
       })
       .catch(e => console.log(e))
     },
@@ -212,6 +227,17 @@ export default {
     },
     closeExpandedItem(id) {
       this.$refs[`closeExpanded-${id}`].click()
+    },
+    addToAdminRows(e, id) {
+      if (!this.adminRows.includes(id)) {
+        e && this.adminRows.push(id)
+      } else {
+        const i = this.adminRows.indexOf(id)
+        !e && this.adminRows.splice(i, 1)
+      }
+    },
+    setRowClass(item) {
+      return (this.currentUser.isAdmin && this.adminRows.includes(item.short_id)) ? 'green lighten-5' : ''
     }
   },
   mounted() {

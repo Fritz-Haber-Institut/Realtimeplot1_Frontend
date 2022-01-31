@@ -1,10 +1,10 @@
 <template>
   <div>
     <router-link v-if="isLoggedUserAssigned" :to="`/chart?pvstring=${pvString}`">
-      {{ pvString }}
+      <span v-html="formattedPVString"></span>
     </router-link>
     <div v-else>
-      {{ pvString }}
+      <span v-html="formattedPVString"></span>
     </div>
   </div>
 </template>
@@ -19,6 +19,14 @@ export default {
     currentUserExperiments: {
       type: Array,
       required: true
+    }
+  },
+  computed: {
+    formattedPVString() {
+      return this.pvString.split('').map(s => {
+        if (s === ':') return s.concat('<wbr>')
+        else return s
+      }).join('')
     }
   },
   data() {

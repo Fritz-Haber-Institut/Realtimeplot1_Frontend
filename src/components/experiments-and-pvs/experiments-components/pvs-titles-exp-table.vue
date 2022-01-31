@@ -5,9 +5,11 @@
         <div v-show="isLoggedUserAssigned">
           <router-link v-if="finishedLoading" :to="`/chart?pvstring=${pvsStrings[idx]}`">
           <v-hover v-slot="{ hover }">
-            <v-chip label :class="`my-2 with-transition ${hover ? 'elevation-12 raise-up' : 'elevation-3'}`" color="secondary" style="cursor: pointer;">
+            <v-chip label :class="getChipClasses(hover)" color="secondary" style="cursor: pointer;">
               <v-icon left>mdi-chart-line</v-icon>
-              {{ pvsTitles[idx] }}
+              <span>
+                <span v-html="pvsTitles[idx]"></span>
+              </span>
             </v-chip>
           </v-hover>
           </router-link>
@@ -15,7 +17,7 @@
         </div>
       </transition>
       <div v-show="!isLoggedUserAssigned" class="my-2">
-        {{ pvsTitles[idx] }}
+        <span v-html="pvsTitles[idx]"></span>
       </div>
     </tr>
   </table>
@@ -66,7 +68,16 @@ export default {
         this.pvsUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
         .then(resArray => resArray.forEach((res, idx) => {
           const pvName = res.data.process_variable.human_readable_name
-          this.pvsTitles.push(pvName ? `${pvName} (${this.pvsStrings[idx]})` : this.pvsStrings[idx])
+          if (pvName) {
+            // Inserting <wbr> after whitespaces and ":"
+            const formattedPVString = `${pvName} <wbr>(${this.pvsStrings[idx]})`.split('').map(s => {
+              if (s === ':') return s.concat('<wbr>')
+              else return s
+            }).join('')
+            this.pvsTitles.push(formattedPVString)
+          } else {
+            this.pvsTitles.push(this.pvsStrings[idx])
+          }
         }))
         .then(() => {
           this.finishedLoading = true
@@ -75,6 +86,16 @@ export default {
     },
     checkIfUserOwnsPV() {
       this.isLoggedUserAssigned = this.currentUserExperiments.some(exp => exp === this.pvsStrings[0].split(':')[0])
+      this.$emit('logged-user-assigned', this.isLoggedUserAssigned)
+    },
+    getChipClasses(hover) {
+      return {
+        'my-2': true,
+        'with-transition': true,
+        'elevation-12 raise-up' : hover,
+        'elevation-3': !hover,
+        'mobile-view': this.$vuetify.breakpoint.smAndDown
+      }
     }
   },
   mounted() {
@@ -100,5 +121,10 @@ export default {
   }
   .with-transition {
     transition: transform 200ms ease-in;
+  }
+  .mobile-view {
+    height: auto;
+    padding: 8px 14px;
+    white-space: normal;
   }
 </style>
