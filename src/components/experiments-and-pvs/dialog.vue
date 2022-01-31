@@ -189,26 +189,26 @@ export default {
     },
     isPVInArchiver() {
       return this.$Axios.get(this.$General.APIValidatePVString(this.tempPV.pv_string), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-      .then(res => res.data.pv_string_exists)
+      .then(({data}) => data.pv_string_exists)
     },
     getResource() {
       const reqUrl = `${this.isExperiment ? this.$General.APIExperiments() : this.$General.APIPVs()}/${this.$props.identifier}`
       this.$Axios.get(reqUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-        .then((res) => {
+        .then(({data}) => {
           if (this.isExperiment) {
-            this.tempExp.short_id = res.data.experiment.short_id
-            this.tempExp.human_readable_name = res.data.experiment.human_readable_name;
+            this.tempExp.short_id = data.experiment.short_id
+            this.tempExp.human_readable_name = data.experiment.human_readable_name;
             // making a copy of human_readable_name so it can be later compared
-            this.tempExp_human_readable_name_COPY = res.data.experiment.human_readable_name;
-            this.tempExp.user_urls = res.data.experiment.user_urls;
+            this.tempExp_human_readable_name_COPY = data.experiment.human_readable_name;
+            this.tempExp.user_urls = data.experiment.user_urls;
             this.getUsersFullNamesForExp()
           } else {
-            this.tempPV.human_readable_name = res.data.process_variable.human_readable_name;
+            this.tempPV.human_readable_name = data.process_variable.human_readable_name;
             // copy of pv name for later comparisson
-            this.tempPV_human_readable_name_COPY = res.data.process_variable.human_readable_name
-            this.tempPV.pv_string = res.data.process_variable.pv_string;
+            this.tempPV_human_readable_name_COPY = data.process_variable.human_readable_name
+            this.tempPV.pv_string = data.process_variable.pv_string;
             // making a copy of pv_string and so it can be used as a title in the update dialog
-            this.tempPV_pv_string_COPY = res.data.process_variable.pv_string;
+            this.tempPV_pv_string_COPY = data.process_variable.pv_string;
           }
         })
         .catch((e) => {
@@ -264,9 +264,9 @@ export default {
     getAllUserNames() {
       this.$Axios
         .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-        .then((res) => {
-          // console.log(res.data)
-          this.allUserNames = res.data.users.map(user => {
+        .then(({data}) => {
+          // console.log(data)
+          this.allUserNames = data.users.map(user => {
             return {
               text: user.first_name + ' ' + user.last_name,
               value: user.user_id
@@ -278,14 +278,14 @@ export default {
     getUsersFullNamesForExp() {
       Promise.all(
         this.tempExp.user_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
-        .then(resArray => resArray.forEach(res => {
+        .then(resArray => resArray.forEach(({data}) => {
           this.expUserNames.push({
-              value: res.data.user.user_id,
-              text: res.data.user.first_name + ' ' + res.data.user.last_name
+              value: data.user.user_id,
+              text: data.user.first_name + ' ' + data.user.last_name
             });
             this.expUserNames_COPY.push({
-              value: res.data.user.user_id,
-              text: res.data.user.first_name + ' ' + res.data.user.last_name
+              value: data.user.user_id,
+              text: data.user.first_name + ' ' + data.user.last_name
             });
         }))
         .catch(e => console.log(e))

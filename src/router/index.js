@@ -21,15 +21,12 @@ const routes = [
     redirect: '/login'
   },
   { path: '/login', component: Login, meta: { Auth: 'NO', title: General.GetString('login'), icon: "mdi-information-outline" } },
-
-  { path: '/profile', component: Profile, meta: { Auth: 'ALL', title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-information-outline" } },
-  { path: '/dashboard', component: Dashboard, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-information-outline" } },
-  { path: '/chart', component: Chart, meta: { Auth: 'ALL', title: General.GetString('chartitle'), icon: "mdi-chart-pie" } },
-  { path: '/experiments-and-pvs', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('managepvs'), icon: "mdi-information-outline" } },
-  { path: '/users', component: Users, meta: { Auth: 'ADMIN', title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
-
-  // { path: '/accounts', component: Accounts, meta: { requiresAuth: true, title: General.GetString('manageusers'), icon: "mdi-information-outline" } },
-  // { path: '/pvs', component: PVs, meta: { requiresAuth: true, title: General.GetString('managepvs'), icon: "mdi-information-outline" } },       
+  { path: '/profile', component: Profile, meta: { Auth: 'ALL', title: General.GetString('profile'), button: General.GetString('update'), icon: "mdi-account" } },
+  { path: '/dashboard', component: Dashboard, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-home" } },
+  { path: '/chart', component: Chart, meta: { Auth: 'ALL', title: General.GetString('dashboard'), icon: "mdi-chart-line" } },
+  { path: '/experiments', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('experimentsTitle'), icon: "mdi-camera-document" } },
+  { path: '/pvs', component: ExperimentsAndPVs, meta: { Auth: 'ALL', title: General.GetString('pvsTitle'), icon: "mdi-file-chart-outline" } },
+  { path: '/users', component: Users, meta: { Auth: 'ADMIN', title: General.GetString('manageusers'), icon: "mdi-account-multiple-outline" } }
 ]
 
 const router = new VueRouter({

@@ -60,8 +60,23 @@
       <transition name="fade" mode="out-in">
         <Header :title="$router.currentRoute.meta.title" :icon="$router.currentRoute.meta.icon" :key="$route.fullPath" />
       </transition>
+      <v-container fluid>
+        <v-tabs v-if="isRouteExpOrPv" class="px-4">
+          <v-spacer></v-spacer>
+          <v-tab to="/experiments">Experiments</v-tab>
+          <v-tab to="/pvs">Process Variables</v-tab>
+        </v-tabs>
+      </v-container>
+      <transition name="fade">
+        <router-view
+          v-if="isRouteExpOrPv"
+          :key="$route.fullPath"
+          :shouldOpenCreatePVDialog="shouldOpenCreatePVDialog"
+          @switch-tab="switchToPVsTab"
+          @create-dialog-open="shouldOpenCreatePVDialog = false"/>
+      </transition>
       <transition name="slide-fade" mode="out-in">
-        <router-view :user="GeneralSettings.UserInfos" :key="$route.fullPath" />
+        <router-view v-if="!isRouteExpOrPv" :user="GeneralSettings.UserInfos" :key="$route.fullPath" />
       </transition>
     </v-main>
   </v-app>
@@ -81,6 +96,8 @@ export default {
       DarkMode: null,
       Navigation: null,
     },
+    shouldOpenCreatePVDialog: false
+    // tab: null
   }),
   watch: {
     $route(to, from) {
@@ -93,6 +110,11 @@ export default {
         this.GeneralSettings.UserInfos = Value;
       }
     },
+  },
+  computed: {
+    isRouteExpOrPv() {
+      return this.$route.path ==='/experiments' || this.$route.path === '/pvs'
+    }
   },
   methods: {
     GetInfos() {
@@ -119,21 +141,28 @@ export default {
       this.$General.SetLSSettings(this.LocalStorage);
       this.$General.ReloadPage('/login');
     },
-    ChangeTheme: function () {
+    ChangeTheme () {
       this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
       this.$General.SetLSSettings(this.LocalStorage);
       this.$vuetify.theme.dark = this.GeneralSettings.DarkMode;
     },
+    // Tab methods
+    switchToPVsTab() {
+      this.shouldOpenCreatePVDialog = true;
+      this.$router.push('/pvs')
+    }
   },
   mounted() {
     if (this.$route.path != '/login') {
       this.GeneralSettings.DarkMode = this.$General.GetLSSettings().dark_theme;
       this.GeneralSettings.Navigation = [
         { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
-        { title: this.$General.GetString('profile'), icon: 'mdi-cogs', url: '/profile' },
-        { title: this.$General.GetString('managepvs'), icon: 'mdi-camera-document', url: '/experiments-and-pvs' },
+        { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },
+        { title: this.$General.GetString('manageExpAndPVs'), icon: 'mdi-camera-document', url: '/experiments' },
       ];
-      this.GeneralSettings.AdminNavigation = [{ title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }];
+      this.GeneralSettings.AdminNavigation = [
+        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }
+      ];
     }
     this.GetInfos();
     setInterval(() => {

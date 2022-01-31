@@ -1,12 +1,12 @@
 <template>
-  <v-container class="mt-10">
-    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getPVs" />
+  <div>
+    <Dialog v-if="dialog.open" v-bind="dialog" @close-dialog="closeDialog" @reload-data="getAllPVs" />
     <v-card>
       <v-card-title>
         <v-text-field full-width hide-details="" prepend-inner-icon="mdi-magnify" :label="$General.GetString('search')" v-model="searchFieldValue" />
-        <v-tooltip bottom>
+        <v-tooltip v-if="currentUser.isAdmin" bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-if="user == undefined ? false : (user.user_type == 'Admin' ? true : false)" fab color="info" class="ml-5" v-bind="attrs" v-on="on" @click="openCreatePVDialog">
+            <v-btn fab color="info" class="ml-5" v-bind="attrs" v-on="on" @click="openCreatePVDialog">
               <v-icon> mdi-plus </v-icon>
             </v-btn>
           </template>
@@ -17,7 +17,7 @@
         <v-divider />
         <v-data-table :headers="headers" :items="pvs" :loading="false" :loading-text="$General.GetString('loading')" :no-results-text="$General.GetString('nodata')" :search="searchFieldValue" :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }">
           <template v-slot:[`item.pv_string`]="{ item }">
-            <PVStringPVsTable :pvString="item.pv_string" :currentUserExpURLs="currentUserExpURLs"/>
+            <PVStringPVsTable :pvString="item.pv_string" :currentUserExperiments="currentUserExperimentsNames"/>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
             <div v-if="$vuetify.breakpoint.smAndDown" :class="actionButtonsWrapperClasses">
@@ -34,7 +34,12 @@
             </div>
           </template>
           <template v-slot:no-data>
-            {{ $General.GetString('emptyTablePVsPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('clickHere') }}</span> {{ $General.GetString('emptyTablePVsPart2') }}
+            <div v-if="currentUser.isAdmin">
+              {{ $General.GetString('emptyTablePVsAdminPart1') }} <span class="DialogLink" @click="openCreatePVDialog">{{ $General.GetString('clickHere') }}</span> {{ $General.GetString('emptyTablePVsAdminPart2') }}
+            </div>
+            <div v-else>
+              {{ $General.GetString('emptyTablePVsUser') }}
+            </div>
           </template>
         </v-data-table>
       </v-card-text>
@@ -42,7 +47,7 @@
     <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
       {{ sheetAlert.text }}
     </BottomSheetAlert>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -57,15 +62,6 @@ export default {
     PVStringPVsTable
   },
   props: {
-    user: {
-      type: Object,
-      requred: true,
-    },
-    hasActiveTab: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
     shouldOpenCreateDialog: {
       type: Boolean,
       default: false,
@@ -91,7 +87,11 @@ export default {
         type: 'sucess',
         text: '',
       },
-      currentUserExpURLs: []
+      currentUser: {
+        isAdmin: false,
+        expURLs: []
+      },
+      pvUrls: []
     };
   },
   computed: {
@@ -109,26 +109,22 @@ export default {
         'mb-3': this.$vuetify.breakpoint.xs,
       };
     },
-  },
-  watch: {
-    hasActiveTab(val) {
-      val && this.getPVs();
-    },
-    user(Value) {
-      this.user = Value;
-    },    
+    currentUserExperimentsNames() {
+      return this.currentUser.expURLs.map(url => url.split('experiments/')[1])
+    }
   },
   methods: {
     // API calls
     getCurrentUser() {
-      this.$Axios
+      return this.$Axios
         .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then(({data}) => {
-          this.currentUserExpURLs = data.user.experiment_urls
+          this.currentUser.isAdmin = (data.user.user_type === 'Admin')
+          this.currentUser.expURLs = data.user.experiment_urls
         })
         .catch(e => console.log(e))
     },
-    getPVs(signalCompletion) {
+    getAllPVs(signalCompletion) {
       this.$Axios
         .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
         .then((res) => {
@@ -136,7 +132,18 @@ export default {
           this.shouldOpenCreateDialog && this.openCreatePVDialog();
           signalCompletion && signalCompletion();
         })
-        .then(this.getCurrentUser)
+        .catch(e => console.log(e))
+    },
+    getUserPVs() {
+      Promise.all(
+        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        .then(resArray => {
+          resArray.forEach(({data}) => {
+            data.experiment.process_variable_urls.forEach(pvUrl => this.pvUrls.push(pvUrl))
+          })
+          return Promise.all(this.pvUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        })
+        .then(resArray => resArray.forEach(({data}) => this.pvs.push(data.process_variable)))
         .catch(e => console.log(e))
     },
     isPVLastOfExperiment(expId, pv_string) {
@@ -165,6 +172,14 @@ export default {
           e.response && this.showSheet('error', this.$General.sheetDeletePVError(e.response.status));
         });
     },
+    // Logic methods
+    loadData() {
+      this.getCurrentUser()
+      .then(() => {
+        this.currentUser.isAdmin ? this.getAllPVs() : this.getUserPVs()
+      })
+      .catch(e => console.log(e))
+    },
     // UI Methods
     openCreatePVDialog() {
       this.shouldOpenCreateDialog && this.$emit('dialog-opened');
@@ -191,7 +206,7 @@ export default {
       } else {
         time = 1000;
       }
-      this.getPVs();
+      this.getAllPVs();
       setTimeout(() => {
         this.closeBottomSheet();
       }, time);
@@ -202,7 +217,7 @@ export default {
     },
   },
   mounted() {
-    this.getPVs()
+    this.loadData()
   },
 };
 </script>
