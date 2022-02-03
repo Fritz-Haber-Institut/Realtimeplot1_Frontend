@@ -128,20 +128,20 @@ export default {
     Submit() {
       if (this.$refs.Submit.validate()) {
         const reqData = {
-          ...(this.FormValues.email && {email: this.FormValues.email}),
-          ...(this.FormValues.login_name && {login_name: this.FormValues.login_name}),
-          ...(this.FormValues.first_name && {first_name: this.FormValues.first_name}),
-          ...(this.FormValues.last_name && {last_name: this.FormValues.last_name}),
-          ...(this.FormValues.password && {password: this.FormValues.password}),    
-        }
-        console.log(reqData)
+          ...(this.FormValues.email && { email: this.FormValues.email }),
+          ...(this.FormValues.login_name && { login_name: this.FormValues.login_name }),
+          ...(this.FormValues.first_name && { first_name: this.FormValues.first_name }),
+          ...(this.FormValues.last_name && { last_name: this.FormValues.last_name }),
+          ...(this.FormValues.password && { password: this.FormValues.password }),
+        };
+        console.log(reqData);
         const AxiosConfig = {
           method: this.$props.type,
           url: this.$General.APIUsers() + this.$props.target,
           headers: {
             'x-access-tokens': this.$General.GetLSSettings().Token,
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + window.btoa(this.FormValues.login_name + ':' + this.FormValues.password),
+            Authorization: 'Basic ' + window.btoa(this.FormValues.login_name + ':' + this.FormValues.password),
           },
           data: reqData,
         };
