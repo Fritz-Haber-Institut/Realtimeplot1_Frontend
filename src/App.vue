@@ -4,9 +4,10 @@
       <v-btn small to="/dashboard" link fab>
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-chip class="elevation-2 px-10 ml-2 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'secondary'">{{ $General.GetString('loggedinas') + ' : ' + GeneralSettings.UserInfos.user_type.toUpperCase() }}</v-chip>
-
       <v-spacer></v-spacer>
+      <v-chip v-if="isCurrentUserAdmin" class="elevation-2 px-10 mr-3 justify-center" color="success">
+        {{ `Admin ${$General.GetString('userMode')}` }}
+      </v-chip>
       <v-btn small @click="GeneralSettings.Drawer = !GeneralSettings.Drawer" fab>
         <v-icon>mdi-menu</v-icon>
       </v-btn>
@@ -16,9 +17,6 @@
       <v-list nav dense>
         <v-list-item dark>
           <v-list-item-content>
-            <v-list-item-title>
-              <v-chip class="mb-4 Full100 justify-center" v-bind:color="GeneralSettings.UserInfos.user_type == 'Admin' ? 'success' : 'info'">{{ GeneralSettings.UserInfos.user_type }}</v-chip>
-            </v-list-item-title>
             <v-list-item-title class="text-h6"> {{ GeneralSettings.UserInfos.login_name }} </v-list-item-title>
             <v-list-item-subtitle class="mt-2">{{ GeneralSettings.UserInfos.email || $General.GetString('noemail') }}</v-list-item-subtitle>
           </v-list-item-content>
@@ -96,7 +94,8 @@ export default {
       DarkMode: null,
       Navigation: null,
     },
-    shouldOpenCreatePVDialog: false
+    shouldOpenCreatePVDialog: false,
+    isCurrentUserAdmin: false
     // tab: null
   }),
   watch: {
@@ -123,6 +122,7 @@ export default {
         .then((LoginResult) => {
           this.$CurrentUser = LoginResult.data.user;
           this.GeneralSettings.UserInfos = LoginResult.data.user;
+          this.isCurrentUserAdmin = LoginResult.data.user.user_type === 'Admin'
           if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
             this.LocalStorage.Token = this.$General.GetLSSettings().Token;
             this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;

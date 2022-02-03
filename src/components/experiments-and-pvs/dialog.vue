@@ -82,7 +82,7 @@ export default {
       type: String,
       required: true,
       default: 'POST',
-      validator: val => ["POST", "PUT", "DELETE"].includes(val)
+      validator: val => ["POST", "PUT"].includes(val)
     },
     open: {
       type: Boolean,
@@ -257,8 +257,9 @@ export default {
           this.reqLoading = false
         })
         .catch((e) => {
-          this.showSheet("error", this.$General.sheetUpdateExpError(e.response.status));
+          e.response && this.showSheet("error", this.$General.sheetUpdateExpError(e.response.status));
           console.log(e);
+          this.reqLoading = false
         });
     },
     getAllUserNames() {

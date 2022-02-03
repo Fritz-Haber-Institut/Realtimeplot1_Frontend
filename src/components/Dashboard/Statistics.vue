@@ -1,14 +1,14 @@
 <template>
-  <v-container fluid>
+  <v-container :fluid="isCurrentUserAdmin()">
     <v-row>
-      <v-col cols="12" :lg="user == undefined ? false : (user.user_type == 'Admin' ? '4' : '12')">
-        <Card v-if="user == undefined ? false : (user.user_type == 'Admin' ? true : false)" :user="user" :settings="{ Title: $General.GetString('userscount'), Count: Statistics.Users.Count, Button: $General.GetString('manageusers'), Link: '/users', Color: 'info', Icon: 'mdi-account-group' }" />
+      <v-col v-if="isCurrentUserAdmin()" cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+        <Card v-bind="usersCard" :count="usersCount" />
       </v-col>
-      <v-col cols="12" :lg="user == undefined ? false : (user.user_type == 'Admin' ? '4' : '6')">
-        <Card :user="user" :settings="{ Title: $General.GetString('pvscount'), Count: Statistics.PVs.Count, Button: $General.GetString('managePVs'), Link: '/pvs', Color: 'success', Icon: 'mdi-file-chart-outline' }" />
+      <v-col cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+        <Card v-bind="pvsCard" :count="pvsCount"/>
       </v-col>
-      <v-col cols="12" :lg="user == undefined ? false : (user.user_type == 'Admin' ? '4' : '6')">
-        <Card :user="user" :settings="{ Title: $General.GetString('experimentscount'), Count: Statistics.Experiments.Count, Button: $General.GetString('manageExperiments'), Link: '/experiments', Color: 'warning', Icon: 'mdi-camera-document' }" />
+      <v-col cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+        <Card v-bind="experimentsCard" :count="expCount"/>
       </v-col>
     </v-row>
   </v-container>
@@ -17,70 +17,116 @@
 <script>
 import Card from './Card.vue';
 export default {
-  components: { Card },
-  data: () => ({
-    Statistics: {
-      Users: {
-        Items: [],
-        Count: 0,
-      },
-      PVs: {
-        Items: [],
-        Count: 0,
-      },
-      Experiments: {
-        Items: [],
-        Count: 0,
-      },
-    },
-  }),
-  watch: {
-    user(Value) {
-      this.user = Value;
-    },
+  components: { 
+    Card 
   },
   props: {
     user: {
       type: Object,
-      requred: true,
+      required: true
+    }
+  },
+  watch: {
+    user(val) {
+      console.log('user changed!')   
+      if (val.user_type === 'Admin') {
+        this.getAllUsersCount()  
+        this.getAllPVsCount()
+        this.getAllExperimentsCount()
+      } else {
+        this.getUserExperimentsCount()
+        this.getUserPVsCount()
+      }
+    },
+  },
+  data: () => ({
+    usersCount: 0,
+    pvsCount: 0,
+    expCount: 0
+  }),
+  computed: {
+    usersCard() {
+      return {
+        title: this.$General.GetString('userscount'),
+        buttonText: this.$General.GetString('manageusers'),
+        buttonLink: '/users',
+        buttonColor: 'info',
+        icon: 'mdi-account-group'
+      }
+    },
+    pvsCard() {
+      return {
+        title: this.$General.GetString('pvscount'),
+        buttonText: this.$General.GetString('managePVs'),
+        buttonLink: '/pvs',
+        buttonColor: 'success',
+        icon: 'mdi-file-chart-outline'
+      }
+    },
+    experimentsCard() {
+      return {
+        title: this.$General.GetString('experimentscount'),
+        buttonText: this.$General.GetString('manageExperiments'),
+        buttonLink: '/experiments',
+        buttonColor: 'warning',
+        icon: 'mdi-camera-document'
+      }
     },
   },
   methods: {
-    GetData() {
-      var AxiosConfigUsers = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
-      this.$Axios(AxiosConfigUsers)
-        .then((DataResult) => {
-          this.Statistics.Users.Items = DataResult.data.users;
-          this.Statistics.Users.Count = this.Statistics.Users.Items.length;
-          var UniqueExperiments = [];
-          this.Statistics.Users.Items.forEach((Element) => {
-            Element.experiment_urls.forEach((Exp) => {
-              if (UniqueExperiments.indexOf(Exp) == -1) {
-                UniqueExperiments.push(Exp);
-              }
-            });
-          });
-          this.Statistics.Experiments.Count = UniqueExperiments.length;
-        })
-        .catch((Error) => {
-          console.log(Error);
-        });
+    isCurrentUserAdmin() {
+      return this.user.userType === 'Admin'
     },
-    GetPVS() {
+    getAllUsersCount() {
+      this.$Axios
+        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then(({data}) => {
+          this.usersCount = data.users.length;
+        })
+        .catch(e => console.log(e))
+    },
+    getAllPVsCount() {
       this.$Axios
         .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-        .then((DataResult) => {
-          this.Statistics.PVs.Items = DataResult.data.process_variables;
-          this.Statistics.PVs.Count = this.Statistics.PVs.Items.length;
+        .then(({data}) => {
+          this.pvsCount = data.process_variables.length;
         })
-        .catch((Error) => {
-          console.log(Error);
-        });
+        .catch(e => console.log(e))
     },
+    getAllExperimentsCount() {
+      this.$Axios
+        .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .then(({data}) => {
+          console.log(data)
+          this.expCount = data.experiments.length;
+        })
+        .catch(e => console.log(e))
+    },
+    getUserExperimentsCount() {
+      this.expCount = this.user.experiment_urls?.length
+    },
+    getUserPVsCount() {
+      if (this.user.experiment_urls) {
+        Promise.all(
+          this.user.experiment_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+          .then(resArray => {
+            resArray.forEach(({data}) => {
+              this.pvsCount += data.experiment.process_variable_urls.length
+            })
+          })
+          .catch(e => console.log(e))
+      }
+    }
   },
   mounted() {
-    this.GetData();
-    this.GetPVS();
+    if (this.isCurrentUserAdmin()) {
+      this.getAllUsersCount()  
+      this.getAllPVsCount()
+      this.getAllExperimentsCount()
+    } else {
+      this.getUserExperimentsCount()
+      this.getUserPVsCount()
+    }
   },
 };
 </script>

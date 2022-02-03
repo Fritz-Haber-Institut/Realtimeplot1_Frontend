@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
-    <Statistics :user="this.$props.user" />
-    <Import-File :user="this.$props.user" style="width:60%" />    
+    <Statistics :user="currentUser" />
+    <Import-File v-if="currentUser.user_type === 'Admin'" style="width:60%" />    
   </v-container>
 </template>
 
@@ -15,20 +15,22 @@ export default {
     ImportFile,
   },
   data() {
-    return {};
+    return {
+      currentUser: {}
+    }
   },
-  watch: {
-    user(Value) {
-      this.user = Value;
-    },
+  methods: {
+    getCurrentUser() {
+      this.$Axios
+      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .then(({data}) => {
+        this.currentUser = data.user
+      })
+      .catch(e => console.log(e))
+    }
   },
-  props: {
-    user: {
-      type: Object,
-      requred: true,
-    },
+  mounted() {
+    this.getCurrentUser()
   },
-  methods: {},
-  mounted() {},
 };
 </script>

@@ -14,7 +14,7 @@
           :loading-text="$General.GetString('loading')"
           :no-results-text="$General.GetString('nodata')"
           :search="searchFieldValue"
-          show-expand
+          :show-expand="currentUser.isAdmin"
           item-key="short_id"
           :item-class="setRowClass"
           :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] } "
@@ -28,7 +28,7 @@
           </template>
           <template v-slot:[`item.data-table-expand`]="{ item, isExpanded, expand }">
             <span v-show="false" :id="`closeExpanded-${item.short_id}`" :ref="`closeExpanded-${item.short_id}`" @click="expand(false)"></span>
-            <span v-if="item.user_urls.length">
+            <span v-if="item.user_urls && item.user_urls.length">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn v-if="isExpanded" icon class="v-data-table__expand-icon v-icon--link v-data-table__expand-icon--active" @click="expand(false)">
@@ -98,7 +98,6 @@ export default {
         { text: 'ID', value: 'short_id' },
         { text: 'Name', value: 'human_readable_name' },
         { text: 'PVs', value: 'process_variable_urls' },
-        { text: 'Users', value: 'data-table-expand' }
       ],
       dialog: {
         open: false,
@@ -179,12 +178,11 @@ export default {
       .then(() => {
         if (this.currentUser.isAdmin) {
           this.getAllExperiments()
-          this.headers.length < 5 &&
-            this.headers.push({
-              value: 'settings',
-              sortable: false,
-              width: '105px'
+          if (this.headers.length < 4) {
+            this.headers.push({ text: 'Users', value: 'data-table-expand' })
+            this.headers.push({ value: 'settings', sortable: false, width: '105px'
             })
+          }
         } else {
           this.getUserExperiments()
         }
