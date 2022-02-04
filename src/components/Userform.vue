@@ -167,7 +167,6 @@ export default {
         }
 
         if (reqData.password || reqData.login_name) {
-          console.log('credentials changed')
           this.credentialsChanged = true
         }
       
@@ -183,14 +182,12 @@ export default {
           },
           data: reqData,
         }
-        console.log(reqData)
         
         this.$Axios(AxiosConfig)
           .then(({data}) => {
             this.reqLoading = false
             let successMessage = ''
             let time
-            console.log(data)
             if (this.$props.type === 'PUT' && this.target === '/current' && this.credentialsChanged) {
               successMessage = this.$General.GetString('sheetUpdatePasswordUserSuccess')
               time = 4000
@@ -213,7 +210,6 @@ export default {
     getUserPassword() {
       const encPassword = this.$General.GetLSSettings(this.$General.LSSpecialKey)
       const bytes = CryptoJS.AES.decrypt(encPassword, this.$General.LSSpecialValue)
-      console.log(bytes.toString(CryptoJS.enc.Utf8))
       return bytes.toString(CryptoJS.enc.Utf8)
     },
     // UI Methods

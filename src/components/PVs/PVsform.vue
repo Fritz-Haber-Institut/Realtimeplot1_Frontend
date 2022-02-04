@@ -65,10 +65,10 @@ export default {
       }
     },
   },
-  mounted() {
-    // setInterval(() => {
-    //   this.LocalStorage = this.$General.GetLSSettings();
-    // }, 100);
-  },
+  // mounted() {
+  //   setInterval(() => {
+  //     this.LocalStorage = this.$General.GetLSSettings();
+  //   }, 100);
+  // },
 };
 </script>
