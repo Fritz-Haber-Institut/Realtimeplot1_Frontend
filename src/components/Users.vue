@@ -126,8 +126,7 @@ export default {
         if (Result) {
           var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' } };
           this.$Axios(AxiosConfig)
-            .then((Result) => {
-              console.log(Result);
+            .then(() => {
               this.GetUsers();
             })
             .catch((Error) => {

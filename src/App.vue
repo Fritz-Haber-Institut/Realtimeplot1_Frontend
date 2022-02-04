@@ -90,12 +90,11 @@ export default {
     GeneralSettings: {
       Drawer: false,
       UserInfos: null,
-      DarkMode: null,
+      DarkMode: false,
       Navigation: null,
     },
     shouldOpenCreatePVDialog: false,
     isCurrentUserAdmin: false
-    // tab: null
   }),
   watch: {
     $route(to, from) {
@@ -150,19 +149,8 @@ export default {
     }
   },
   mounted() {
-    if (this.$route.path !== '/login') {
-      console.log('opa not login: ' + this.$route.path)
-      // this.GeneralSettings.DarkMode = this.$General.GetLSSettings('dark_theme');
-      // this.GeneralSettings.Navigation = [
-      //   { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
-      //   { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },
-      //   { title: this.$General.GetString('manageExpAndPVs'), icon: 'mdi-camera-document', url: '/experiments' },
-      // ];
-      // this.GeneralSettings.AdminNavigation = [
-      //   { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }
-      // ];
-    }
     this.GeneralSettings.DarkMode = this.$General.GetLSSettings('dark_theme')
+    
     this.GeneralSettings.Navigation = [
       { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
       { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },

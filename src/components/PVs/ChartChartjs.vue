@@ -53,7 +53,14 @@
           </v-col>
         </v-row>
         <v-divider class="my-2" />
-      <PVSetValue :user="user" />   
+        <v-row>
+          <v-col cols="4">
+            <PVSetValue :user="user" />
+          </v-col>
+          <v-col cols="8">
+            <EmailSubscription :pvString="$route.query.pvstring" />
+          </v-col>
+        </v-row>
         <v-divider class="my-2" />           
         <apexchart v-if="ChartSettings.Switcher == 'ApexChart'" width="100%" type="area" :options="options" :series="series"> </apexchart>
         <div v-else id="chart">
@@ -74,11 +81,13 @@
 
 <script>
 import AreaChart from './AreaChart.vue';
+import EmailSubscription from './email-subscription.vue';
 import PVSetValue from './PVSetValue.vue';
 export default {
   components: {
     AreaChart,
     PVSetValue,
+    EmailSubscription,
   },
   data: () => ({
     ChartSettings: {
@@ -117,7 +126,7 @@ export default {
       }
       window.location.href = '/chart?pvstring=' + this.ChartSettings.URLParamenters.PVString + IfDate;
     },
-    LoadParamenters() {
+    LoadParameters() {
       this.ChartSettings.URLParamenters = {
         PVString: this.$route.query.pvstring,
         ShortID: this.$route.query.pvstring.split(':')[0],
@@ -211,10 +220,10 @@ export default {
   },
   async mounted() {
     if (this.$route.query.pvstring != null) {
-      await this.LoadParamenters();
+      await this.LoadParameters();
       await this.GetData();
     } else {
-      window.location.href = '/experiments-and-pvs';
+      this.$router.push('/experiments')
     }
   },
 };

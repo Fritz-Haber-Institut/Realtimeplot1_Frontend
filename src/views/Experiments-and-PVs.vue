@@ -40,7 +40,6 @@ export default {
   },
   methods: {
     switchTabForcibly() {
-      console.log('Emitting from the view')  
       this.$emit('switch-tab')
     },
     openDialogCompleted() {
