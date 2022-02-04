@@ -34,7 +34,7 @@ export default {
         method: 'GET',
         url: this.$General.APIFileExport(),
         headers: {
-          'x-access-tokens': this.$General.GetLSSettings().Token,
+          'x-access-tokens': this.$General.GetLSSettings('Token'),
         },
         responseType: 'blob',
       };

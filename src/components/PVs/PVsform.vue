@@ -24,7 +24,7 @@
 <script>
 export default {
   data: () => ({
-    LocalStorage: {},
+    // LocalStorage: {},
     GeneralValues: {
       PasswordShow: false,
       AlertMessage: {
@@ -51,7 +51,7 @@ export default {
   methods: {
     Submit() {
       if (this.$refs.Submit.validate()) {
-        var AxiosConfig = { method: 'POST', url: this.$General.APIPVs(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
+        var AxiosConfig = { method: 'POST', url: this.$General.APIPVs(), headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' }, data: this.FormValues };
         this.$Axios(AxiosConfig)
           .then(() => {
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
@@ -66,9 +66,9 @@ export default {
     },
   },
   mounted() {
-    setInterval(() => {
-      this.LocalStorage = this.$General.GetLSSettings();
-    }, 100);
+    // setInterval(() => {
+    //   this.LocalStorage = this.$General.GetLSSettings();
+    // }, 100);
   },
 };
 </script>

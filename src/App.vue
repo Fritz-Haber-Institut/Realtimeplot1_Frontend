@@ -33,7 +33,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <v-list dense nav dark v-if="GeneralSettings.UserInfos.user_type == 'Admin'">
+      <v-list dense nav dark v-if="GeneralSettings.UserInfos.user_type === 'Admin'">
         <v-list-item v-for="item in GeneralSettings.AdminNavigation" :key="item.title" link :to="item.url">
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
@@ -74,7 +74,7 @@
           @create-dialog-open="shouldOpenCreatePVDialog = false"/>
       </transition>
       <transition name="slide-fade" mode="out-in">
-        <router-view v-if="!isRouteExpOrPv" :user="GeneralSettings.UserInfos" :key="$route.fullPath" />
+        <router-view v-if="!isRouteExpOrPv" :user="GeneralSettings.UserInfos" :key="$route.fullPath" @do-logout="Logout"/>
       </transition>
     </v-main>
   </v-app>
@@ -87,7 +87,6 @@ export default {
     Header,
   },
   data: () => ({
-    LocalStorage: {},
     GeneralSettings: {
       Drawer: false,
       UserInfos: null,
@@ -117,34 +116,32 @@ export default {
   },
   methods: {
     GetInfos() {
-      this.$Axios
-        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      if (this.$route.path !== '/login' && this.$route.path !== '/'){
+        this.$Axios
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then((LoginResult) => {
           this.$CurrentUser = LoginResult.data.user;
           this.GeneralSettings.UserInfos = LoginResult.data.user;
           this.isCurrentUserAdmin = LoginResult.data.user.user_type === 'Admin'
-          if (LoginResult.data.preferred_language != this.$General.GetLSSettings().preferred_language) {
-            this.LocalStorage.Token = this.$General.GetLSSettings().Token;
-            this.LocalStorage.preferred_language = LoginResult.data.user.preferred_language;
-            this.LocalStorage.dark_theme = this.$General.GetLSSettings().dark_theme;
-            this.$General.SetLSSettings(this.LocalStorage);
+          if (LoginResult.data.preferred_language != this.$General.GetLSSettings('preferred_language')) {
+            this.$General.SetLSSettings('preferred_language', LoginResult.data.user.preferred_language);
           }
         })
         .catch((Error) => {
           console.log(Error);
           this.GeneralSettings.UserInfos = null;
         });
+      }
     },
     Logout() {
-      this.LocalStorage = this.$General.GetLSSettings();
-      this.LocalStorage.Token = null;
-      this.$General.SetLSSettings(this.LocalStorage);
-      this.$General.ReloadPage('/login');
+      this.$General.RemoveLSSettings('Token')
+      this.$General.RemoveLSSettings(this.$General.LSSpecialKey)
+      this.GeneralSettings.UserInfos = null
+      this.$router.push('/login')
     },
     ChangeTheme () {
-      this.LocalStorage.dark_theme = this.GeneralSettings.DarkMode;
-      this.$General.SetLSSettings(this.LocalStorage);
       this.$vuetify.theme.dark = this.GeneralSettings.DarkMode;
+      this.$General.SetLSSettings('dark_theme', this.GeneralSettings.DarkMode);
     },
     // Tab methods
     switchToPVsTab() {
@@ -153,17 +150,27 @@ export default {
     }
   },
   mounted() {
-    if (this.$route.path != '/login') {
-      this.GeneralSettings.DarkMode = this.$General.GetLSSettings().dark_theme;
-      this.GeneralSettings.Navigation = [
-        { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
-        { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },
-        { title: this.$General.GetString('manageExpAndPVs'), icon: 'mdi-camera-document', url: '/experiments' },
-      ];
-      this.GeneralSettings.AdminNavigation = [
-        { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }
-      ];
+    if (this.$route.path !== '/login') {
+      console.log('opa not login: ' + this.$route.path)
+      // this.GeneralSettings.DarkMode = this.$General.GetLSSettings('dark_theme');
+      // this.GeneralSettings.Navigation = [
+      //   { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
+      //   { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },
+      //   { title: this.$General.GetString('manageExpAndPVs'), icon: 'mdi-camera-document', url: '/experiments' },
+      // ];
+      // this.GeneralSettings.AdminNavigation = [
+      //   { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }
+      // ];
     }
+    this.GeneralSettings.DarkMode = this.$General.GetLSSettings('dark_theme')
+    this.GeneralSettings.Navigation = [
+      { title: this.$General.GetString('dashboard'), icon: 'mdi-home', url: '/dashboard' },        
+      { title: this.$General.GetString('profile'), icon: 'mdi-account', url: '/profile' },
+      { title: this.$General.GetString('manageExpAndPVs'), icon: 'mdi-camera-document', url: '/experiments' },
+    ];
+    this.GeneralSettings.AdminNavigation = [
+      { title: this.$General.GetString('manageusers'), icon: 'mdi-account-multiple-outline', url: '/users' }
+    ];
     this.GetInfos();
     setInterval(() => {
       this.GetInfos();

@@ -65,7 +65,7 @@ export default {
   methods: {
     getPVTitles() {
       Promise.all(
-        this.pvsUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        this.pvsUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         .then(resArray => resArray.forEach((res, idx) => {
           const pvName = res.data.process_variable.human_readable_name
           if (pvName) {

@@ -116,7 +116,7 @@ export default {
     // API calls
     getCurrentUser() {
       return this.$Axios
-        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           this.currentUser.isAdmin = (data.user.user_type === 'Admin')
           this.currentUser.expURLs = data.user.experiment_urls
@@ -125,7 +125,7 @@ export default {
     },
     getAllPVs(signalCompletion) {
       this.$Axios
-        .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then((res) => {
           this.pvs = res.data.process_variables;
           this.shouldOpenCreateDialog && this.openCreatePVDialog();
@@ -135,19 +135,19 @@ export default {
     },
     getUserPVs() {
       Promise.all(
-        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         .then(resArray => {
           resArray.forEach(({data}) => {
             data.experiment.process_variable_urls.forEach(pvUrl => this.pvUrls.push(pvUrl))
           })
-          return Promise.all(this.pvUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+          return Promise.all(this.pvUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         })
         .then(resArray => resArray.forEach(({data}) => this.pvs.push(data.process_variable)))
         .catch(e => console.log(e))
     },
     isPVLastOfExperiment(expId, pv_string) {
       return this.$Axios
-        .get(`${this.$General.APIExperiments()}/${expId}`, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(`${this.$General.APIExperiments()}/${expId}`, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then((res) => {
           const experimentPVs = res.data.experiment.process_variable_urls;
           return experimentPVs.length === 1 && experimentPVs[0].split('pvs/')[1] === pv_string;
@@ -161,7 +161,7 @@ export default {
       this.isPVLastOfExperiment(item.experiment_short_id, item.pv_string)
         .then((isLastPv) => (isLastPv ? 'This PV is the last of its experiment. If you delete it, you will also delete the experiment.' : ''))
         .then((alertText) => this.$General.ConfirmDeleteAlert(item.pv_string, alertText))
-        .then((isConfirmed) => (isConfirmed ? { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } } : Promise.reject('Delete request cancelled.')))
+        .then((isConfirmed) => (isConfirmed ? { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token') } } : Promise.reject('Delete request cancelled.')))
         .then((config) => this.$Axios(config))
         .then(() => {
           this.showSheet('success', this.$General.GetString('sheetDeletePVSuccess'));

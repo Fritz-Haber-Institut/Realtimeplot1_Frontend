@@ -19,7 +19,7 @@ export default {
   methods: {
     getUsers() {
       this.$Axios
-      .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
       .then(res => {
         // console.log(res.data)
         this.users = res.data.users

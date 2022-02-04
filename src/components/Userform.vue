@@ -55,6 +55,7 @@
 <script>
 import ButtonWithLoading from './button-with-loading.vue'
 import BottomSheetAlert from '../components/bottom-sheet-alert.vue'
+import CryptoJS from 'crypto-js'
 
 export default {
   components: { 
@@ -73,7 +74,6 @@ export default {
     },
   },
   data: () => ({
-    LocalStorage: {},
     showPassword: false,
     GeneralValues: {
       AlertMessage: {
@@ -98,6 +98,7 @@ export default {
       type: 'sucess',
       text: "",
     },
+    credentialsChanged: false
   }),
   watch: {
     type(Value) {
@@ -125,12 +126,9 @@ export default {
     },
   },
   methods: {
-    ParentPassing(Value) {
-      this.$emit('clicked', Value);
-    },
     getCurrentUser() {
       this.$Axios
-      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
       .then(({data}) => {
         this.currentUser = data.user
       })
@@ -138,7 +136,7 @@ export default {
     },
     CheckData() {
       this.$Axios
-      .get(this.$General.APIUsers() + this.$props.target, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      .get(this.$General.APIUsers() + this.$props.target, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
       .then(({data}) => {
         this.userData = data.user
         this.userData_COPY = { ...this.userData }
@@ -162,10 +160,15 @@ export default {
           }
         }
 
-        if (!Object.keys(reqData).length) {
+        if (!Object.keys(reqData).length || reqData.password === '' || reqData.password === this.getUserPassword()) {
           this.showSheet('info', this.$General.GetString(this.type === 'PUT' ? 'sheetUpdateNoChanges' : 'sheetNewNoValues'), false)
           this.confirmButtonDisabled = true
           return
+        }
+
+        if (reqData.password || reqData.login_name) {
+          console.log('credentials changed')
+          this.credentialsChanged = true
         }
       
         this.reqLoading = true
@@ -173,7 +176,7 @@ export default {
           method: this.$props.type,
           url: this.$General.APIUsers() + this.$props.target,
           headers: {
-            'x-access-tokens': this.$General.GetLSSettings().Token,
+            'x-access-tokens': this.$General.GetLSSettings('Token'),
             'Content-Type': 'application/json',
             ...(this.userData.user_type === 'User' && {'Authorization': 'Basic ' + window.btoa(this.userData.login_name + ':' + this.getUserPassword())})
           },
@@ -187,7 +190,10 @@ export default {
             let successMessage = ''
             let time
             console.log(data)
-            if (this.$props.type == 'PUT') {
+            if (this.$props.type === 'PUT' && this.target === '/current' && this.credentialsChanged) {
+              successMessage = this.$General.GetString('sheetUpdatePasswordUserSuccess')
+              time = 4000
+            } else if (this.$props.type === 'PUT') {
               successMessage = this.$General.GetString('sheetUpdateUserSuccess')
             } else {
               successMessage = this.$General.sheetNewUserSuccess(data.user.login_name, data.user.temporary_password)
@@ -197,14 +203,17 @@ export default {
           })
           .catch((e) => {
             if (e.response) {
-              this.showSheet("error", this.$props.type == 'PUT' ? this.$General.sheetUpdateUserError(e.response.status) : this.$General.sheetCreateUserError(e.response.status))
+              this.showSheet("error", this.$props.type === 'PUT' ? this.$General.sheetUpdateUserError(e.response.status) : this.$General.sheetCreateUserError(e.response.status))
             }
             this.reqLoading = false
           });
       }
     },
     getUserPassword() {
-
+      const encPassword = this.$General.GetLSSettings(this.$General.LSSpecialKey)
+      const bytes = CryptoJS.AES.decrypt(encPassword, this.$General.LSSpecialValue)
+      console.log(bytes.toString(CryptoJS.enc.Utf8))
+      return bytes.toString(CryptoJS.enc.Utf8)
     },
     // UI Methods
     activateConfirmButton() {
@@ -227,6 +236,7 @@ export default {
       this.target !== '/current' && this.$emit('reload-data')
       setTimeout(() => {
         this.closeBottomSheet()
+        this.credentialsChanged && this.$emit('do-logout')
         if (this.target !== '/current' && doCloseDialog) {
           this.closeDialog()
         }
@@ -246,6 +256,7 @@ export default {
   mounted() {
     this.$props.type == 'PUT' && this.CheckData()
     this.getCurrentUser()
+    this.getUserPassword()
   },
 };
 </script>

@@ -24,12 +24,10 @@ Vue.component('apexchart', VueApexCharts)
 
 Vue.config.productionTip = false
 
-if (Vue.prototype.$General.GetLSSettings() == null) {
-  var LS = new Object();
-  LS.Token = null;
-  LS.preferred_language = 'en';
-  LS.dark_theme = false;
-  Vue.prototype.$General.SetLSSettings(LS);
+if (Vue.prototype.$General.GetLSSettings('Token') === null) {
+  Vue.prototype.$General.SetLSSettings('Token', null)
+  Vue.prototype.$General.SetLSSettings('preferred_language', 'en')
+  Vue.prototype.$General.SetLSSettings('dark_theme', false)
   window.location.reload();
 }
 

@@ -102,7 +102,7 @@ export default {
           method: 'POST',
           url: this.$General.APIFileImport(),
           headers: {
-            "x-access-tokens": this.$General.GetLSSettings().Token,
+            "x-access-tokens": this.$General.GetLSSettings('Token'),
             "Content-Type": "text/plain"
           },
           data: fileContents

@@ -94,12 +94,12 @@ export default {
     },
     getCurrentUser() {
       return this.$Axios
-        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => this.currentUser.login_name = data.user.login_name)
         .catch(e => console.log(e))
     },
     GetUsers() {
-      var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
+      var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' } };
       this.$Axios(AxiosConfig)
         .then((UsersResult) => {
           this.Users.Items = UsersResult.data.users;
@@ -124,7 +124,7 @@ export default {
       const userLoginName = this.Users.Items.filter((userObj) => userObj.user_id === Value)[0].login_name;
       this.$General.ConfirmDeleteAlert('the user ' + userLoginName).then((Result) => {
         if (Result) {
-          var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
+          var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' } };
           this.$Axios(AxiosConfig)
             .then((Result) => {
               console.log(Result);

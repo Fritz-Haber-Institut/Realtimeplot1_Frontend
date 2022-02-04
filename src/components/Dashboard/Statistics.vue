@@ -1,13 +1,13 @@
 <template>
-  <v-container :fluid="isCurrentUserAdmin()">
+  <v-container :fluid="isCurrentUserAdmin">
     <v-row>
-      <v-col v-if="isCurrentUserAdmin()" cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+      <v-col v-if="isCurrentUserAdmin" cols="12" :lg="isCurrentUserAdmin ? '4' : '6'">
         <Card v-bind="usersCard" :count="usersCount" />
       </v-col>
-      <v-col cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+      <v-col cols="12" :lg="isCurrentUserAdmin ? '4' : '6'">
         <Card v-bind="pvsCard" :count="pvsCount"/>
       </v-col>
-      <v-col cols="12" :lg="isCurrentUserAdmin() ? '4' : '6'">
+      <v-col cols="12" :lg="isCurrentUserAdmin ? '4' : '6'">
         <Card v-bind="experimentsCard" :count="expCount"/>
       </v-col>
     </v-row>
@@ -28,8 +28,7 @@ export default {
   },
   watch: {
     user(val) {
-      console.log('user changed!')   
-      if (val.user_type === 'Admin') {
+      if (val.user_type === 'Admin') {     
         this.getAllUsersCount()  
         this.getAllPVsCount()
         this.getAllExperimentsCount()
@@ -45,6 +44,9 @@ export default {
     expCount: 0
   }),
   computed: {
+    isCurrentUserAdmin() {
+      return this.$props.user.user_type === 'Admin'
+    },
     usersCard() {
       return {
         title: this.$General.GetString('userscount'),
@@ -74,12 +76,9 @@ export default {
     },
   },
   methods: {
-    isCurrentUserAdmin() {
-      return this.user.userType === 'Admin'
-    },
     getAllUsersCount() {
       this.$Axios
-        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           this.usersCount = data.users.length;
         })
@@ -87,7 +86,7 @@ export default {
     },
     getAllPVsCount() {
       this.$Axios
-        .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIPVs(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           this.pvsCount = data.process_variables.length;
         })
@@ -95,9 +94,8 @@ export default {
     },
     getAllExperimentsCount() {
       this.$Axios
-        .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIExperiments(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
-          console.log(data)
           this.expCount = data.experiments.length;
         })
         .catch(e => console.log(e))
@@ -108,7 +106,7 @@ export default {
     getUserPVsCount() {
       if (this.user.experiment_urls) {
         Promise.all(
-          this.user.experiment_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+          this.user.experiment_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
           .then(resArray => {
             resArray.forEach(({data}) => {
               this.pvsCount += data.experiment.process_variable_urls.length
@@ -119,7 +117,7 @@ export default {
     }
   },
   mounted() {
-    if (this.isCurrentUserAdmin()) {
+    if (this.isCurrentUserAdmin) {
       this.getAllUsersCount()  
       this.getAllPVsCount()
       this.getAllExperimentsCount()

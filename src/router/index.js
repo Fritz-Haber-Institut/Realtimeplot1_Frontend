@@ -38,9 +38,10 @@ const router = new VueRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
-  Axios
-    .get(General.APIUsers() + '/current', General.GetHeaderValue(General.GetLSSettings().Token, true))
+router.beforeEach((to, from, next) => { 
+  if (to.path !== '/login') {
+    Axios
+    .get(General.APIUsers() + '/current', General.GetHeaderValue(General.GetLSSettings('Token'), true))
     .then((Result) => {
       if (to.matched.some(record => record.meta.Auth == 'ALL')) {
         if (Result.data.user.user_type == 'Admin' || Result.data.user.user_type == 'User') {
@@ -71,6 +72,9 @@ router.beforeEach((to, from, next) => {
         window.location.href = '/login';
       }
     });
+  } else {
+    next()
+  }
 })
 
 export default router

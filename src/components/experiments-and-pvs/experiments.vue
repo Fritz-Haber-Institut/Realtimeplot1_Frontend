@@ -133,7 +133,7 @@ export default {
     // API calls
     getCurrentUser() {
       return this.$Axios
-        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           this.currentUser.isAdmin = (data.user.user_type === 'Admin')
           this.currentUser.expURLs = data.user.experiment_urls
@@ -143,7 +143,7 @@ export default {
     getAllExperiments() {
       this.shouldRenderPVsTitles = false
       this.$Axios
-        .get(this.$General.APIExperiments() + '/', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIExperiments() + '/', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then((res) => {
           this.experiments = res.data.experiments;
           this.shouldRenderPVsTitles = true;
@@ -153,7 +153,7 @@ export default {
     getUserExperiments() {
       this.shouldRenderPVsTitles = false // delete it later
       Promise.all(
-        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        this.currentUser.expURLs.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         .then(resArray => resArray.forEach(({data}) => this.experiments.push(data.experiment)))
         .catch(e => console.log(e))
     },
@@ -162,7 +162,7 @@ export default {
       const alertText = 'All corresponding PVs will also be deleted.';
       this.$General
         .ConfirmDeleteAlert(short_id, alertText)
-        .then((isConfirmed) => (isConfirmed ? { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token } } : Promise.reject('Delete request cancelled.')))
+        .then((isConfirmed) => (isConfirmed ? { method: 'DELETE', url: reqUrl, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token') } } : Promise.reject('Delete request cancelled.')))
         .then((config) => this.$Axios(config))
         .then(() => {
           this.showSheet('success', this.$General.GetString('sheetDeleteExpSuccess'));

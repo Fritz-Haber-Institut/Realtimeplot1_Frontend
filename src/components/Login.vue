@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
-      <v-form ref="Login" lazy-validation autocomplete="off">
+      <v-form ref="Login" lazy-validation>
         <v-row>
           <v-col>
             <v-text-field autocomplete="new-username" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="LoginValues.username" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
@@ -22,9 +22,10 @@
 </template>
 
 <script>
+import AES from 'crypto-js/aes'
+
 export default {
   data: () => ({
-    LocalStorage: {},
     GeneralValues: {
       PasswordShow: false,
       AlertMessage: {
@@ -44,18 +45,17 @@ export default {
       }
     },
     Login() {
-      if (this.$refs.Login.validate()) {
+      if (this.$refs.Login?.validate()) {
         this.$Axios
           .post(this.$General.APILogin(), this.LoginValues, this.$General.GetHeaderValue(window.btoa(this.LoginValues.username + ':' + this.LoginValues.password), false))
-          .then((LoginResult) => {
-            console.log(LoginResult);
-            this.LocalStorage.Token = LoginResult.data.access_token;
-            this.LocalStorage.preferred_language = 'en';
-            this.$General.SetLSSettings(this.LocalStorage);
+          .then((LoginResult) => {          
+            this.$General.SetLSSettings('Token', LoginResult.data.access_token)
+            this.$General.SetLSSettings('preferred_language', 'en')
+            this.$General.SetLSSettings(this.$General.LSSpecialKey, AES.encrypt(this.LoginValues.password, this.$General.LSSpecialValue).toString())
             this.GeneralValues.AlertMessage.Message = this.$General.GetString('successfullLogin');
             this.GeneralValues.AlertMessage.Color = 'success';
             setTimeout(() => {
-              this.$General.ReloadPage('/dashboard');
+              this.$router.push('/dashboard')
             }, 2000);
           })
           .catch((Error) => {
@@ -67,9 +67,6 @@ export default {
     },
   },
   mounted() {
-    setInterval(() => {
-      this.LocalStorage = this.$General.GetLSSettings();
-    }, 100);
     document.addEventListener('keydown', this.initiateLoginOnEnterKey);
   },
 };

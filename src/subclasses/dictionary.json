@@ -177,6 +177,10 @@
       "en": "User changes saved successfully!"
     },
     {
+      "value": "sheetUpdatePasswordUserSuccess",
+      "en": "User changes saved successfully! Please login with your new credentials."
+    },
+    {
       "value": "sheetNewPVSuccess",
       "en": "PV created successfully!"
     },

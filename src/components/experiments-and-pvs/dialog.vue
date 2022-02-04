@@ -172,7 +172,7 @@ export default {
             this.showSheet('error', this.$General.GetString('sheetPVNotInArchiver'))
             return Promise.reject('ERROR: ' + this.$General.GetString('sheetPVNotInArchiver'))
           } else {
-            return { method: "POST", url: this.$General.APIPVs(), headers: { "x-access-tokens": this.$General.GetLSSettings().Token, "Content-Type": "application/json" }, data: this.tempPV }
+            return { method: "POST", url: this.$General.APIPVs(), headers: { "x-access-tokens": this.$General.GetLSSettings('Token'), "Content-Type": "application/json" }, data: this.tempPV }
           }
         })
         .then(config => this.$Axios(config))
@@ -188,12 +188,12 @@ export default {
       }
     },
     isPVInArchiver() {
-      return this.$Axios.get(this.$General.APIValidatePVString(this.tempPV.pv_string), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      return this.$Axios.get(this.$General.APIValidatePVString(this.tempPV.pv_string), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
       .then(({data}) => data.pv_string_exists)
     },
     getResource() {
       const reqUrl = `${this.isExperiment ? this.$General.APIExperiments() : this.$General.APIPVs()}/${this.$props.identifier}`
-      this.$Axios.get(reqUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+      this.$Axios.get(reqUrl, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           if (this.isExperiment) {
             this.tempExp.short_id = data.experiment.short_id
@@ -245,7 +245,7 @@ export default {
         method: "PUT",
         url: reqUrl,
         headers: {
-          "x-access-tokens": this.$General.GetLSSettings().Token,
+          "x-access-tokens": this.$General.GetLSSettings('Token'),
           "Content-Type": "application/json",
         },
         data: reqData,
@@ -264,7 +264,7 @@ export default {
     },
     getAllUserNames() {
       this.$Axios
-        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
+        .get(this.$General.APIUsers(), this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
         .then(({data}) => {
           // console.log(data)
           this.allUserNames = data.users.map(user => {
@@ -278,7 +278,7 @@ export default {
     },
     getUsersFullNamesForExp() {
       Promise.all(
-        this.tempExp.user_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        this.tempExp.user_urls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         .then(resArray => resArray.forEach(({data}) => {
           this.expUserNames.push({
               value: data.user.user_id,

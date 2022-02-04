@@ -22,10 +22,8 @@ export default {
   methods: {
     getCurrentUser() {
       this.$Axios
-      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))
-      .then(({data}) => {
-        this.currentUser = data.user
-      })
+      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
+      .then(({data}) => this.currentUser = data.user)
       .catch(e => console.log(e))
     }
   },

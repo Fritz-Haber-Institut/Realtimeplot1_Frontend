@@ -30,12 +30,17 @@ export default {
     return this.MainDomain + '/file/export'
   },
   // General Functions
-  LSSettings: 'ZgjdLNewsboV3LRxOgaw',
-  GetLSSettings() {
-    return JSON.parse(localStorage.getItem(this.LSSettings))
+  // LSSettings: 'ZgjdLNewsboV3LRxOgaw',
+  LSSpecialKey: 'V21kcVpFeE9aWGR6WW05V00weFNlRTluWVhjPQ==',
+  LSSpecialValue: 'WmdqZExOZXdzYm9WM0xSeE9nYXc=',
+  GetLSSettings(key) {
+    return localStorage.getItem(key)
   },
-  SetLSSettings(NewLSSetting) {
-    return localStorage.setItem(this.LSSettings, JSON.stringify(NewLSSetting))
+  SetLSSettings(key, value) {
+    localStorage.setItem(key, value)
+  },
+  RemoveLSSettings(key) {
+    return localStorage.removeItem(key)
   },
   ReloadPage(URL) {
     return URL === null ? window.location.reload() : window.location.replace(URL)
@@ -62,7 +67,7 @@ export default {
   GetString: function (String, WantedLanguage) {
     try {
       if (WantedLanguage == null) {
-        var Language = this.GetLSSettings().preferred_language;
+        var Language = this.GetLSSettings('preferred_language');
         try {
           if (Dictionary.Strings.find(Word => Word.value === String)[Language] === undefined) {
             return Dictionary.Strings.find(Word => Word.value === String)['en']
