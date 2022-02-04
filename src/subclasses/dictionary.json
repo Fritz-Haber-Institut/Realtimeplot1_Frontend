@@ -85,6 +85,11 @@
       "en": "PVs Count"
     },
     {
+      "value": "pvvalue",
+      "en": "Set new value for process variable"
+    },    
+    
+    {
       "value": "experimentscount",
       "en": "Experiments Count"
     },

@@ -17,6 +17,9 @@ export default {
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
+  APIPVSetValue() {
+    return this.MainDomain + "/publish/"
+  },  
   APIData() {
     return this.MainDomain + "/data/"
   },

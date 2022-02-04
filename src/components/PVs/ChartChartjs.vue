@@ -7,6 +7,7 @@
       </v-card>
     </div>
     <div v-else>
+      <v-divider />
       <v-expansion-panels accordion>
         <v-expansion-panel>
           <v-expansion-panel-header class="headline font-weight-bold">
@@ -52,6 +53,8 @@
           </v-col>
         </v-row>
         <v-divider class="my-2" />
+      <PVSetValue :user="user" />   
+        <v-divider class="my-2" />           
         <apexchart v-if="ChartSettings.Switcher == 'ApexChart'" width="100%" type="area" :options="options" :series="series"> </apexchart>
         <div v-else id="chart">
           <AreaChart
@@ -71,9 +74,11 @@
 
 <script>
 import AreaChart from './AreaChart.vue';
+import PVSetValue from './PVSetValue.vue';
 export default {
   components: {
     AreaChart,
+    PVSetValue,
   },
   data: () => ({
     ChartSettings: {

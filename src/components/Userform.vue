@@ -172,6 +172,7 @@ export default {
         }
       
         this.reqLoading = true
+
         const AxiosConfig = {
           method: this.$props.type,
           url: this.$General.APIUsers() + this.$props.target,
