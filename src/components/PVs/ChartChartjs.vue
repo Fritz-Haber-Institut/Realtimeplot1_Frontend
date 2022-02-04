@@ -137,7 +137,7 @@ export default {
         until: this.ChartSettings.URLParamenters.Until,
       };
       var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
-      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
+      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
       this.$Axios(AxiosConfig)
         .then((DataResult) => {
           DataResult.data.data.experiment.process_variable_urls.forEach((Element) => {

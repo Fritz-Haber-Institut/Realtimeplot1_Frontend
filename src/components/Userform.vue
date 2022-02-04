@@ -1,60 +1,88 @@
 <template>
-  <v-card class="pa-5 mx-auto" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
-    <v-form ref="Submit" lazy-validation autocomplete="off">
-      <v-row>
-        <v-col cols="12">
-          <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="FormValues.email"></v-text-field>
-          <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="FormValues.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-          <v-text-field v-if="$props.type == 'PUT'" autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('passwordcanbeempty')" v-model.trim="FormValues.password" :append-icon="GeneralValues.PasswordShow ? 'mdi-eye' : 'mdi-eye-off'" :type="GeneralValues.PasswordShow ? 'text' : 'password'" @click:append="GeneralValues.PasswordShow = !GeneralValues.PasswordShow"></v-text-field>
-          <v-select
-            v-if="$props.user == undefined ? false : $props.user.user_type == 'Admin' ? true : false"
-            prepend-inner-icon="mdi-badge-account-horizontal"
-            label="User Role"
-            v-model="FormValues.user_type"
-            :items="[
-              { text: 'Admin', value: 'Admin' },
-              { text: 'User', value: 'User' },
-            ]"
-            item-text="text"
-            item-value="value"
-            :rules="[(v) => !!v || $General.GetString('noempty')]"
-          ></v-select>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="FormValues.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="FormValues.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]"></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row justify="center">
-        <v-card-actions>
-          <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn>
-        </v-card-actions>
-      </v-row>
-      <v-row>
-        <v-col cols="6" class="mx-auto">
-          <v-alert class="d-flex justify-center" icon="mdi-check-circle" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
-            {{ GeneralValues.AlertMessage.Message }}
-          </v-alert>
-        </v-col>
-      </v-row>
-    </v-form>
+  <v-card class="" :width="this.$vuetify.breakpoint.smAndDown ? '100%' : '100%'">
+    <v-card-title>{{ getDialogTitle }}</v-card-title>
+    <v-card-text>
+      <v-form ref="Submit" lazy-validation autocomplete="off">
+        <v-row>
+          <v-col cols="12">
+            <v-text-field autocomplete="new-email" prepend-inner-icon="mdi-email" :label="$General.GetString('email')" v-model.trim="userData.email" :rules="emailRules" @keydown="activateConfirmButton" />
+            <v-text-field autocomplete="new-loginname" prepend-inner-icon="mdi-account" :label="$General.GetString('loginname')" v-model.trim="userData.login_name" :rules="[(v) => !!v || $General.GetString('noempty')]" @keydown="activateConfirmButton" />
+            <v-text-field v-if="$props.type == 'PUT'" autocomplete="new-password" prepend-inner-icon="mdi-key" :label="$General.GetString('passwordcanbeempty')" v-model.trim="userData.password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'" @click:append="showPassword = !showPassword" @keydown="activateConfirmButton" />
+            <v-select
+              v-if="currentUser.user_type == 'Admin'"
+              prepend-inner-icon="mdi-badge-account-horizontal"
+              label="User Role"
+              v-model="userData.user_type"
+              :items="[
+                { text: 'Admin', value: 'Admin' },
+                { text: 'User', value: 'User' },
+              ]"
+              item-text="text"
+              item-value="value"
+              :rules="[(v) => !!v || $General.GetString('noempty')]"
+            ></v-select>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field autocomplete="new-first_name" :label="$General.GetString('firstname')" v-model.trim="userData.first_name" :rules="[(v) => !!v || $General.GetString('noempty')]" @keydown="activateConfirmButton" />
+          </v-col>
+          <v-col cols="6">
+            <v-text-field autocomplete="new-last_name" :label="$General.GetString('lastname')" v-model.trim="userData.last_name" :rules="[(v) => !!v || $General.GetString('noempty')]" @keydown="activateConfirmButton" />
+          </v-col>
+        </v-row>
+        <v-row justify="center">
+          <v-card-actions>
+            <ButtonWithLoading color="info" @clicked="Submit" :disabled="confirmButtonDisabled" :loading="reqLoading">
+              {{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }}
+            </ButtonWithLoading>
+            <!-- <v-btn color="info" dark @click="Submit()" max-width="200px">{{ this.$props.type == 'PUT' ? $General.GetString('update') : $General.GetString('new') }} </v-btn> -->
+          </v-card-actions>
+        </v-row>
+        <v-row>
+          <v-col cols="6" class="mx-auto">
+            <v-alert class="d-flex justify-center" icon="mdi-check-circle" rounded="lg" v-if="GeneralValues.AlertMessage.Message != ''" :color="GeneralValues.AlertMessage.Color" dark>
+              {{ GeneralValues.AlertMessage.Message }}
+            </v-alert>
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-card-text>
+    <BottomSheetAlert :open="sheetAlert.open" :type="sheetAlert.type" @close-sheet="closeBottomSheet">
+      {{ sheetAlert.text }}
+    </BottomSheetAlert>
   </v-card>
 </template>
 
 <script>
+import ButtonWithLoading from './button-with-loading.vue'
+import BottomSheetAlert from '../components/bottom-sheet-alert.vue'
+import CryptoJS from 'crypto-js'
+
 export default {
+  components: { 
+    ButtonWithLoading,
+    BottomSheetAlert
+  },
+  props: {
+    type: {
+      type: String,
+      requred: true,
+      validator: val => ["POST", "PUT"].includes(val)
+    },
+    target: {
+      type: String,
+      requred: true,
+    },
+  },
   data: () => ({
-    LocalStorage: {},
+    showPassword: false,
     GeneralValues: {
-      PasswordShow: false,
       AlertMessage: {
         Message: '',
         Color: '',
       },
     },
-    FormValues: {
+    currentUser: {},
+    userData: {
       email: '',
       login_name: '',
       user_type: '',
@@ -62,12 +90,17 @@ export default {
       last_name: '',
       password: '',
     },
+    userData_COPY: {},
+    reqLoading: false,
+    confirmButtonDisabled: true,
+    sheetAlert: {
+      open: false,
+      type: 'sucess',
+      text: "",
+    },
+    credentialsChanged: false
   }),
   watch: {
-    user(Value) {
-      this.user = Value;
-      this.CheckData();
-    },
     type(Value) {
       if (Value) {
         this.type = Value;
@@ -79,92 +112,152 @@ export default {
       }
     },
   },
-  props: {
-    user: {
-      type: Object,
-      requred: true,
+  computed: {
+    getDialogTitle() {
+      if (this.type === 'PUT') {
+        return this.target === '/current' ? '' : 'Update user ' + this.userData_COPY.login_name
+      } else {
+        return 'Create new user'
+      }
     },
-    type: {
-      type: String,
-      requred: true,
-    },
-    target: {
-      type: String,
-      requred: true,
+    emailRules() {
+      const rules = [(v) => this.$General.emailRegex.test(v) || this.$General.GetString('wrongemailformat')];
+      return rules
     },
   },
   methods: {
-    ParentPassing(Value) {
-      this.$emit('clicked', Value);
+    getCurrentUser() {
+      this.$Axios
+      .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
+      .then(({data}) => {
+        this.currentUser = data.user
+      })
+      .catch(e => console.log(e))
     },
     CheckData() {
-      if (this.$props.type == 'PUT') {
-        if (this.$props.target == '/current') {
-          this.FillUserInfos(this.$props.user);
-          this.FormValues.email = this.$props.user == null ? '' : this.$props.user.email;
-          this.FormValues.login_name = this.$props.user == null ? '' : this.$props.user.login_name;
-          this.FormValues.user_type = this.$props.user == null ? '' : this.$props.user.user_type;
-          this.FormValues.first_name = this.$props.user == null ? '' : this.$props.user.first_name;
-          this.FormValues.last_name = this.$props.user == null ? '' : this.$props.user.last_name;
-        } else {
-          const AxiosConfig = { method: 'GET', url: this.$General.APIUsers() + this.$props.target, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' }, data: this.FormValues };
-          this.$Axios(AxiosConfig)
-            .then((UserInfos) => {
-              this.FillUserInfos(UserInfos.data.user);
-            })
-            .catch((Error) => {
-              console.log(Error);
-            });
-        }
-      }
+      this.$Axios
+      .get(this.$General.APIUsers() + this.$props.target, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
+      .then(({data}) => {
+        this.userData = data.user
+        this.userData_COPY = { ...this.userData }
+      })
     },
     FillUserInfos(UserInfos) {
-      this.FormValues.email = UserInfos == null ? '' : UserInfos.email;
-      this.FormValues.login_name = UserInfos == null ? '' : UserInfos.login_name;
-      this.FormValues.user_type = UserInfos == null ? '' : UserInfos.user_type;
-      this.FormValues.first_name = UserInfos == null ? '' : UserInfos.first_name;
-      this.FormValues.last_name = UserInfos == null ? '' : UserInfos.last_name;
+      this.userData.email = UserInfos == null ? '' : UserInfos.email;
+      this.userData.login_name = UserInfos == null ? '' : UserInfos.login_name;
+      this.userData.user_type = UserInfos == null ? '' : UserInfos.user_type;
+      this.userData.first_name = UserInfos == null ? '' : UserInfos.first_name;
+      this.userData.last_name = UserInfos == null ? '' : UserInfos.last_name;
     },
     Submit() {
       if (this.$refs.Submit.validate()) {
-        const reqData = {
-          ...(this.FormValues.email && { email: this.FormValues.email }),
-          ...(this.FormValues.login_name && { login_name: this.FormValues.login_name }),
-          ...(this.FormValues.first_name && { first_name: this.FormValues.first_name }),
-          ...(this.FormValues.last_name && { last_name: this.FormValues.last_name }),
-          ...(this.FormValues.password && { password: this.FormValues.password }),
-        };
-        console.log(reqData);
+        let reqData = {}
+        for (let prop in this.userData) {
+          const putCheck = this.type === 'PUT' && this.userData[prop] !== this.userData_COPY[prop]
+          const postCheck = this.type === 'POST' && !!this.userData[prop]
+          if (putCheck || postCheck) {
+            reqData[prop] = this.userData[prop]
+          }
+        }
+
+        if (!Object.keys(reqData).length || reqData.password === '' || reqData.password === this.getUserPassword()) {
+          this.showSheet('info', this.$General.GetString(this.type === 'PUT' ? 'sheetUpdateNoChanges' : 'sheetNewNoValues'), false)
+          this.confirmButtonDisabled = true
+          return
+        }
+
+        if (reqData.password || reqData.login_name) {
+          console.log('credentials changed')
+          this.credentialsChanged = true
+        }
+      
+        this.reqLoading = true
+
         const AxiosConfig = {
           method: this.$props.type,
           url: this.$General.APIUsers() + this.$props.target,
           headers: {
-            'x-access-tokens': this.$General.GetLSSettings().Token,
+            'x-access-tokens': this.$General.GetLSSettings('Token'),
             'Content-Type': 'application/json',
-            Authorization: 'Basic ' + window.btoa(this.FormValues.login_name + ':' + this.FormValues.password),
+            ...(this.userData.user_type === 'User' && {'Authorization': 'Basic ' + window.btoa(this.userData.login_name + ':' + this.getUserPassword())})
           },
           data: reqData,
-        };
+        }
+        console.log(reqData)
+        
         this.$Axios(AxiosConfig)
-          .then((Result) => {
-            this.GeneralValues.AlertMessage.Color = 'success';
-            if (this.$props.type == 'PUT') {
-              this.GeneralValues.AlertMessage.Message = this.$General.GetString('success');
-              this.ParentPassing(this.GeneralValues.AlertMessage);
+          .then(({data}) => {
+            this.reqLoading = false
+            let successMessage = ''
+            let time
+            console.log(data)
+            if (this.$props.type === 'PUT' && this.target === '/current' && this.credentialsChanged) {
+              successMessage = this.$General.GetString('sheetUpdatePasswordUserSuccess')
+              time = 4000
+            } else if (this.$props.type === 'PUT') {
+              successMessage = this.$General.GetString('sheetUpdateUserSuccess')
             } else {
-              this.GeneralValues.AlertMessage.Message = '<b>' + this.$General.GetString('success') + '</b><br/>' + this.$General.GetString('temppassword') + ' : ' + Result.data.user.temporary_password;
-              this.ParentPassing(this.GeneralValues.AlertMessage);
+              successMessage = this.$General.sheetNewUserSuccess(data.user.login_name, data.user.temporary_password)
+              time = 10000
             }
+            this.showSheet("success", successMessage, true, time)
           })
-          .catch((Error) => {
-            this.GeneralValues.AlertMessage.Message = Error.response.data.errors[0];
-            this.GeneralValues.AlertMessage.Color = 'error';
+          .catch((e) => {
+            if (e.response) {
+              this.showSheet("error", this.$props.type === 'PUT' ? this.$General.sheetUpdateUserError(e.response.status) : this.$General.sheetCreateUserError(e.response.status))
+            }
+            this.reqLoading = false
           });
       }
     },
+    getUserPassword() {
+      const encPassword = this.$General.GetLSSettings(this.$General.LSSpecialKey)
+      const bytes = CryptoJS.AES.decrypt(encPassword, this.$General.LSSpecialValue)
+      console.log(bytes.toString(CryptoJS.enc.Utf8))
+      return bytes.toString(CryptoJS.enc.Utf8)
+    },
+    // UI Methods
+    activateConfirmButton() {
+      this.confirmButtonDisabled = false
+    },
+    showSheet(type, text, doCloseDialog = true, customTime) {
+      this.sheetAlert.type = type;
+      this.sheetAlert.text = text;
+      this.sheetAlert.open = true;
+      let time
+      if (customTime) {
+        time = customTime
+      } else if (type === 'error') {
+        time = 4000
+      } else if (!doCloseDialog) {
+        time = 3000
+      } else {
+        time = 1000
+      }
+      this.target !== '/current' && this.$emit('reload-data')
+      setTimeout(() => {
+        this.closeBottomSheet()
+        this.credentialsChanged && this.$emit('do-logout')
+        if (this.target !== '/current' && doCloseDialog) {
+          this.closeDialog()
+        }
+      }, time);
+    },
+    closeBottomSheet() {
+      this.sheetAlert.open = false
+      this.sheetAlert.type !== 'info' && this.closeDialog()
+    },
+    closeDialog() {
+      // waiting for the closing animation to finish
+      setTimeout(() => {
+        this.$emit('close-dialog');
+      }, 200);
+    },
   },
   mounted() {
-    this.CheckData();
+    this.$props.type == 'PUT' && this.CheckData()
+    this.getCurrentUser()
+    this.getUserPassword()
   },
 };
 </script>

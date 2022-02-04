@@ -25,6 +25,10 @@
       "en": "Logged in as"
     },
     {
+      "value": "userMode",
+      "en": "mode"
+    },
+    {
       "value": "login",
       "en": "Login"
     },
@@ -46,11 +50,11 @@
     },
     {
       "value": "temppassword",
-      "en": "Temporary Password"
-    },    
+      "en": "The temporary password for this new user is"
+    },
     {
     "value": "passwordcanbeempty",
-    "en": "Password (If you do not want to update, leave it empty)"
+    "en": "Password (If you do not want to update, leave this field empty)"
     },
     {
       "value": "userrole",
@@ -167,15 +171,19 @@
     },
     {
       "value": "wrongemailformat",
-      "en": "Wrong E-Mail format!"
+      "en": "Please insert a correctly formatted E-Mail!"
     },
     {
       "value": "passwordsdontmatch",
       "en": "Password values do not match"
     },
     {
-      "value": "userTableUpdateDialogSuccess",
+      "value": "sheetUpdateUserSuccess",
       "en": "User changes saved successfully!"
+    },
+    {
+      "value": "sheetUpdatePasswordUserSuccess",
+      "en": "User changes saved successfully! Please login with your new credentials."
     },
     {
       "value": "sheetNewPVSuccess",
@@ -192,6 +200,10 @@
     {
       "value": "sheetUpdateNoChanges",
       "en": "Please update some of the properties first."
+    },
+    {
+      "value": "sheetNewNoValues",
+      "en": "Please fill in the required values first."
     },
     {
       "value": "success",
