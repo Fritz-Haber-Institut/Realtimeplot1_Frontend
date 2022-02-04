@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <Userform :user="this.$props.user" type="PUT" target="/current" />
+    <Userform type="PUT" target="/current" @do-logout="$emit('do-logout')" />
   </v-container>
 </template>
 
@@ -9,19 +9,6 @@ import Userform from '../components/Userform';
 export default {
   components: {
     Userform,
-  },
-  watch: {
-    user(Value) {
-      if (Value) {
-        this.user = Value;
-      }
-    },
-  },
-  props: {
-    user: {
-      type: Object,
-      requred: true,
-    },
-  },
+  }
 };
 </script>

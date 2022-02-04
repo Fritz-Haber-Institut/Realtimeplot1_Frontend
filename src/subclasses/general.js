@@ -17,6 +17,9 @@ export default {
   APIPVs() {
     return this.MainDomain + "/experiments/pvs"
   },
+  APIPVSetValue() {
+    return this.MainDomain + "/publish/"
+  },  
   APIData() {
     return this.MainDomain + "/data/"
   },
@@ -30,12 +33,17 @@ export default {
     return this.MainDomain + '/file/export'
   },
   // General Functions
-  LSSettings: 'ZgjdLNewsboV3LRxOgaw',
-  GetLSSettings() {
-    return JSON.parse(localStorage.getItem(this.LSSettings))
+  // LSSettings: 'ZgjdLNewsboV3LRxOgaw',
+  LSSpecialKey: 'V21kcVpFeE9aWGR6WW05V00weFNlRTluWVhjPQ==',
+  LSSpecialValue: 'WmdqZExOZXdzYm9WM0xSeE9nYXc=',
+  GetLSSettings(key) {
+    return localStorage.getItem(key)
   },
-  SetLSSettings(NewLSSetting) {
-    return localStorage.setItem(this.LSSettings, JSON.stringify(NewLSSetting))
+  SetLSSettings(key, value) {
+    localStorage.setItem(key, value)
+  },
+  RemoveLSSettings(key) {
+    return localStorage.removeItem(key)
   },
   ReloadPage(URL) {
     return URL === null ? window.location.reload() : window.location.replace(URL)
@@ -62,7 +70,7 @@ export default {
   GetString: function (String, WantedLanguage) {
     try {
       if (WantedLanguage == null) {
-        var Language = this.GetLSSettings().preferred_language;
+        var Language = this.GetLSSettings('preferred_language');
         try {
           if (Dictionary.Strings.find(Word => Word.value === String)[Language] === undefined) {
             return Dictionary.Strings.find(Word => Word.value === String)['en']
@@ -116,14 +124,15 @@ export default {
   DoubleEmail: 'Email already exists',
   passwordsDontMatch: 'Password values do not match',
   maxCharactersAllowed: maxChars => `A maximum of ${maxChars} characters is allowed`,
-  userTableUpdateDialogError: errorStatusCode => `Failed to save user changes. HTTP Error: ${errorStatusCode}`,
   userTableNewUserDialogSuccess: (username, userType) => `New ${userType.toLowerCase()} ${username} saved successfully!`,
-  userTableNewUserDialogError: errorStatusCode => `Failed to save a new user. HTTP Error: ${errorStatusCode}`,
-  userTableDeleteDialogError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error: ${errorStatusCode}`,
   sheetNewPVError: errorStatusCode => errorStatusCode === 400 ? `Failed to save a new PV. No PV String was specified.` : `Failed to save a new PV. HTTP Error: ${errorStatusCode}`,
   sheetUpdateExpError: errorStatusCode => `Failed to save experiment changes. HTTP Error: ${errorStatusCode}`,
   sheetDeleteExpError: errorStatusCode => `Failed to delete this experiment. HTTP Error: ${errorStatusCode}`,
   sheetDeletePVError: errorStatusCode => `Failed to delete this PV. HTTP Error: ${errorStatusCode}`,
   sheetFileImportError: errorStatusCode => `Failed to import the file. HTTP Error: ${errorStatusCode}`,
   sheetFileDownloadError: errorStatusCode => `Failed to download the file. HTTP Error: ${errorStatusCode}`,
+  sheetNewUserSuccess: (username, tempPassword) => `User ${username} created successfully. Their temporary password is: ${tempPassword}`,
+  sheetUpdateUserError: errorStatusCode => `Failed to save user changes. HTTP Error: ${errorStatusCode}`,
+  sheetCreateUserError: errorStatusCode => `Failed to save a new user. HTTP Error: ${errorStatusCode}`,
+  sheetDeleteUserError: (username, errorStatusCode) => `Failed to delete user ${username}. HTTP Error: ${errorStatusCode}`,
 }

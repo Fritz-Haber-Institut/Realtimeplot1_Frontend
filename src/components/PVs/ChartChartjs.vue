@@ -7,6 +7,7 @@
       </v-card>
     </div>
     <div v-else>
+      <v-divider />
       <v-expansion-panels accordion>
         <v-expansion-panel>
           <v-expansion-panel-header class="headline font-weight-bold">
@@ -52,6 +53,15 @@
           </v-col>
         </v-row>
         <v-divider class="my-2" />
+        <v-row>
+          <v-col cols="4">
+            <PVSetValue :user="user" />
+          </v-col>
+          <v-col cols="8">
+            <EmailSubscription :pvString="$route.query.pvstring" />
+          </v-col>
+        </v-row>
+        <v-divider class="my-2" />           
         <apexchart v-if="ChartSettings.Switcher == 'ApexChart'" width="100%" type="area" :options="options" :series="series"> </apexchart>
         <div v-else id="chart">
           <AreaChart
@@ -71,9 +81,13 @@
 
 <script>
 import AreaChart from './AreaChart.vue';
+import EmailSubscription from './email-subscription.vue';
+import PVSetValue from './PVSetValue.vue';
 export default {
   components: {
     AreaChart,
+    PVSetValue,
+    EmailSubscription,
   },
   data: () => ({
     ChartSettings: {
@@ -112,7 +126,7 @@ export default {
       }
       window.location.href = '/chart?pvstring=' + this.ChartSettings.URLParamenters.PVString + IfDate;
     },
-    LoadParamenters() {
+    LoadParameters() {
       this.ChartSettings.URLParamenters = {
         PVString: this.$route.query.pvstring,
         ShortID: this.$route.query.pvstring.split(':')[0],
@@ -132,7 +146,7 @@ export default {
         until: this.ChartSettings.URLParamenters.Until,
       };
       var Subtitle = this.ChartSettings.URLParamenters.Since == null ? this.$General.GetString('last7records') : this.$Moment(String(this.ChartSettings.URLParamenters.Since)).format('DD.MM.YYYY') + ' - ' + this.$Moment(String(this.ChartSettings.URLParamenters.Until)).format('DD.MM.YYYY');
-      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
+      var AxiosConfig = { method: 'POST', url: this.$General.APIData() + this.$route.query.pvstring.split(':')[0] + '/' + this.$route.query.pvstring, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json;charset=UTF-8' }, data: Data };
       this.$Axios(AxiosConfig)
         .then((DataResult) => {
           DataResult.data.data.experiment.process_variable_urls.forEach((Element) => {
@@ -206,10 +220,10 @@ export default {
   },
   async mounted() {
     if (this.$route.query.pvstring != null) {
-      await this.LoadParamenters();
+      await this.LoadParameters();
       await this.GetData();
     } else {
-      window.location.href = '/experiments-and-pvs';
+      this.$router.push('/experiments')
     }
   },
 };

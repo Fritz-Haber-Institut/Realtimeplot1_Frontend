@@ -52,7 +52,7 @@ export default {
       this.usersFullNames = []
       this.loading = true
       Promise.all(
-        this.userUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings().Token, true))))
+        this.userUrls.map(url => this.$Axios.get(this.$General.MainDomain + url, this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))))
         .then(resArray => resArray.forEach(res => {
           this.usersFullNames.push(`${res.data.user.first_name} ${res.data.user.last_name}`)
         }))

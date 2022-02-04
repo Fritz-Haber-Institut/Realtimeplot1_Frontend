@@ -34,7 +34,7 @@ export default {
         method: 'GET',
         url: this.$General.APIFileExport(),
         headers: {
-          'x-access-tokens': this.$General.GetLSSettings().Token,
+          'x-access-tokens': this.$General.GetLSSettings('Token'),
         },
         responseType: 'blob',
       };
@@ -51,7 +51,6 @@ export default {
     },
     // UI Methods
     showSheet(type, text, doCloseDialog = true) {
-      console.log('opa');
       this.sheetAlert.type = type;
       this.sheetAlert.text = text;
       this.sheetAlert.open = true;

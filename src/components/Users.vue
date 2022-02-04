@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-dialog v-model="Users.Dialog" width="700px">
-      <Userform v-if="Users.Dialog" @clicked="onClickChild" :user="this.$props.user" :type="UserOp.Type" :target="UserOp.UserID" />
+      <Userform v-if="Users.Dialog" @clicked="onClickChild" :type="UserOp.Type" :target="UserOp.UserID" @reload-data="loadData" @close-dialog="Users.Dialog = false" />
     </v-dialog>
     <v-card>
       <v-card-actions>
@@ -21,13 +21,13 @@
       </v-card-title>
       <v-card-text>
         <v-divider />
-        <v-data-table :headers="Users.Headers" :items="Users.Items" :loading="Users.Loading" :no-results-text="$General.GetString('nodata')" :no-data-text="$General.GetString('nodata')" :loading-text="$General.GetString('loading')" :search="Users.Search">
+        <v-data-table :headers="headers" :items="Users.Items" :loading="Users.Loading" :no-results-text="$General.GetString('nodata')" :no-data-text="$General.GetString('nodata')" :loading-text="$General.GetString('loading')" :search="Users.Search">
           <template v-slot:[`item.user_type`]="{ item }">
             <v-chip class="Full100 justify-center" v-bind:color="item.user_type == 'Admin' ? 'success' : 'info'">{{ item.user_type }}</v-chip>
           </template>
           <template v-slot:[`item.settings`]="{ item }">
-            <v-btn :disabled="item.login_name == $props.user.login_name" fab color="warning" x-small @click="EditUser(item.url.split('/')[3])"><v-icon> mdi-pencil </v-icon></v-btn>
-            <v-btn :disabled="item.login_name == $props.user.login_name" fab color="error" class="ml-2" x-small @click="DeleteUser(item.url.split('/')[3])"> <v-icon> mdi-delete </v-icon></v-btn>
+            <v-btn v-if="item.login_name !== currentUser.login_name" fab color="warning" x-small @click="EditUser(item.url.split('/')[3])"><v-icon> mdi-pencil </v-icon></v-btn>
+            <v-btn v-if="item.login_name !== currentUser.login_name" fab color="error" class="ml-2" x-small @click="DeleteUser(item.url.split('/')[3])"> <v-icon> mdi-delete </v-icon></v-btn>
           </template>
         </v-data-table>
       </v-card-text>
@@ -48,35 +48,37 @@ export default {
         Color: '',
       },
     },
+    currentUser: {
+      login_name: ''
+    },
     Users: {
       Loading: true,
       Dialog: false,
       OpType: null,
-      Headers: [],
       Items: [],
     },
     UserOp: {
-      Dialog: false,
       Type: null,
       UserID: null,
     },
   }),
+  computed: {
+    headers() {
+      return [
+        { text: this.$General.GetString('loginname'), value: 'login_name' },
+        { text: this.$General.GetString('firstname'), value: 'first_name' },
+        { text: this.$General.GetString('lastname'), value: 'last_name' },
+        { text: this.$General.GetString('userrole'), value: 'user_type' },
+        { text: this.$General.GetString('email'), value: 'email' },
+        { value: 'settings', sortable: false, width: '105px' }
+      ]
+    }
+  },
   watch: {
     'Users.Dialog'(Value) {
       if (!Value) {
         this.GetUsers();
       }
-    },
-    user(Value) {
-      if (Value) {
-        this.user = Value;
-      }
-    },
-  },
-  props: {
-    user: {
-      type: Object,
-      requred: true,
     },
   },
   methods: {
@@ -85,8 +87,19 @@ export default {
       this.GeneralValues.AlertMessage.Color = Value.Color;
       this.Users.Dialog = false;
     },
+    loadData() {
+      this.getCurrentUser()
+      .then(this.GetUsers())
+      .catch(e => console.log(e))
+    },
+    getCurrentUser() {
+      return this.$Axios
+        .get(this.$General.APIUsers() + '/current', this.$General.GetHeaderValue(this.$General.GetLSSettings('Token'), true))
+        .then(({data}) => this.currentUser.login_name = data.user.login_name)
+        .catch(e => console.log(e))
+    },
     GetUsers() {
-      var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
+      var AxiosConfig = { method: 'GET', url: this.$General.APIUsers(), headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' } };
       this.$Axios(AxiosConfig)
         .then((UsersResult) => {
           this.Users.Items = UsersResult.data.users;
@@ -111,10 +124,9 @@ export default {
       const userLoginName = this.Users.Items.filter((userObj) => userObj.user_id === Value)[0].login_name;
       this.$General.ConfirmDeleteAlert('the user ' + userLoginName).then((Result) => {
         if (Result) {
-          var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings().Token, 'Content-Type': 'application/json' } };
+          var AxiosConfig = { method: 'DELETE', url: this.$General.APIUsers() + '/' + Value, headers: { 'x-access-tokens': this.$General.GetLSSettings('Token'), 'Content-Type': 'application/json' } };
           this.$Axios(AxiosConfig)
-            .then((Result) => {
-              console.log(Result);
+            .then(() => {
               this.GetUsers();
             })
             .catch((Error) => {
@@ -125,15 +137,7 @@ export default {
     },
   },
   mounted() {
-    this.GetUsers();
-    this.Users.Headers = [
-      { text: this.$General.GetString('email'), value: 'email' },
-      { text: this.$General.GetString('loginname'), value: 'login_name' },
-      { text: this.$General.GetString('userrole'), value: 'user_type' },
-      { text: this.$General.GetString('firstname'), value: 'first_name' },
-      { text: this.$General.GetString('lastname'), value: 'last_name' },
-      { value: 'settings', sortable: false, width: '105px' },
-    ];
+    this.loadData()
   },
 };
 </script>

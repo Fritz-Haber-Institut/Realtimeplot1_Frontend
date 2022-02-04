@@ -5,7 +5,7 @@ import colors from 'vuetify/lib/util/colors'
 
 Vue.use(Vuetify);
 
-var ThemeMode = (General.GetLSSettings() == null) ? false : Boolean(General.GetLSSettings().dark_theme);
+const ThemeMode = General.GetLSSettings('dark_theme') === null ? false : General.GetLSSettings('dark_theme') === 'true';
 export default new Vuetify({
     theme: {
         dark: ThemeMode,
